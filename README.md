@@ -1,99 +1,207 @@
-# Tandem
+<h1 align="center">Tandem</h1>
 
-> Multi-modal urban transit planner with external calendar synchronization, dynamic nature-focused rescheduling ("Touch Grass" prize), accessibility elevator tracking (STM Metro & CDPQ REM), carbon savings calculation, and step counting with the phone's pedometer.
+<p align="center">
+  <b>A day planner that joins your calendar with public transit in greater Montreal.</b><br>
+  It plans the trip between every pair of events, tells you when to leave, and uses spare time for a greener walk.
+</p>
+
+<p align="center">
+  <img alt="Go 1.26" src="https://img.shields.io/badge/Go-1.26-00ADD8?logo=go&logoColor=white">
+  <img alt="React Native with Expo" src="https://img.shields.io/badge/React%20Native-Expo%2058-61DAFB?logo=react&logoColor=black">
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-6.0-3178C6?logo=typescript&logoColor=white">
+  <img alt="Python 3.10+" src="https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white">
+</p>
+
+<p align="center">
+  <img src="mockups/light/10-green-routes.png" alt="Day tab with green routes on: the day's totals, then the route from home to the first event, with the walk through a park marked by a pine tree" width="280">
+  &nbsp;&nbsp;&nbsp;
+  <img src="mockups/light/07-activity.png" alt="Activity tab: today's steps and the last seven days" width="280">
+</p>
+
+<p align="center"><sub>Day, with green routes on &nbsp;·&nbsp; Activity</sub></p>
 
 ---
+
+## Contents
+
+- [What it does](#what-it-does)
+- [How it works](#how-it-works)
+- [Quick start](#quick-start)
+- [Commands](#commands)
+- [Configuration](#configuration)
+- [Project layout](#project-layout)
+- [Status and limits](#status-and-limits)
+- [Data and attribution](#data-and-attribution)
+
+## What it does
+
+Routes are planned from the calendar, not from a search box: the app already knows where you have to be and when.
+
+- **Routes between events.** Each day starts and ends at home (or a place you choose for that day). Every trip is planned to arrive before the event, so its departure time is your time to leave.
+- **Time-to-leave reminders.** Local notifications 10 minutes before and at the moment to leave (phone only).
+- **Ranked for you.** Routes are ordered by your settings (preferred and avoided modes, longest walk, step-free only) and by what you actually pick: choosing an alternative teaches a small ranking agent.
+- **Green routes.** One switch favours walks through parks, marks them with a pine tree, and on short trips in dry weather offers a walk routed through a park.
+- **Free-time suggestions.** When there is slack before you need to leave, the app suggests a café, library or park that fits.
+- **Impact at a glance.** Time travelling, steps on foot, and CO₂ saved against driving, with a plain comparison such as "≈ 49 km by car".
+- **Calendar.** Week and month views, add and edit events, import an `.ics` file, optional Google Calendar sync.
+- **Saved places.** Keep the places you go to often and pick them as an event's location or a day's start or end.
+- **Step counting.** From the phone's own pedometer, with a seven-day chart and a green-walk streak.
+- **Light and dark themes.**
 
 ## How it works
 
-1. A free transit API ([Transitous](https://transitous.org), STM + REM + exo + RTL/STL schedules) finds candidate routes between consecutive calendar events.
-2. The Go backend adds steps, CO2 saved, green-space exposure and elevator access to each candidate.
-3. Candidates are ranked by the user's settings, adjusted by a small ML agent that learns from which alternatives the user picks.
+Pathfinding is done by a transit engine. The app's own logic only chooses between the routes it returns.
 
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the reasoning and a per-feature status table (what is live vs. simulated).
-
-**Laval (STL) buses:** the public routing server the app uses by default has no STL timetable, so trips involving Laval are routed on exo buses only. Run `make routing` once (a few minutes, about 2 GB) to build a local routing engine with every agency of the region; `make dev` then uses it automatically.
-
-**Not available by default:** Google Calendar sync. Its button appears once you add OAuth client IDs to `frontend/.env`. The app starts empty: no sample events or places. Everything you add, and every route already planned, is saved to a SQLite database, `backend/data/app.db`; `make reset-data` wipes it.
-
----
-
-## 🏗️ Repository Architecture
-
-This project is organized as a layered monorepo:
+| Step | Who | What |
+|------|-----|------|
+| 1. Candidates | Transit engine ([MOTIS](https://github.com/motis-project/motis), public [Transitous](https://transitous.org) server or a local build) | Real itineraries on real timetables for "arrive at B by 11:50" |
+| 2. Enrichment | Go backend | Steps, CO₂ against a car, share of the walk in green space, step-free access, slack before leaving |
+| 3. Ranking | Go backend + Python agent | `score = weights · features`; weights come from your settings plus what the agent learned from your past choices |
+| 4. Feedback | App → backend → agent | Picking an alternative pins it for that trip and becomes a training example |
 
 ```
-├── backend/                     # Go 1.22+ Clean Architecture REST API
-│   ├── cmd/api/main.go          # Server entrypoint (:8080)
-│   ├── internal/domain/         # Pure business entities (Event, Route, IntermodalNode)
-│   ├── internal/service/        # Application services (Routing, Calendar, Places, Health)
-│   ├── internal/adapter/        # External integrations (transit API, ICS, Google Calendar, parks, weather)
-│   └── internal/transport/http/ # REST HTTP Handlers
-│
-├── frontend/                    # React Native (Expo) Mobile App
-│   ├── src/components/          # CommuteCard, RouteMap, calendar grids, dialogs
-│   ├── src/screens/             # DayView, Calendar, SavedPlaces, Health, Settings
-│   ├── src/store/AppContext.tsx # Global application state
-│   └── src/theme/               # Material 3 Design (Paper)
-│
-├── ml-agent/                    # Route-ranking agent (FastAPI + Python, optional at runtime)
-│   ├── agent/ranker.py          # Pairwise logistic ranker: learns per-user weights from choices
-│   └── server.py                # /rank, /feedback (:8000)
-│
-├── scripts/                     # Refresh bundled data: parks, third places, step-free stations (make data)
-│
-├── docs/                        # Architecture guides, API specifications, UI concepts
-├── docker-compose.yml           # Monorepo containerization
-└── Makefile                     # Developer commands
+ React Native app (Expo)
+        │ REST/JSON
+        ▼
+ Go backend ──────────────► MOTIS / Transitous   (pathfinding, geocoding)
+   │  enrich + rank    └──► Open-Meteo           (weather)
+   │  POST /rank, /feedback
+   ▼
+ Python ML agent            (optional: the backend falls back to settings-only ranking)
 ```
 
----
+More detail: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) (design reasoning and a per-feature status table) and [docs/API_SPEC.md](docs/API_SPEC.md) (REST endpoints).
 
-## 🚀 Quick Start
+## Quick start
 
-### 1. Prerequisites
-- **Go** (1.22+)
-- **Node.js** (v18+) & **npm**
-- **Python** (3.10+)
+**You need:** Go 1.26+, Node.js 18+ with npm, Python 3.10+.
 
-### 2. Running with Docker Compose
 ```bash
-docker compose up --build
+git clone git@github.com:nim-sam/tandem.git
+cd tandem
+make setup      # install backend, frontend and ML agent dependencies
+make dev-web    # start everything and open the app in the browser
 ```
-- Go Backend: `http://localhost:8080`
-- ML Agent: `http://localhost:8000`
 
-### 3. Running Locally
+`make dev` does the same without opening a browser (press `w` for web or `a` for Android in the Expo prompt), and `make dev-android` opens the app in an Android emulator. Quitting Expo stops the backend and the agent.
 
-#### Backend (Go)
+The app starts empty. Set a home address in Settings, add a few events with addresses, and the Day tab plans the routes.
+
+<details>
+<summary><b>Laval and exo coverage: build the local routing engine</b></summary>
+
+<br>
+
+The public Transitous server has no timetable for the STL (Laval), so trips to, from or across Laval come back as long detours. To route on every agency of the region (STM, STL, RTL, REM, exo buses and commuter trains):
+
 ```bash
-cd backend
-# Transitous requires a contact in the User-Agent (e-mail or URL)
-export TRANSIT_USER_AGENT="your-app-name/0.1 (contact: you@example.com)"
-TZ=America/Toronto go run ./cmd/api
-# Runs on http://localhost:8080; GET /health shows provider + ML agent status
-# TRANSIT_PROVIDER=mock runs fully offline with hardcoded demo routes
+make routing    # a few minutes, about 2 GB in ./routing
 ```
 
-#### ML Agent (Python)
-```bash
-cd ml-agent
-python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
-.venv/bin/python server.py
-# Runs on http://localhost:8000
-```
+`make dev` then uses the local engine automatically. Rebuild every few weeks: agencies publish new timetables each season, and an expired timetable returns no trips. The local engine has no live delays.
 
-#### Frontend (React Native / Expo)
+</details>
+
+<details>
+<summary><b>Running on a real phone</b></summary>
+
+<br>
+
+On a phone, `localhost` is the phone itself. Point the app at your computer instead:
+
 ```bash
 cd frontend
-npm install
-cp .env.example .env   # on a real phone, set EXPO_PUBLIC_API_URL to your laptop's LAN IP
-npx expo start
+cp .env.example .env
+# set EXPO_PUBLIC_API_URL=http://<your computer's LAN IP>:8080/api
 ```
 
-### 4. Tests
+Then run `make dev` and scan the QR code with Expo Go.
+
+</details>
+
+<details>
+<summary><b>Running the services one by one, or with Docker</b></summary>
+
+<br>
+
 ```bash
-make test   # Go tests, ML agent tests, frontend typecheck
+make dev-backend    # Go API on :8080 (GET /health shows provider and agent status)
+make dev-ml         # ranking agent on :8000
+make dev-frontend   # Expo
 ```
 
-Transit data: [Transitous sources](https://transitous.org/sources/). Map and park data © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors.
+```bash
+docker compose up --build   # backend on :8080 and agent on :8000
+```
+
+</details>
+
+## Commands
+
+| Command | What it does |
+|---|---|
+| `make setup` | Install dependencies for the backend, frontend and ML agent |
+| `make dev` | Run the whole stack; Expo in the foreground |
+| `make dev-web` | Same, opening the app in the browser |
+| `make dev-android` | Same, opening the app in an Android emulator |
+| `make routing` | Build the local routing engine with every Montreal-area agency |
+| `make test` | Go tests, ML agent tests and the frontend typecheck |
+| `make logs` | Follow the backend and ML agent logs |
+| `make stop` | Stop background servers left over from `make dev` |
+| `make data` | Refresh bundled data: parks, third places, step-free stations |
+| `make reset-data` | Delete saved events, places, settings and planned routes |
+
+## Configuration
+
+All settings are optional environment variables.
+
+| Variable | Used by | Default | Purpose |
+|---|---|---|---|
+| `EXPO_PUBLIC_API_URL` | app (`frontend/.env`) | `http://localhost:8080/api` | Where the app finds the backend |
+| `EXPO_PUBLIC_GOOGLE_CLIENT_ID` | app (`frontend/.env`) | unset | Google OAuth client ID; shows the Google Calendar sync button |
+| `TRANSIT_PROVIDER` | backend | `transitous` | `mock` runs offline with hardcoded demo routes |
+| `TRANSIT_API_URL` | backend | `https://api.transitous.org` | MOTIS server to route with; `make dev` sets it to the local engine when built |
+| `TRANSIT_USER_AGENT` | backend | `tandem/0.1 (hackathon prototype)` | Sent to the transit API; Transitous asks for an app name and a contact |
+| `ML_AGENT_URL` | backend | `http://localhost:8000` | Ranking agent |
+| `DATA_PATH` | backend | `data/app.db` | SQLite database file |
+| `PORT` | backend | `8080` | Backend port |
+
+## Project layout
+
+```
+├── backend/                     # Go REST API (:8080)
+│   ├── cmd/api/                 # entry point
+│   ├── internal/domain/         # entities: events, routes, preferences, ranking weights
+│   ├── internal/service/        # routing, calendar, places, health, ranking
+│   ├── internal/adapter/        # transit engine, .ics and Google Calendar, parks, weather, SQLite
+│   └── internal/transport/http/ # handlers
+├── frontend/                    # React Native app (Expo): Android, iOS, web
+│   └── src/
+│       ├── screens/             # Day, Calendar, Places, Activity, Settings
+│       ├── components/          # CommuteCard, RouteMap, calendar grids, dialogs
+│       ├── store/               # app state
+│       └── theme/               # colours and type
+├── ml-agent/                    # route-ranking agent (FastAPI, :8000)
+├── scripts/                     # routing engine setup and bundled-data refresh
+├── docs/                        # architecture, API, UI concept
+├── mockups/                     # screenshots, light and dark
+└── Makefile
+```
+
+## Status and limits
+
+Tandem is a hackathon prototype for a single user.
+
+- **No accounts.** One hardcoded user; everything is stored in `backend/data/app.db`.
+- **Google Calendar sync** is hidden until OAuth client IDs are set, and has only been tested against a fake server.
+- **Step counts** are exact on iOS; Android counts only while the app is open; a browser has no step sensor.
+- **Time-to-leave notifications** are not available in a browser.
+- **CO₂ figures** are estimates from per-mode averages, and the comparisons (car distance, gasoline, trees) are rough.
+- **Step-free access** comes from a static station list, not live elevator outages.
+- **Live delays** appear only with the public Transitous server and are cached for 15 minutes.
+
+## Data and attribution
+
+- Transit timetables: [Transitous sources](https://transitous.org/sources/) and the agencies' open data (STM, STL, RTL, REM, exo).
+- Maps, parks and places: © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors.
+- Weather: [Open-Meteo](https://open-meteo.com).
