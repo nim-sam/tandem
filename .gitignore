@@ -41,3 +41,6 @@ ml-agent/.venv/
 ml-agent/data/
 .logs/
 backend/data/
+
+# Local routing engine: MOTIS binary, street map, timetables (make routing)
+routing/

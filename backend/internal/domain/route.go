@@ -43,23 +43,27 @@ type IntermodalNode struct {
 	StopCode   string `json:"stop_code,omitempty"`
 	ToStopCode string `json:"to_stop_code,omitempty"`
 	// IntermediateStops are the stops passed between boarding and alighting.
-	IntermediateStops  []StopVisit `json:"intermediate_stops,omitempty"`
-	VehicleAccessible  bool        `json:"vehicle_accessible"`           // transit legs: vehicle/trip is wheelchair accessible
-	Polyline           string      `json:"polyline,omitempty"`           // encoded polyline of the leg, for drawing on a map
-	PolylinePrecision  int         `json:"polyline_precision,omitempty"` // 5 or 6
-	GreenSpaces        []string    `json:"green_spaces,omitempty"`       // parks a walking leg passes through
-	RealTime           bool        `json:"real_time"`                    // times include live vehicle data
-	DelayMinutes       int         `json:"delay_minutes"`                // departure delay vs. schedule (when RealTime)
-	TransitLine        string      `json:"transit_line,omitempty"`       // e.g. "Orange Line (STM)", "REM A (CDPQ)", "Bus 80"
-	Instruction        string      `json:"instruction"`                  // e.g. "Transfer from Metro to REM at Gare Centrale"
-	DepartureTime      time.Time   `json:"departure_time"`
-	ArrivalTime        time.Time   `json:"arrival_time"`
-	DurationMinutes    int         `json:"duration_minutes"`
-	DistanceMeters     int         `json:"distance_meters"`
-	StepCount          int         `json:"step_count"`         // Step count if walking
-	ElevatorAvailable  bool        `json:"elevator_available"` // True if accessibility elevators are operating
-	AccessibilityNotes string      `json:"accessibility_notes,omitempty"`
-	NatureScore        float64     `json:"nature_score"` // 0.0 to 1.0 (closeness to parks/green space)
+	IntermediateStops []StopVisit `json:"intermediate_stops,omitempty"`
+	VehicleAccessible bool        `json:"vehicle_accessible"`           // transit legs: vehicle/trip is wheelchair accessible
+	Polyline          string      `json:"polyline,omitempty"`           // encoded polyline of the leg, for drawing on a map
+	PolylinePrecision int         `json:"polyline_precision,omitempty"` // 5 or 6
+	GreenSpaces       []string    `json:"green_spaces,omitempty"`       // parks a walking leg passes through
+	RealTime          bool        `json:"real_time"`                    // times include live vehicle data
+	DelayMinutes      int         `json:"delay_minutes"`                // departure delay vs. schedule (when RealTime)
+	// LineCode is what is printed on the vehicle and the signs ("144", "2",
+	// "A1"); LineName is the rest ("Des Pins", "Orange", "Brossard").
+	LineCode           string    `json:"line_code,omitempty"`
+	LineName           string    `json:"line_name,omitempty"`
+	TransitLine        string    `json:"transit_line,omitempty"` // e.g. "Orange Line (STM)", "REM A (CDPQ)", "Bus 80"
+	Instruction        string    `json:"instruction"`            // e.g. "Transfer from Metro to REM at Gare Centrale"
+	DepartureTime      time.Time `json:"departure_time"`
+	ArrivalTime        time.Time `json:"arrival_time"`
+	DurationMinutes    int       `json:"duration_minutes"`
+	DistanceMeters     int       `json:"distance_meters"`
+	StepCount          int       `json:"step_count"`         // Step count if walking
+	ElevatorAvailable  bool      `json:"elevator_available"` // True if accessibility elevators are operating
+	AccessibilityNotes string    `json:"accessibility_notes,omitempty"`
+	NatureScore        float64   `json:"nature_score"` // 0.0 to 1.0 (closeness to parks/green space)
 }
 
 // Route represents a planned trip between two event locations.

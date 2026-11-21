@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button, Icon, Text, TouchableRipple } from 'react-native-paper';
-import { IntermodalNode, Route } from '../types';
-import { lineColor, useAppTheme, useTokens } from '../theme';
+import { DAY_END, DAY_START, IntermodalNode, Route } from '../types';
+import { inkOn, lineColor, useAppTheme, useTokens } from '../theme';
 import { formatCO2, formatDuration, formatTime } from '../utils/format';
 import { easeLayout } from '../utils/motion';
 import { RouteMap } from './RouteMap';
@@ -13,6 +13,32 @@ export const lineSummary = (route: Route): string => {
   if (route.is_park_walk) return `Walk via ${route.nodes[0]?.to_stop_name ?? 'the park'}`;
   const lines = route.nodes.filter((n) => n.mode !== 'walk').map((n) => n.transit_line);
   return lines.length ? lines.join(' → ') : 'Walk';
+};
+
+// The line's number or letter as it is printed on the vehicle and the signs
+// (bus 144, metro 2, REM A1, train 12), on the colour its agency gives it.
+export const LinePill: React.FC<{ node: IntermodalNode }> = ({ node }) => {
+  const theme = useAppTheme();
+  if (!node.line_code) return null;
+  const fill = lineColor(node.mode, node.route_color, theme.dark);
+  return (
+    <View style={[styles.linePill, { backgroundColor: fill }]}>
+      <Text variant="labelLarge" numberOfLines={1} style={[styles.tabular, styles.lineCode, { color: inkOn(fill) }]}>
+        {node.line_code}
+      </Text>
+    </View>
+  );
+};
+
+// The walking counterpart of a line pill: same size, a walker instead of a code.
+const WalkPill: React.FC = () => {
+  const theme = useAppTheme();
+  const tokens = useTokens();
+  return (
+    <View style={[styles.linePill, { backgroundColor: theme.colors.surfaceVariant }]}>
+      <Icon source="walk" size={16} color={tokens.muted} />
+    </View>
+  );
 };
 
 // A walk between two consecutive lines (changing platforms, crossing to the
@@ -27,7 +53,13 @@ const visibleLegs = (nodes: IntermodalNode[]): IntermodalNode[] =>
 
 // A stretch of the line: dotted for walking, solid in the line's colour for a
 // vehicle. Tapping a vehicle stretch lists the stops it passes, in order.
-const Segment: React.FC<{ node: IntermodalNode }> = ({ node }) => {
+// `header` and `footer` are drawn in the same row, above and below the
+// segment's own line of text, alongside the same stretch of line.
+const Segment: React.FC<{ node: IntermodalNode; header?: React.ReactNode; footer?: React.ReactNode }> = ({
+  node,
+  header,
+  footer,
+}) => {
   const theme = useAppTheme();
   const tokens = useTokens();
   const [open, setOpen] = useState(false);
@@ -42,11 +74,17 @@ const Segment: React.FC<{ node: IntermodalNode }> = ({ node }) => {
       : 'Walk'
     : node.transit_line;
 
+  // With a pill, the text beside it is only the line's name ("Des Pins").
+  const text = !walking && node.line_code ? node.line_name ?? '' : label;
+
   const summary = (
     <View style={styles.segment}>
-      <Text variant="bodyMedium" numberOfLines={1} style={{ flexShrink: 1, color: walking ? tokens.muted : theme.colors.onSurface }}>
-        {label}
-      </Text>
+      {walking ? <WalkPill /> : <LinePill node={node} />}
+      {!!text && (
+        <Text variant="bodyMedium" numberOfLines={1} style={{ flexShrink: 1, color: walking ? tokens.muted : theme.colors.onSurface }}>
+          {text}
+        </Text>
+      )}
       <Text variant="bodySmall" numberOfLines={1} style={[styles.tabular, { color: tokens.muted, flexShrink: 0 }]}>
         {node.duration_minutes} min
         {!walking && passed.length > 0 ? ` · ${passed.length + 1} stops` : ''}
@@ -80,6 +118,7 @@ const Segment: React.FC<{ node: IntermodalNode }> = ({ node }) => {
         )}
       </View>
       <View style={{ flex: 1, minWidth: 0 }}>
+        {!!header && <View style={styles.joined}>{header}</View>}
         {walking || passed.length === 0 ? (
           summary
         ) : (
@@ -111,6 +150,7 @@ const Segment: React.FC<{ node: IntermodalNode }> = ({ node }) => {
               </Text>
             </View>
           ))}
+        {!!footer && <View style={styles.joined}>{footer}</View>}
       </View>
     </View>
   );
@@ -171,6 +211,10 @@ export const CommuteCard: React.FC<Props> = ({ route, onSelect }) => {
   const alternatives = route.alternatives ?? [];
   const places = route.suggested_third_places ?? [];
   const legs = visibleLegs(route.nodes);
+  const first = legs[0];
+  const last = legs[legs.length - 1];
+  const fromStart = route.origin_event_id === DAY_START;
+  const toEnd = route.destination_event_id === DAY_END;
   const warning =
     route.source === 'mock'
       ? 'Offline demo data, not real directions'
@@ -178,41 +222,36 @@ export const CommuteCard: React.FC<Props> = ({ route, onSelect }) => {
         ? 'Does not fit between these events'
         : null;
 
-  return (
-    <View style={styles.commute}>
-      {route.slack_minutes >= 10 && places.length > 0 && (
-        <Pass>
-          <View style={styles.free}>
-            <Text variant="bodySmall" style={{ color: tokens.teal, flexShrink: 1 }} numberOfLines={1}>
-              {formatDuration(route.slack_minutes)} free · {places[0].name}
-            </Text>
-            <Text variant="bodySmall" numberOfLines={1} style={[styles.tabular, { color: tokens.teal, flexShrink: 0 }]}>
-              {places[0].detour_minutes > 1 ? `+${places[0].detour_minutes} min` : 'on your way'}
-            </Text>
-          </View>
-        </Pass>
-      )}
+  // When the trip leaves the day's start (or reaches its end) on foot, the
+  // times line (or the details) is drawn inside that walk's own row, so the
+  // dotted line is one unbroken segment between the marker and the first stop.
+  const joinStart = fromStart && first?.mode === 'walk';
+  const joinEnd = toEnd && last?.mode === 'walk';
 
-      <Pass>
-        <View
-          style={styles.leave}
-          accessible
+  const timesBlock = (
+    <>
+        {/* The day's start and end markers already say when to leave home and
+            when the trip back arrives, so those times are not repeated here. */}
+        <Text
+          variant="bodyMedium"
+          style={[styles.tabular, styles.times, { color: tokens.muted }]}
           accessibilityLabel={`Leave at ${formatTime(route.departure_time)}. ${formatDuration(
             route.total_duration_minutes
           )}, arrive ${formatTime(route.arrival_time)}.`}
         >
-          <View style={[styles.leavePill, { backgroundColor: tokens.gold }]}>
-            <Text variant="titleMedium" style={{ color: tokens.onGold }}>
-              Leave
-            </Text>
-            <Text variant="headlineMedium" style={[styles.tabular, { color: tokens.onGold }]}>
-              {formatTime(route.departure_time)}
-            </Text>
-          </View>
-          <Text variant="bodyMedium" style={[styles.tabular, { color: tokens.muted, flexShrink: 1 }]}>
-            {formatDuration(route.total_duration_minutes)} · arrive {formatTime(route.arrival_time)}
-          </Text>
-        </View>
+          {!fromStart && (
+            <>
+              leave <Text variant="titleSmall" style={{ color: theme.colors.onSurface }}>{formatTime(route.departure_time)}</Text>
+              {'  ·  '}
+            </>
+          )}
+          {formatDuration(route.total_duration_minutes)}
+          {!toEnd && (
+            <>
+              {'  ·  '}arrive <Text variant="titleSmall" style={{ color: theme.colors.onSurface }}>{formatTime(route.arrival_time)}</Text>
+            </>
+          )}
+        </Text>
         {warning && (
           <View style={styles.warning}>
             <Icon source="alert-outline" size={16} color={tokens.warn} />
@@ -221,29 +260,11 @@ export const CommuteCard: React.FC<Props> = ({ route, onSelect }) => {
             </Text>
           </View>
         )}
-      </Pass>
+    </>
+  );
 
-      {legs.map((leg, i) => (
-        <React.Fragment key={leg.id || i}>
-          {i > 0 && (
-            <Stop
-              // the stop where the next stretch starts; before a final walk, where you got off
-              name={(leg.mode === 'walk' ? legs[i - 1].to_stop_name : leg.station_or_stop_name) ?? ''}
-              code={
-                leg.mode === 'bus'
-                  ? leg.stop_code
-                  : leg.mode === 'walk' && legs[i - 1].mode === 'bus'
-                    ? legs[i - 1].to_stop_code
-                    : undefined
-              }
-              time={formatTime(leg.departure_time)}
-            />
-          )}
-          <Segment node={leg} />
-        </React.Fragment>
-      ))}
-
-      <Pass>
+  const detailsBlock = (
+    <>
         <View style={styles.actions}>
           <Button
             mode="text"
@@ -317,9 +338,25 @@ export const CommuteCard: React.FC<Props> = ({ route, onSelect }) => {
                   >
                     <View>
                       <View style={styles.optionHead}>
-                        <Text variant="titleSmall" style={{ flex: 1 }} numberOfLines={2}>
-                          {lineSummary(alt)}
-                        </Text>
+                        {alt.nodes.some((n) => n.mode !== 'walk' && n.line_code) ? (
+                          <View style={styles.pills}>
+                            {alt.nodes
+                              .filter((n) => n.mode !== 'walk')
+                              .map((n, i) =>
+                                n.line_code ? (
+                                  <LinePill key={i} node={n} />
+                                ) : (
+                                  <Text key={i} variant="titleSmall">
+                                    {n.transit_line}
+                                  </Text>
+                                )
+                              )}
+                          </View>
+                        ) : (
+                          <Text variant="titleSmall" style={{ flex: 1 }} numberOfLines={2}>
+                            {lineSummary(alt)}
+                          </Text>
+                        )}
                         <Text variant="titleSmall" style={styles.tabular}>
                           {formatDuration(alt.total_duration_minutes)}
                         </Text>
@@ -335,7 +372,69 @@ export const CommuteCard: React.FC<Props> = ({ route, onSelect }) => {
             )}
           </View>
         )}
-      </Pass>
+    </>
+  );
+
+  return (
+    <View style={styles.commute}>
+      {route.slack_minutes >= 10 && places.length > 0 && (
+        <Pass>
+          <View style={styles.free}>
+            <Text variant="bodySmall" style={{ color: tokens.teal, flexShrink: 1 }} numberOfLines={1}>
+              {formatDuration(route.slack_minutes)} free · {places[0].name}
+            </Text>
+            <Text variant="bodySmall" numberOfLines={1} style={[styles.tabular, { color: tokens.teal, flexShrink: 0 }]}>
+              {places[0].detour_minutes > 1 ? `+${places[0].detour_minutes} min` : 'on your way'}
+            </Text>
+          </View>
+        </Pass>
+      )}
+
+      {!joinStart && <Pass>{timesBlock}</Pass>}
+
+      {/* A commute from an event starts at a node naming the place. From the
+          day's start there is none: its marker is that node. */}
+      {first && !fromStart && (
+        <Stop
+          name={first.station_or_stop_name || route.origin_location.name || 'Start'}
+          code={first.mode === 'bus' ? first.stop_code : undefined}
+          time={formatTime(route.departure_time)}
+        />
+      )}
+      {legs.map((leg, i) => (
+        <React.Fragment key={leg.id || i}>
+          {i > 0 && (
+            <Stop
+              // the stop where the next stretch starts; before a final walk, where you got off
+              name={(leg.mode === 'walk' ? legs[i - 1].to_stop_name : leg.station_or_stop_name) ?? ''}
+              code={
+                leg.mode === 'bus'
+                  ? leg.stop_code
+                  : leg.mode === 'walk' && legs[i - 1].mode === 'bus'
+                    ? legs[i - 1].to_stop_code
+                    : undefined
+              }
+              time={formatTime(leg.departure_time)}
+            />
+          )}
+          <Segment
+            node={leg}
+            header={i === 0 && joinStart ? timesBlock : undefined}
+            footer={i === legs.length - 1 && joinEnd ? detailsBlock : undefined}
+          />
+        </React.Fragment>
+      ))}
+      {/* ...and ends at one, unless it ends at the day's end marker: then a
+          final walk's dotted line carries on down to the marker. */}
+      {last && !toEnd && (
+        <Stop
+          name={last.to_stop_name || route.destination_location.name || 'Arrive'}
+          code={last.mode === 'bus' ? last.to_stop_code : undefined}
+          time={formatTime(route.arrival_time)}
+        />
+      )}
+
+      {!joinEnd && <Pass>{detailsBlock}</Pass>}
     </View>
   );
 };
@@ -354,8 +453,11 @@ const styles = StyleSheet.create({
   tick: { width: 6, height: 2, marginLeft: -8, marginRight: 0 },
   stop: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8, paddingLeft: 8 },
   pass: { flex: 1, paddingLeft: 8, paddingVertical: 6, minWidth: 0 },
-  leave: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  leavePill: { flexDirection: 'row', alignItems: 'baseline', gap: 8, borderRadius: 6, paddingHorizontal: 12, paddingVertical: 4 },
+  joined: { paddingLeft: 8, paddingVertical: 6 },
+  times: { minHeight: 24 },
+  linePill: { minWidth: 30, height: 22, borderRadius: 6, paddingHorizontal: 6, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
+  lineCode: { lineHeight: 22, fontWeight: '700' },
+  pills: { flex: 1, flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 6 },
   warning: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 6 },
   actions: { flexDirection: 'row', marginLeft: -12 },
   target: { minHeight: 48 },
@@ -364,6 +466,6 @@ const styles = StyleSheet.create({
   list: { gap: 4 },
   place: { flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 24 },
   option: { borderTopWidth: StyleSheet.hairlineWidth, paddingVertical: 10, minHeight: 56, justifyContent: 'center', marginTop: 8 },
-  optionHead: { flexDirection: 'row', alignItems: 'baseline', gap: 8 },
+  optionHead: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   tabular: { fontVariant: ['tabular-nums'] },
 });

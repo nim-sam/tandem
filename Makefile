@@ -1,7 +1,8 @@
 SHELL := /bin/bash
-.PHONY: help setup dev dev-web stop logs dev-backend dev-frontend dev-ml docker-up test data reset-data
+.PHONY: help setup routing dev dev-web stop logs dev-backend dev-frontend dev-ml docker-up test data reset-data
 
 LOGS := $(CURDIR)/.logs
+MOTIS_PORT ?= 8082
 # What `make dev` runs in the foreground once the servers are up.
 FRONTEND_CMD ?= npx expo start
 
@@ -11,6 +12,7 @@ help:
 	@echo "  make dev-web      - Same, opening the app in the browser"
 	@echo "  make stop         - Stop background servers left over from make dev"
 	@echo "  make logs         - Follow backend and ML agent logs"
+	@echo "  make routing      - Build the local routing engine with every Montreal-area agency, STL (Laval) included; rerun every few weeks"
 	@echo "  make setup        - Install dependencies for backend, frontend, and ML agent"
 	@echo "  make dev-backend  - Run Go backend locally"
 	@echo "  make dev-frontend - Run React Native frontend (Expo)"
@@ -19,6 +21,11 @@ help:
 	@echo "  make test         - Run backend, ML agent and frontend checks"
 	@echo "  make data         - Refresh bundled data: parks, third places (OpenStreetMap), step-free stations (STM)"
 	@echo "  make reset-data   - Delete saved events, places, settings and planned routes; the app starts empty"
+
+# Local routing engine. The public Transitous server has no STL (Laval)
+# timetable; this builds our own MOTIS with every agency of the region.
+routing:
+	./scripts/setup_routing.sh
 
 setup:
 	@echo "Setting up backend..."
@@ -39,11 +46,25 @@ dev: ml-agent/.venv frontend/node_modules
 	@cd backend && go build -o bin/api ./cmd/api
 	@cleanup() { \
 		echo; echo "Stopping backend and ML agent..."; \
-		kill $$ML_PID $$API_PID 2>/dev/null; wait $$ML_PID $$API_PID 2>/dev/null; \
+		kill $$ML_PID $$API_PID $$MOTIS_PID 2>/dev/null; wait $$ML_PID $$API_PID $$MOTIS_PID 2>/dev/null; \
 		rm -f $(LOGS)/*.pid; \
 	}; \
 	trap cleanup EXIT; trap 'exit 130' INT TERM; \
 	(cd ml-agent && exec .venv/bin/python server.py) > $(LOGS)/ml-agent.log 2>&1 & ML_PID=$$!; \
+	MOTIS_PID=""; \
+	if [ -f routing/.built ]; then \
+		(cd routing && exec ./motis server) > $(LOGS)/motis.log 2>&1 & MOTIS_PID=$$!; echo $$MOTIS_PID > $(LOGS)/motis.pid; \
+		echo "Starting the local routing engine (timetables from $$(cat routing/.built))..."; \
+		for i in $$(seq 1 120); do \
+			curl -sf -o /dev/null "localhost:$(MOTIS_PORT)/api/v1/geocode?text=montreal" && break; \
+			kill -0 $$MOTIS_PID 2>/dev/null || break; sleep 0.5; \
+		done; \
+		if curl -sf -o /dev/null "localhost:$(MOTIS_PORT)/api/v1/geocode?text=montreal"; then \
+			export TRANSIT_API_URL=http://localhost:$(MOTIS_PORT); \
+		else \
+			echo "Local routing engine did not start (see $(LOGS)/motis.log); using Transitous"; kill $$MOTIS_PID 2>/dev/null; MOTIS_PID=""; \
+		fi; \
+	fi; \
 	(cd backend && TZ=America/Toronto exec ./bin/api) > $(LOGS)/backend.log 2>&1 & API_PID=$$!; \
 	echo $$ML_PID > $(LOGS)/ml-agent.pid; echo $$API_PID > $(LOGS)/backend.pid; \
 	for i in $$(seq 1 40); do \
@@ -56,6 +77,9 @@ dev: ml-agent/.venv frontend/node_modules
 	curl -sf localhost:8000/health >/dev/null \
 		&& echo "ML agent  http://localhost:8000" \
 		|| echo "ML agent  NOT running (see $(LOGS)/ml-agent.log); routes are ranked by settings only"; \
+	[ -n "$$MOTIS_PID" ] \
+		&& echo "Routing   local MOTIS on :$(MOTIS_PORT), all Montreal-area agencies incl. STL (no live delays)" \
+		|| echo "Routing   Transitous (public server: has NO STL/Laval buses; run 'make routing' once to add them)"; \
 	echo "Logs      make logs   (in another terminal)"; echo; \
 	cd frontend && $(FRONTEND_CMD)
 

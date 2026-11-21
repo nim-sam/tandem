@@ -177,6 +177,9 @@ export const lineColor = (mode: TransitMode, routeColor: string | undefined, dar
   return color;
 };
 
+// Black or white, whichever reads better on the given fill.
+export const inkOn = (fill: string): string => (luminance(fill) > 0.3 ? '#161616' : '#F4F4F4');
+
 export const modeIcon = (mode: TransitMode): string =>
   ({ walk: 'walk', metro: 'subway-variant', rem: 'train', bus: 'bus', bike: 'bike', train: 'train-variant' })[mode] ??
   'navigation';

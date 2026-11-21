@@ -104,3 +104,18 @@ the tile URL in `RouteMap.tsx` to a hosted provider (most have a free tier and
 need a key), or switch to `react-native-maps` (Google Maps on Android, Apple
 Maps on iOS; needs a Google Maps API key and a development build, and does not
 run on web).
+
+## Coverage: why a local routing engine
+
+The public Transitous server has timetables for STM, exo, RTL and the REM but
+**not for the STL (Laval)**. Any trip to, from or through Laval is therefore
+planned on the few exo lines that cross it, which is slow and often absurd.
+
+`make routing` (`scripts/setup_routing.sh`) builds a MOTIS server of our own in
+`routing/` from the agencies' published GTFS files, STL included, plus an
+OpenStreetMap extract for walking and address search. `make dev` starts it on
+port 8082 when it has been built and points the backend at it
+(`TRANSIT_API_URL`); otherwise the backend keeps using Transitous. Trade-offs:
+about 2 GB on disk, no live delays (the agencies' real-time feeds need API
+keys), and the timetables must be rebuilt every few weeks as agencies publish
+new ones.

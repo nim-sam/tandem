@@ -1,6 +1,6 @@
 ---
 name: Sentier
-description: A day drawn as one trail on soft charcoal, with a single gold field that says when to leave.
+description: A day drawn as one trail on soft charcoal, with each transit line on a pill in its own colour.
 colors:
   gold: "#E0AE3A"
   on-gold: "#1B1B1B"
@@ -120,12 +120,11 @@ components:
     typography: "{typography.title}"
     rounded: "{rounded.block}"
     padding: "10px 14px"
-  leave-pill:
-    backgroundColor: "{colors.gold}"
-    textColor: "{colors.on-gold}"
-    typography: "{typography.headline}"
+  line-pill:
+    typography: "{typography.label}"
     rounded: "{rounded.pill}"
-    padding: "4px 12px"
+    height: "22px"
+    padding: "0 6px"
   stop-dot:
     backgroundColor: "{colors.ground}"
     rounded: "6px"
@@ -173,16 +172,16 @@ components:
 
 **Creative North Star: "Sentier, night"**
 
-The day is one trail. Events are bordered blocks; between two blocks runs a single vertical line with a small dot wherever the rider changes mode, labelled like a trail marker with the station or stop. The ground is neutral charcoal with no tint, and one flat gold field per trip says when to leave. Contrast is deliberately moderate: a mid charcoal ground, soft grey ink and slightly desaturated accents, with body text still above 4.5:1. Everything the rider does not need in the first few seconds waits behind "Details" and opens in place.
+The day is one trail. Events are bordered blocks; between two blocks runs a single vertical line with a small dot wherever the rider changes mode, labelled like a trail marker with the station or stop. The ground is neutral charcoal with no tint, and each vehicle line is named by a pill in its agency's colour. Contrast is deliberately moderate: a mid charcoal ground, soft grey ink and slightly desaturated accents, with body text still above 4.5:1. Everything the rider does not need in the first few seconds waits behind "Details" and opens in place.
 
-It is an Android-first Material 3 app (react-native-paper) and keeps Material's controls, navigation bar and touch targets. What is its own is the trail, the three-job colour scheme and the sign-style condensed face on times, headings and stop names. Dark is the designed scheme and the default; a light scheme with the same colour jobs is selectable in Settings (dark, light, or follow the phone) for direct sunlight.
+It is an Android-first Material 3 app (react-native-paper) and keeps Material's controls, navigation bar and touch targets. What is its own is the trail, the three-job colour scheme, the line pills and the sign-style condensed face on times, headings and stop names. Dark is the designed scheme and the default; a light scheme with the same colour jobs is selectable in Settings (dark, light, or follow the phone) for direct sunlight.
 
 The surface is flat. Sections are separated by hairlines and space, not by filled cards. Motion happens only when the user changes state.
 
 **Key Characteristics:**
 - Lightly bordered event blocks joined by one vertical line; a dot and a name at each change of mode.
 - The day starts and ends at a round marker (a house for home), not at a block: home is a place, not an event.
-- One gold field per commute: "Leave HH:MM".
+- Gold marks where you are and what to commit; times on the trail are plain text.
 - Teal for offers and good news, vermilion for warnings, each transit line in its agency's colour.
 - Condensed sign face for times, headings and stop names; platform face for body and controls.
 - Flat charcoal grounds, hairline rules, no authored shadows.
@@ -193,7 +192,7 @@ The surface is flat. Sections are separated by hairlines and space, not by fille
 Neutral charcoal carries the screen; three colours each have one job, and transit lines bring their own.
 
 ### Primary
-- **Trail Gold** (`gold`, #E0AE3A, ink `on-gold`): the flat field. It fills the "Leave HH:MM" pill, the pill behind the selected navigation destination, today in the calendar (the date's disc and the current-time line), and the primary action (the add-event button, a screen's one committing button). The field is the same gold in both schemes. In the light scheme, gold used as a text or control colour becomes **Deep Gold** (`gold-text-light`) because the field colour is unreadable as text on white.
+- **Trail Gold** (`gold`, #E0AE3A, ink `on-gold`): the flat field. It fills the pill behind the selected navigation destination, today in the calendar (the date's disc and the current-time line), and the primary action (the add-event button, a screen's one committing button). The field is the same gold in both schemes. In the light scheme, gold used as a text or control colour becomes **Deep Gold** (`gold-text-light`) because the field colour is unreadable as text on white.
 
 ### Secondary
 - **Patina Teal** (`teal`; `teal-light` in light): offers and positive state. The free-time line above a departure, "on time", the green-walk bars and icons, the heading of places that fit a gap. Its container (`teal-container`) is the selected state of choices: an active filter chip and the chosen segment of a segmented control.
@@ -216,7 +215,7 @@ Neutral charcoal carries the screen; three colours each have one job, and transi
 Each vehicle segment is drawn in the colour the agency publishes for that line. When none is published the mode fallback applies (`line-bus`, `line-metro`, `line-rem`, `line-train`, `line-bike`). A colour that would vanish against the ground is pulled toward the ink: in dark, colours with relative luminance under 0.12 are mixed 45% toward white; in light, colours over 0.7 are mixed 35% toward black.
 
 ### Named Rules
-**The One Gold Field Rule.** A commute has exactly one gold field, and it is the time to leave. Elsewhere gold marks only where you are (selected destination) and the one thing to commit (primary action). Gold is never a text highlight on the dark ground and never decoration.
+**The Sparing Gold Rule.** Gold marks only where you are (selected destination, today) and the one thing to commit (primary action). The trail itself carries no gold field. Gold is never a text highlight on the dark ground and never decoration.
 
 **The Three Jobs Rule.** Gold says go, teal offers, vermilion warns. A colour never borrows another's job, and a warning always carries an icon or words as well as vermilion.
 
@@ -279,8 +278,11 @@ Where the day starts and ends. Not events, so not blocks: a 44dp round marker wi
 ### The trail (signature)
 The trip between two blocks, top to bottom:
 - **Free-time line** (only with 10 minutes or more spare and a place that fits): one teal Body Small line, "31 min free · place" with "+4 min" or "on your way" at the right. One line, never a prompt.
-- **Leave field:** the gold pill, "Leave" in Title and the time in Headline, both in `on-gold`; beside it in muted Body, the duration and arrival time. A warning, if any, sits under it with an alert icon in vermilion.
-- **Segments:** dotted for walking ("Walk" or "Walk via <park>", muted), solid in the line's colour for a vehicle (line name in ink, then minutes and stop count in muted Body Small, then "on time" in teal or "N min late" in vermilion, then a stairs icon in vermilion with a spoken label when the leg is not step-free).
+- **Times line:** one muted Body line, "leave 10:58 · 52 min · arrive 11:50", with the two clock times in ink Title Small. There is no gold field. The trip from the day's start omits "leave" and the trip to the day's end omits "arrive", because the endpoint markers already carry those times. A warning, if any, sits under it with an alert icon in vermilion.
+- **Segments:** dotted for walking ("Walk" or "Walk via <park>", muted), solid in the line's colour for a vehicle (a line pill, then the line's name in ink, then minutes and stop count in muted Body Small, then "on time" in teal or "N min late" in vermilion, then a stairs icon in vermilion with a spoken label when the leg is not step-free).
+- **Line pill:** the code printed on the vehicle and signs (bus "144", metro "2", REM branch "A1", train "12") in bold tabular Label on the agency's colour for that line, 22dp tall, at least 30dp wide, 6dp corners; the code is black or white, whichever reads better on the fill. Other route options are listed as a row of these pills.
+- **Walk pill:** a walking segment starts with the same pill shape, on the high charcoal, holding a 16dp walker icon in muted ink, then "Walk" or "Walk via <park>".
+- **End node:** every commute closes with a stop dot naming where it ends and the arrival time, so a final walk has a node at both ends.
 - **Stop dots:** at every change of mode, the station or stop name in Title Small with its time at the right. Bus stops add the number printed on their sign ("stop 52369") in muted Body Small.
 - **Transfer walks** of 5 minutes or less between two vehicles are not drawn; the dot already says "change here". The first and last walks are always drawn.
 - **Passed stops:** tapping a vehicle segment (48dp target, chevron at the right) lists the stops it passes, each with a tick in the line's colour, name, stop number for buses, and time.
@@ -318,7 +320,8 @@ Section heading in Title Large; rows at least 56dp; sections end in a hairline. 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** give each commute exactly one gold field, the time to leave, with duration and arrival beside it in muted ink.
+- **Do** state each commute's times once, as plain text: leave, duration, arrive; let the day's endpoint markers carry the first leave and the last arrive.
+- **Do** show every vehicle line as a pill with its code on the agency's colour.
 - **Do** draw the trip as one continuous vertical line: dotted for walking, solid in the agency's line colour for a vehicle, a 12dp ringed dot with the stop name at each change of mode.
 - **Do** show the stop number on bus stops, and only on bus stops.
 - **Do** keep reasons, estimates, places, the map and other options behind "Details", opened in place.
@@ -329,7 +332,7 @@ Section heading in Title Large; rows at least 56dp; sections end in a hairline. 
 - **Do** ease layout changes over 200ms ease-out and respect the remove-animations setting.
 
 ### Don't:
-- **Don't** put a second gold field on a commute, or use gold for emphasis, icons or decoration.
+- **Don't** put a gold field on a commute, or use gold for emphasis, icons or decoration.
 - **Don't** stack commutes or sections as filled, rounded, elevated cards.
 - **Don't** write step-by-step instruction sentences on the trail; a segment is a line name, a duration and a stop count.
 - **Don't** draw transfer walks of 5 minutes or less between two vehicles.

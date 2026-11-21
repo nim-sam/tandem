@@ -12,6 +12,8 @@
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the reasoning and a per-feature status table (what is live vs. simulated).
 
+**Laval (STL) buses:** the public routing server the app uses by default has no STL timetable, so trips involving Laval are routed on exo buses only. Run `make routing` once (a few minutes, about 2 GB) to build a local routing engine with every agency of the region; `make dev` then uses it automatically.
+
 **Not real yet:** Fitbit/Garmin step counts (simulated and labelled; the phone pedometer is real), and Google Calendar sync until you add OAuth client IDs to `frontend/.env`. The app starts empty: no sample events or places. Everything you add, and every route already planned, is saved to a SQLite database, `backend/data/app.db`; `make reset-data` wipes it.
 
 ---

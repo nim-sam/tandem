@@ -41,6 +41,8 @@ export interface IntermodalNode {
   green_spaces?: string[];
   real_time?: boolean;
   delay_minutes?: number;
+  line_code?: string; // what is printed on the vehicle: "144", "2", "A1"
+  line_name?: string; // the rest: "Des Pins", "Orange", "Brossard"
   transit_line?: string;
   instruction: string;
   departure_time: string;

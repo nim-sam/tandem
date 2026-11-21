@@ -308,7 +308,7 @@ func (s *RoutingService) parkWalk(ctx context.Context, req transit.PlanRequest) 
 		return domain.Route{}, false
 	}
 
-	key := fmt.Sprintf("%s/park:%.4f,%.4f>%.4f,%.4f@%d/%v", s.primary.Name(), o.Latitude, o.Longitude, d.Latitude, d.Longitude, req.Time.Unix()/300, req.ArriveBy)
+	key := fmt.Sprintf("v2/%s/park:%.4f,%.4f>%.4f,%.4f@%d/%v", s.primary.Name(), o.Latitude, o.Longitude, d.Latitude, d.Longitude, req.Time.Unix()/300, req.ArriveBy)
 	routes, fetchedAt, hit := s.repo.GetRoutes(key)
 	if !hit || !isFresh(fetchedAt, req.Time) {
 		routes = nil // an empty answer is saved too: "no park route"
@@ -409,7 +409,7 @@ func (s *RoutingService) SelectRoute(ctx context.Context, routeID string) error 
 
 // candidates fetches, caches and enriches itineraries from the provider.
 func (s *RoutingService) candidates(ctx context.Context, req transit.PlanRequest) ([]domain.Route, error) {
-	key := fmt.Sprintf("%s/%.4f,%.4f>%.4f,%.4f@%d/%v/%v", s.primary.Name(),
+	key := fmt.Sprintf("v2/%s/%.4f,%.4f>%.4f,%.4f@%d/%v/%v", s.primary.Name(),
 		req.Origin.Latitude, req.Origin.Longitude, req.Dest.Latitude, req.Dest.Longitude,
 		req.Time.Unix()/300, req.ArriveBy, req.Prefs.RequireElevator)
 

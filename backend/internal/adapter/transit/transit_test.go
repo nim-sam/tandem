@@ -105,6 +105,9 @@ func TestMotisProviderMapsLegsAndDeduplicates(t *testing.T) {
 		n.IntermediateStops[0].Name != "Station Panama" || n.IntermediateStops[0].Code != "S5" || n.StopCount != 2 {
 		t.Errorf("stop codes / intermediate stops not mapped: %+v", n)
 	}
+	if n := r.Nodes[1]; n.LineCode == "" {
+		t.Errorf("line code not set: %+v", n.TransitLine)
+	}
 	if got := r.Nodes[1].Instruction; got != "2 stops to Station Du Quartier" {
 		t.Errorf("instruction = %q", got)
 	}

@@ -33,7 +33,15 @@ func NewMotisProvider(baseURL, userAgent string) *MotisProvider {
 	}
 }
 
-func (p *MotisProvider) Name() string { return "transitous" }
+// Name says which server answers: the public Transitous one, or a MOTIS of
+// our own (make routing). Saved routes are kept apart by this name, so
+// switching servers never serves the other one's itineraries.
+func (p *MotisProvider) Name() string {
+	if strings.Contains(p.baseURL, "transitous") {
+		return "transitous"
+	}
+	return "motis"
+}
 
 type motisPlace struct {
 	Name     string    `json:"name"`
@@ -225,6 +233,7 @@ func (p *MotisProvider) toRoute(it motisItinerary, req PlanRequest) domain.Route
 			}
 		} else {
 			n.TransitLine = lineName(leg)
+			n.LineCode, n.LineName = lineCode(leg)
 			n.StopCount = len(leg.IntermediateStops) + 1
 			n.StopCode, n.ToStopCode = leg.From.StopCode, leg.To.StopCode
 			for _, st := range leg.IntermediateStops {
@@ -310,6 +319,38 @@ func lineName(leg motisLeg) string {
 		name += " " + long
 	}
 	return strings.TrimSpace(label + " " + name)
+}
+
+var (
+	remBranch   = regexp.MustCompile(`^([A-Z]\d+)\s*-\s*(.+)$`) // headsign "A1 - Brossard"
+	numberedRun = regexp.MustCompile(`^(\d+)\s*-\s*(.+)$`)      // long name "12 - Saint-Jérôme"
+)
+
+// lineCode splits a line into the code shown on signs and vehicles and the
+// name that goes with it: bus "144" + "Des Pins", metro "2" + "Orange", REM
+// "A1" + "Brossard" (the branch the train is heading for, since the feed
+// names the whole line "A4-A1"), commuter train "12" + "Saint-Jérôme".
+func lineCode(leg motisLeg) (code, name string) {
+	code, name = leg.RouteShortName, leg.RouteLongName
+	switch mapMode(leg) {
+	case domain.ModeMetro:
+		if m := metroLine.FindStringSubmatch(name); m != nil {
+			name = m[1]
+		}
+	case domain.ModeREM:
+		if m := remBranch.FindStringSubmatch(leg.Headsign); m != nil {
+			return m[1], m[2]
+		}
+		return code, ""
+	case domain.ModeTrain:
+		if m := numberedRun.FindStringSubmatch(name); m != nil {
+			return m[1], m[2]
+		}
+	}
+	if code == "" { // no short name published: the long name is all there is
+		return "", name
+	}
+	return code, name
 }
 
 func mapMode(leg motisLeg) domain.TransitMode {
