@@ -1,9 +1,8 @@
-<h1 align="center">Tandem</h1>
-
 <p align="center">
-  <b>A day planner that joins your calendar with public transit in greater Montreal.</b><br>
-  It plans the trip between every pair of events, tells you when to leave, and uses spare time for a greener walk.
+  <img src="frontend/assets/favicon.png" alt="Tandem logo: a handwritten t drawn as two transit lines" width="96">
 </p>
+
+<h1 align="center">Tandem</h1>
 
 <p align="center">
   <img alt="Go 1.26" src="https://img.shields.io/badge/Go-1.26-00ADD8?logo=go&logoColor=white">
@@ -13,12 +12,10 @@
 </p>
 
 <p align="center">
-  <img src="mockups/light/10-green-routes.png" alt="Day tab with green routes on: the day's totals, then the route from home to the first event, with the walk through a park marked by a pine tree" width="280">
-  &nbsp;&nbsp;&nbsp;
-  <img src="mockups/light/07-activity.png" alt="Activity tab: today's steps and the last seven days" width="280">
+  <img src="mockups/banner-readme.png" alt="Your calendar and public transit, planned together. Tandem plans the trip between every event in your day, tells you when to leave, and finds time for a greener walk. Shown beside a spread of the app's screens." width="100%">
 </p>
 
-<p align="center"><sub>Day, with green routes on &nbsp;·&nbsp; Activity</sub></p>
+<p align="center">A day planner for greater Montreal that joins your calendar with public transit.</p>
 
 ---
 
@@ -47,6 +44,14 @@ Routes are planned from the calendar, not from a search box: the app already kno
 - **Saved places.** Keep the places you go to often and pick them as an event's location or a day's start or end.
 - **Step counting.** From the phone's own pedometer, with a seven-day chart and a green-walk streak.
 - **Light and dark themes.**
+
+<p align="center">
+  <img src="mockups/light/10-green-routes.png" alt="Day tab with green routes on: the day's totals, then the route from home to the first event, with the walk through a park marked by a pine tree" width="280">
+  &nbsp;&nbsp;&nbsp;
+  <img src="mockups/light/07-activity.png" alt="Activity tab: today's steps and the last seven days" width="280">
+</p>
+
+<p align="center"><sub>Day, with green routes on &nbsp;·&nbsp; Activity</sub></p>
 
 ## How it works
 
