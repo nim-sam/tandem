@@ -6,7 +6,7 @@ import { Screen } from '../components/Screen';
 import { Card } from '../components/Card';
 import { usePhoneSteps } from '../hooks/usePhoneSteps';
 import { useTokens } from '../theme';
-import { formatCO2, fromDateKey, todayKey } from '../utils/format';
+import { co2Equivalent, formatCO2, fromDateKey, todayKey } from '../utils/format';
 
 const PHONE_STATUS = {
   checking: 'Checking the step sensor…',
@@ -126,7 +126,10 @@ export const HealthScreen: React.FC = () => {
           <View style={{ flex: 1 }}>
             <Text variant="titleMedium">{formatCO2(week?.total_co2_saved_grams ?? 0)} CO₂ avoided this week</Text>
             <Text variant="bodyMedium" style={{ color: tokens.muted }}>
-              Compared with driving the same trips. An estimate from planned routes.
+              {co2Equivalent(week?.total_co2_saved_grams ?? 0)
+                ? `About ${co2Equivalent(week?.total_co2_saved_grams ?? 0)}. `
+                : ''}
+              Compared with driving the same trips; an estimate from planned routes.
             </Text>
           </View>
         </View>

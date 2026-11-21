@@ -63,5 +63,32 @@ export const timeOnDate = (dateKey: string, hhmm: string): string | null => {
 export const formatCO2 = (grams: number): string =>
   grams >= 1000 ? `${(grams / 1000).toFixed(1)} kg` : `${Math.round(grams)} g`;
 
+const amount = (n: number): string => (n < 10 ? n.toFixed(1).replace(/\.0$/, '') : Math.round(n).toLocaleString());
+
+// Ways to picture an amount of CO2. All are rough, rounded figures:
+//  - a car emits about 171 g per km (the figure the server compares routes against)
+//  - burning a litre of gasoline emits about 2.3 kg
+//  - a mature tree absorbs about 22 kg a year, so about 60 g a day
+const CO2_EQUIVALENTS: ((grams: number, short: boolean) => string)[] = [
+  (g, short) => (short ? `${amount(g / 171)} km by car` : `the exhaust of ${amount(g / 171)} km driven by car`),
+  (g, short) =>
+    `${short ? '' : 'burning '}${g < 2300 ? `${Math.round(g / 2.3)} mL` : `${amount(g / 2300)} L`} of gasoline`,
+  (g, short) => {
+    const days = g / 60;
+    if (days >= 365) return short ? `${amount(days / 365)} trees for a year` : `what ${amount(days / 365)} mature trees absorb in a year`;
+    if (days < 1.5) return short ? 'a tree for a day' : 'what a mature tree absorbs in a day';
+    return short ? `a tree for ${amount(days)} days` : `what a mature tree absorbs in ${amount(days)} days`;
+  },
+];
+
+// One comparison is picked at random each time the app is opened.
+const co2Pick = Math.floor(Math.random() * CO2_EQUIVALENTS.length);
+
+// "the exhaust of 12 km driven by car": the same CO2, pictured. Empty for
+// amounts too small to compare with anything.
+// `short` is the caption form: "12 km by car".
+export const co2Equivalent = (grams: number, short = false): string =>
+  grams >= 50 ? CO2_EQUIVALENTS[co2Pick](grams, short) : '';
+
 export const formatDuration = (minutes: number): string =>
   minutes >= 60 ? `${Math.floor(minutes / 60)} h ${minutes % 60} min` : `${minutes} min`;

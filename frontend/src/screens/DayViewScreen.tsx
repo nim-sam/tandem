@@ -11,7 +11,7 @@ import { Blue, NAV_CLEARANCE, Radius, Space, cardShadow, endpointIcon, useAppThe
 import { Card } from '../components/Card';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DAY_END, DAY_START, DayEndpoint, EndpointKind, Event, Route } from '../types';
-import { addDays, isNearDay, formatCO2, formatDay, formatDuration, formatTime, fromDateKey, todayKey } from '../utils/format';
+import { addDays, isNearDay, co2Equivalent, formatCO2, formatDay, formatDuration, formatTime, fromDateKey, todayKey } from '../utils/format';
 
 // An event is a white card; the line to the next event leaves from under it.
 // Tapping it opens the event's details.
@@ -199,10 +199,14 @@ export const DayViewScreen: React.FC = () => {
                 {showing.commutes.length > 0 && (
                   <View style={styles.stats}>
                     {[
-                      [formatDuration(showing.summary.total_commute_minutes), 'travelling'],
-                      [formatCO2(showing.summary.total_co2_saved_grams), 'CO₂ saved, est.'],
-                      [showing.summary.total_steps.toLocaleString(), 'steps on foot'],
-                    ].map(([value, label]) => (
+                      [formatDuration(showing.summary.total_commute_minutes), 'travelling', ''],
+                      [
+                        formatCO2(showing.summary.total_co2_saved_grams),
+                        'CO₂ saved, est.',
+                        co2Equivalent(showing.summary.total_co2_saved_grams, true),
+                      ],
+                      [showing.summary.total_steps.toLocaleString(), 'steps on foot', ''],
+                    ].map(([value, label, like]) => (
                       <View key={label} style={styles.stat}>
                         <Text variant="titleLarge" style={[styles.tabular, { color: tokens.onDeep }]} numberOfLines={1}>
                           {value}
@@ -210,6 +214,11 @@ export const DayViewScreen: React.FC = () => {
                         <Text variant="bodySmall" style={{ color: tokens.onDeepMuted }} numberOfLines={1}>
                           {label}
                         </Text>
+                        {!!like && (
+                          <Text variant="bodySmall" style={{ color: tokens.onDeep }} numberOfLines={2}>
+                            ≈ {like}
+                          </Text>
+                        )}
                       </View>
                     ))}
                   </View>

@@ -47,6 +47,9 @@ const WalkPill: React.FC<{ green?: boolean }> = ({ green }) => {
 // Only a long one, a real walk between stations, is kept.
 const TRANSFER_WALK_MAX_MIN = 5;
 
+// Modes that stop at a named station.
+const RAIL_MODES: IntermodalNode['mode'][] = ['metro', 'rem', 'train'];
+
 const visibleLegs = (nodes: IntermodalNode[]): IntermodalNode[] =>
   nodes.filter(
     (n, i) => n.mode !== 'walk' || i === 0 || i === nodes.length - 1 || n.duration_minutes > TRANSFER_WALK_MAX_MIN
@@ -415,8 +418,15 @@ export const CommuteCard: React.FC<Props> = ({ route, onSelect }) => {
         <React.Fragment key={leg.id || i}>
           {i > 0 && (
             <Stop
-              // the stop where the next stretch starts; before a final walk, where you got off
-              name={(leg.mode === 'walk' ? legs[i - 1].to_stop_name : leg.station_or_stop_name) ?? ''}
+              // the stop where the next stretch starts; before a final walk, where you got off;
+              // from rail to a bus, the station you got off at rather than the bus stop's intersection
+              name={
+                (leg.mode === 'walk' || (leg.mode === 'bus' && RAIL_MODES.includes(legs[i - 1].mode))
+                  ? legs[i - 1].to_stop_name
+                  : leg.station_or_stop_name) ||
+                leg.station_or_stop_name ||
+                ''
+              }
               code={
                 leg.mode === 'bus'
                   ? leg.stop_code

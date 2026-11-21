@@ -51,12 +51,15 @@ stl|https://stlaval.ca/datas/opendata/GTF_STL.zip
 rtl|https://www.rtl-longueuil.qc.ca/transit/latestfeed/RTL.zip
 rem|https://gtfs.gpmmom.ca/gtfs/gtfs.zip
 "
-for sector in trains citla mrclm mrclasso citsv citso citpi lrrs citcrc citvr omitsju cithsl; do
-  FEEDS+="exo${sector}|https://exo.quebec/xdata/${sector}/google_transit.zip"$'\n'
+# exo: commuter trains and the bus networks of the north and south shores.
+# Links are listed on https://exo.quebec/fr/a-propos/donnees-ouvertes
+for sector in trains citla mrclm mrclasso citsv citso citpi lrrs citcrc citvr omitsju; do
+  FEEDS+="exo${sector}|https://exo.quebec/uploads/ressources-telechargeables/a-propos/donnees-ouvertes/${sector}/google_transit.zip"$'\n'
 done
 
 echo "Downloading timetables..."
 DATASETS=""
+SKIPPED=""
 while IFS='|' read -r tag url; do
   [ -n "$tag" ] || continue
   fetch "$url" "feeds/$tag.zip" || true
@@ -64,6 +67,9 @@ while IFS='|' read -r tag url; do
   if [ -s "feeds/$tag.zip" ] && unzip -tq "feeds/$tag.zip" >/dev/null 2>&1; then
     DATASETS+="    $tag:"$'\n'"      path: feeds/$tag.zip"$'\n'
   else
+    # e.g. a moved link that now answers with a web page instead of a zip
+    rm -f "feeds/$tag.zip"
+    SKIPPED+=" $tag"
     echo "  skipping $tag: no usable file" >&2
   fi
 done <<< "$FEEDS"
@@ -91,3 +97,7 @@ echo "Building routing data (a few minutes)..."
 ./motis import
 date +%F > .built
 echo "Done. 'make dev' now routes with the local engine (port $PORT)."
+if [ -n "$SKIPPED" ]; then
+  echo "WARNING: left out, so their lines are not routed:$SKIPPED" >&2
+  echo "Check the links in scripts/setup_routing.sh." >&2
+fi
