@@ -1,0 +1,43 @@
+# OS & IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Go
+backend/bin/
+backend/dist/
+*.exe
+*.test
+*.out
+vendor/
+
+# Node / React Native
+node_modules/
+frontend/node_modules/
+.expo/
+frontend/.expo/
+frontend/dist/
+frontend/web-build/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Python / ML Agent
+__pycache__/
+*.py[cod]
+*$py.class
+ml-agent/venv/
+ml-agent/.venv/
+.pytest_cache/
+*.egg-info/
+ml-agent/data/
+.logs/
+backend/data/
