@@ -1,13 +1,19 @@
 import { MD3LightTheme, MD3DarkTheme, MD3Theme, configureFonts, useTheme } from 'react-native-paper';
 import { TransitMode } from '../types';
 
-// "Sentier": the day is one trail on a neutral charcoal ground.
-// Colour jobs:
-//   gold      one flat field: when to leave, the selected tab, today, the primary action
-//   teal      offers and good news (free time, green walks, on time)
-//   vermilion warnings only (stairs, late, does not fit)
-//   line colours   each transit line's own colour, on the trail blazes
-// Dark is the designed scheme; light keeps the same roles for bright sunlight.
+// "Sentier": the day is one trail on a neutral ground.
+// The scheme is minimal: neutral greys carry the screen and one hue, blue,
+// does every accent job in two shades.
+//   blue (primary)        where you are and what to commit: the selected tab,
+//                         today, the add button, a dialog's one committing button
+//   pale blue (secondary) offers and good news (free time, on time, found on
+//                         the map); its container is the selected state of chips
+//   vermilion (error)     warnings only (stairs, late, does not fit); the one
+//                         colour outside the blues, because a warning must not
+//                         look like an accent
+//   line colours          each transit line's own colour, on pills and the trail
+// These are Material 3 colour roles, so every react-native-paper component
+// picks them up without per-component styling.
 
 const DISPLAY = 'BarlowSemiCondensed_700Bold';
 const TITLE = 'BarlowSemiCondensed_600SemiBold';
@@ -27,23 +33,22 @@ const fonts = configureFonts({
   },
 });
 
-// Contrast is deliberately moderate: ink is a soft grey rather than near-white,
-// the ground a mid charcoal rather than near-black, and the accents are
-// slightly desaturated. Body text still clears WCAG AA (4.5:1) in both schemes.
+// Contrast is deliberately moderate: soft grey ink on mid charcoal, and blues
+// that are clear without being loud. Body text clears WCAG AA (4.5:1) in both schemes.
 export const DarkTheme: MD3Theme = {
   ...MD3DarkTheme,
   fonts,
   roundness: 2,
   colors: {
     ...MD3DarkTheme.colors,
-    primary: '#E0AE3A',
-    onPrimary: '#1B1B1B',
-    primaryContainer: '#3D3214',
-    onPrimaryContainer: '#EBD597',
-    secondary: '#6FB8B0',
-    onSecondary: '#12302D',
-    secondaryContainer: '#203B39',
-    onSecondaryContainer: '#B5DCD8',
+    primary: '#8FB8F2',
+    onPrimary: '#0F2542',
+    primaryContainer: '#22395A',
+    onPrimaryContainer: '#D4E3F9',
+    secondary: '#A9C4E6',
+    onSecondary: '#17293F',
+    secondaryContainer: '#25364D',
+    onSecondaryContainer: '#CEDDF2',
     tertiary: '#DE9584',
     onTertiary: '#3B1810',
     tertiaryContainer: '#4E2A23',
@@ -62,7 +67,7 @@ export const DarkTheme: MD3Theme = {
     outlineVariant: '#343434',
     inverseSurface: '#D2D2D2',
     inverseOnSurface: '#222222',
-    inversePrimary: '#7A5B14',
+    inversePrimary: '#2D62B5',
     surfaceDisabled: 'rgba(210,210,210,0.12)',
     onSurfaceDisabled: 'rgba(210,210,210,0.38)',
     backdrop: 'rgba(0,0,0,0.5)',
@@ -83,16 +88,14 @@ export const LightTheme: MD3Theme = {
   roundness: 2,
   colors: {
     ...MD3LightTheme.colors,
-    // Gold is too light to read as text on a light ground, so text-coloured
-    // uses of "primary" get a deep gold; the flat gold field comes from useTokens().
-    primary: '#7A5B14',
-    onPrimary: '#F8F8F8',
-    primaryContainer: '#F3E2AE',
-    onPrimaryContainer: '#3A2C08',
-    secondary: '#2A7770',
-    onSecondary: '#F8F8F8',
-    secondaryContainer: '#D3E8E5',
-    onSecondaryContainer: '#16403C',
+    primary: '#2D62B5',
+    onPrimary: '#FFFFFF',
+    primaryContainer: '#D5E3F8',
+    onPrimaryContainer: '#12305C',
+    secondary: '#3A669C',
+    onSecondary: '#FFFFFF',
+    secondaryContainer: '#DAE6F5',
+    onSecondaryContainer: '#1B3558',
     tertiary: '#A9503B',
     onTertiary: '#F8F8F8',
     tertiaryContainer: '#F3DAD3',
@@ -111,7 +114,7 @@ export const LightTheme: MD3Theme = {
     outlineVariant: '#D9D9D9',
     inverseSurface: '#2C2C2C',
     inverseOnSurface: '#E8E8E8',
-    inversePrimary: '#E0AE3A',
+    inversePrimary: '#8FB8F2',
     elevation: {
       level0: 'transparent',
       level1: '#F8F8F8',
@@ -125,13 +128,13 @@ export const LightTheme: MD3Theme = {
 
 export const useAppTheme = () => useTheme<MD3Theme>();
 
-// Colours with a fixed job that Material's roles do not name.
+// Colours by job, for the places Material's role names do not say enough.
 export const useTokens = () => {
   const theme = useAppTheme();
   return {
-    gold: '#E0AE3A', // the flat field, same in both schemes
-    onGold: '#1B1B1B',
-    teal: theme.colors.secondary,
+    accent: theme.colors.primary, // the flat blue field: selected tab, today, primary action
+    onAccent: theme.colors.onPrimary,
+    offer: theme.colors.secondary, // offers and good news, as text and icons
     warn: theme.colors.error,
     rail: theme.dark ? '#3E3E3E' : '#CFCFCF', // the trail line
     post: theme.colors.onSurface, // event markers
@@ -140,6 +143,12 @@ export const useTokens = () => {
     muted: theme.colors.onSurfaceVariant,
   };
 };
+
+// The navigation bar floats over the content. Anything pinned to the bottom of
+// a screen (the add button, snackbars, the last row of a list) keeps this much
+// clear, plus the system's bottom inset.
+export const NAV_BAR = { height: 64, margin: 12 };
+export const NAV_CLEARANCE = NAV_BAR.height + NAV_BAR.margin * 2;
 
 // Fallback colours per mode, used when the agency does not publish a line colour.
 export const TransitModeColors: Record<TransitMode, string> = {

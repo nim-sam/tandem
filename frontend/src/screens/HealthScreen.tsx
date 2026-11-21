@@ -61,7 +61,7 @@ export const HealthScreen: React.FC = () => {
             style={{
               width: `${Math.min(100, Math.round((steps / goal) * 100))}%`,
               height: '100%',
-              backgroundColor: tokens.gold,
+              backgroundColor: tokens.accent,
             }}
           />
         </View>
@@ -107,7 +107,7 @@ export const HealthScreen: React.FC = () => {
                   styles.bar,
                   {
                     height: Math.max(3, Math.round((bar.value / max) * 112)),
-                    backgroundColor: bar.grass ? tokens.teal : theme.colors.outline,
+                    backgroundColor: bar.grass ? tokens.offer : theme.colors.outline,
                   },
                 ]}
               />
@@ -128,7 +128,7 @@ export const HealthScreen: React.FC = () => {
 
       <View style={[styles.section, styles.ruled, { borderTopColor: tokens.hairline }]}>
         <View style={styles.statRow}>
-          <Icon source="pine-tree" size={24} color={tokens.teal} />
+          <Icon source="pine-tree" size={24} color={tokens.offer} />
           <View style={{ flex: 1 }}>
             <Text variant="titleMedium">
               {streak > 0 ? `${streak} day${streak === 1 ? '' : 's'} in a row with a green walk` : 'No green-walk streak yet'}
@@ -139,7 +139,7 @@ export const HealthScreen: React.FC = () => {
           </View>
         </View>
         <View style={styles.statRow}>
-          <Icon source="leaf" size={24} color={tokens.teal} />
+          <Icon source="leaf" size={24} color={tokens.offer} />
           <View style={{ flex: 1 }}>
             <Text variant="titleMedium">{formatCO2(week?.total_co2_saved_grams ?? 0)} CO₂ avoided this week</Text>
             <Text variant="bodyMedium" style={{ color: tokens.muted }}>

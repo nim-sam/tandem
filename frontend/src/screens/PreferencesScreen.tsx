@@ -5,7 +5,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useApp } from '../store/AppContext';
 import { API } from '../api/client';
 import { Screen } from '../components/Screen';
-import { useAppTheme, useTokens } from '../theme';
+import { NAV_CLEARANCE, useAppTheme, useTokens } from '../theme';
 import { AddressInput } from '../components/AddressInput';
 import { Appearance, LearnedWeights, Location, TransitMode, UserPreferences } from '../types';
 
@@ -223,8 +223,8 @@ export const PreferencesScreen: React.FC = () => {
           </HelperText>
           <Button
             mode="contained"
-            buttonColor={tokens.gold}
-            textColor={tokens.onGold}
+            buttonColor={tokens.accent}
+            textColor={tokens.onAccent}
             onPress={saveHome}
             loading={busy}
             disabled={busy || !home.trim()}
@@ -272,7 +272,7 @@ export const PreferencesScreen: React.FC = () => {
                     <View
                       style={{
                         width: `${Math.round((Math.abs(value) / strongest) * 100)}%`,
-                        backgroundColor: tokens.teal,
+                        backgroundColor: tokens.offer,
                         height: '100%',
                         borderRadius: 4,
                       }}
@@ -327,7 +327,7 @@ export const PreferencesScreen: React.FC = () => {
           . Weather from Open-Meteo.
         </Text>
       </Screen>
-      <Snackbar visible={!!notice} onDismiss={() => setNotice('')} duration={4000}>
+      <Snackbar visible={!!notice} onDismiss={() => setNotice('')} duration={4000} wrapperStyle={{ bottom: NAV_CLEARANCE }}>
         {notice}
       </Snackbar>
     </View>

@@ -292,8 +292,8 @@ export const EventDialog: React.FC<Props> = ({ visible, date, event, initialStar
               <Button onPress={onDismiss}>Cancel</Button>
               <Button
                 mode="contained"
-                buttonColor={tokens.gold}
-                textColor={tokens.onGold}
+                buttonColor={tokens.accent}
+                textColor={tokens.onAccent}
                 onPress={save}
                 loading={saving}
                 disabled={saving}

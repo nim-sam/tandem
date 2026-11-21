@@ -27,6 +27,8 @@ Signature interaction: "Details" unfolds the route in place (reason, facts, plac
 
 User-directed revision (after the first build): the user called the trail-with-time-column version cluttered and specified the block-line-dot layout above, short labels only, no transfer walks.
 
+User-directed revision (2026-11-21): the colour scheme is now minimal, with shades of blue as the only accent (blue for where you are and what to commit, a paler blue for offers and good news) on the unchanged neutral grounds; vermilion is kept for warnings. The bottom navigation bar now floats: a fully rounded bar inset from the screen edges, content scrolling behind it, the selected destination on a blue pill. The earlier gold "Leave" pill had already been removed at the user's request; leave and arrive times are plain text. Colour names and values above this paragraph are the earlier direction and are kept as history; DESIGN.md records the current system.
+
 FORM: grounded candidate 6 of 7 (park trail markers), steered by the user to dark-first with Impeccable's charcoal/gold/patina colouring. seed:b7af9b70e2242801
 
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance

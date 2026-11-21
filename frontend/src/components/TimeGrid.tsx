@@ -118,8 +118,8 @@ export const TimeGrid: React.FC<Props> = ({ days, events, commutes = [], onPress
                 <Text variant="labelSmall" style={{ color: tokens.muted }}>
                   {d.toLocaleDateString([], { weekday: 'short' })}
                 </Text>
-                <View style={[styles.dayNumber, isToday && { backgroundColor: tokens.gold }]}>
-                  <Text variant="titleSmall" style={[styles.tabular, isToday && { color: tokens.onGold }]}>
+                <View style={[styles.dayNumber, isToday && { backgroundColor: tokens.accent }]}>
+                  <Text variant="titleSmall" style={[styles.tabular, isToday && { color: tokens.onAccent }]}>
                     {d.getDate()}
                   </Text>
                 </View>
@@ -245,8 +245,8 @@ export const TimeGrid: React.FC<Props> = ({ days, events, commutes = [], onPress
             })}
 
             {day === today && nowMinutes >= firstHour * 60 && (
-              <View pointerEvents="none" style={[styles.now, { top: y(nowMinutes), backgroundColor: tokens.gold }]}>
-                <View style={[styles.nowDot, { backgroundColor: tokens.gold }]} />
+              <View pointerEvents="none" style={[styles.now, { top: y(nowMinutes), backgroundColor: tokens.accent }]}>
+                <View style={[styles.nowDot, { backgroundColor: tokens.accent }]} />
               </View>
             )}
           </View>

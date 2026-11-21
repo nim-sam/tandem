@@ -76,7 +76,7 @@ export const AddressInput: React.FC<Props> = ({ label, value, onChangeText, onPi
           searching ? (
             <TextInput.Icon icon={() => <ActivityIndicator size={16} color={tokens.muted} />} />
           ) : resolved ? (
-            <TextInput.Icon icon="map-marker-check-outline" color={tokens.teal} forceTextInputFocus={false} />
+            <TextInput.Icon icon="map-marker-check-outline" color={tokens.offer} forceTextInputFocus={false} />
           ) : undefined
         }
       />
@@ -115,7 +115,7 @@ export const AddressInput: React.FC<Props> = ({ label, value, onChangeText, onPi
       )}
 
       {resolved ? (
-        <Text variant="bodySmall" style={[styles.status, { color: tokens.teal }]}>
+        <Text variant="bodySmall" style={[styles.status, { color: tokens.offer }]}>
           Found on the map
         </Text>
       ) : noMatch ? (

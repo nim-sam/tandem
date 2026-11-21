@@ -21,7 +21,8 @@ import { EventDialog } from '../components/EventDialog';
 import { GoogleSync } from '../components/GoogleSync';
 import { GridCommute, TimeGrid } from '../components/TimeGrid';
 import { MonthGrid, monthRange } from '../components/MonthGrid';
-import { endpointIcon, useTokens } from '../theme';
+import { NAV_CLEARANCE, endpointIcon, useTokens } from '../theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DAY_END, DAY_START, Event } from '../types';
 import { addDays, isNearDay, addMonths, formatDay, fromDateKey, mondayOf, startOfMonth, todayKey } from '../utils/format';
 
@@ -34,6 +35,7 @@ const short = (key: string) => fromDateKey(key).toLocaleDateString([], { month: 
 // them between the events, as on the Day tab.
 export const CalendarScreen: React.FC = () => {
   const tokens = useTokens();
+  const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const { date, setDate, schedule, loading, refresh } = useApp();
   const [mode, setMode] = useState<Mode>('month');
@@ -215,7 +217,7 @@ export const CalendarScreen: React.FC = () => {
               <View style={[styles.pad, styles.dayBar]}>
                 {loading && !planned ? (
                   <>
-                    <ActivityIndicator size="small" color={tokens.gold} />
+                    <ActivityIndicator size="small" color={tokens.accent} />
                     <Text variant="bodyMedium" style={{ color: tokens.muted, flex: 1 }}>
                       Planning the routes for this day…
                     </Text>
@@ -252,8 +254,8 @@ export const CalendarScreen: React.FC = () => {
       <FAB
         icon="plus"
         accessibilityLabel="Add event"
-        style={[styles.fab, { backgroundColor: tokens.gold }]}
-        color={tokens.onGold}
+        style={[styles.fab, { backgroundColor: tokens.accent, bottom: NAV_CLEARANCE + insets.bottom + 4 }]}
+        color={tokens.onAccent}
         onPress={() => setDialog({ open: true, day: newEventDay, event: null })}
       />
       <EventDialog
@@ -307,7 +309,7 @@ export const CalendarScreen: React.FC = () => {
         </Dialog>
       </Portal>
 
-      <Snackbar visible={!!notice} onDismiss={() => setNotice('')} duration={4000}>
+      <Snackbar visible={!!notice} onDismiss={() => setNotice('')} duration={4000} wrapperStyle={{ bottom: NAV_CLEARANCE }}>
         {notice}
       </Snackbar>
     </View>
@@ -321,5 +323,5 @@ const styles = StyleSheet.create({
   dayBar: { flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 48 },
   dialog: { maxWidth: 520, width: '92%', alignSelf: 'center' },
   import: { gap: 10 },
-  fab: { position: 'absolute', right: 16, bottom: 16 },
+  fab: { position: 'absolute', right: 16 },
 });

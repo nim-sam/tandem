@@ -1,115 +1,409 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-20T00:00:00Z",
+  "generatedAt": "2026-11-21T00:00:00Z",
   "title": "Design System: Sentier",
   "extensions": {
     "colorMeta": {
-      "gold": { "role": "primary", "displayName": "Trail Gold", "canonical": "#E0AE3A", "tonalRamp": ["#2B1E00", "#3A2D00", "#7A5600", "#B88600", "#F7B500", "#FFCB45", "#FFE08A", "#FFF3CF"] },
-      "on-gold": { "role": "primary", "displayName": "Ink on Gold", "canonical": "#1B1B1B" },
-      "gold-container": { "role": "primary", "displayName": "Gold Container", "canonical": "#3D3214" },
-      "on-gold-container": { "role": "primary", "displayName": "On Gold Container", "canonical": "#EBD597" },
-      "gold-text-light": { "role": "primary", "displayName": "Deep Gold (light scheme text and controls)", "canonical": "#7A5B14" },
-      "gold-container-light": { "role": "primary", "displayName": "Gold Container, light", "canonical": "#F3E2AE" },
-      "teal": { "role": "secondary", "displayName": "Patina Teal", "canonical": "#6FB8B0", "tonalRamp": ["#062B28", "#163A37", "#00716A", "#2E9D94", "#5CC5BC", "#8ADAD2", "#B4EBE5", "#D2EFEC"] },
-      "teal-container": { "role": "secondary", "displayName": "Teal Container (selected state)", "canonical": "#203B39" },
-      "on-teal-container": { "role": "secondary", "displayName": "On Teal Container", "canonical": "#B5DCD8" },
-      "teal-light": { "role": "secondary", "displayName": "Patina Teal, light", "canonical": "#2A7770" },
-      "teal-container-light": { "role": "secondary", "displayName": "Teal Container, light", "canonical": "#D3E8E5" },
-      "on-teal-container-light": { "role": "secondary", "displayName": "On Teal Container, light", "canonical": "#16403C" },
-      "vermilion": { "role": "tertiary", "displayName": "Vermilion", "canonical": "#DE9584", "tonalRamp": ["#3A0E05", "#55231A", "#A8371C", "#D56A50", "#F2907A", "#F8B3A3", "#FFD3C8", "#FFEDE8"] },
-      "vermilion-container": { "role": "tertiary", "displayName": "Vermilion Container", "canonical": "#4E2A23" },
-      "on-vermilion-container": { "role": "tertiary", "displayName": "On Vermilion Container", "canonical": "#EFCFC7" },
-      "vermilion-light": { "role": "tertiary", "displayName": "Vermilion, light", "canonical": "#A9503B" },
-      "vermilion-container-light": { "role": "tertiary", "displayName": "Vermilion Container, light", "canonical": "#F3DAD3" },
-      "on-vermilion-container-light": { "role": "tertiary", "displayName": "On Vermilion Container, light", "canonical": "#4A1F15" },
-      "ground": { "role": "neutral", "displayName": "Charcoal Ground", "canonical": "#1B1B1B", "tonalRamp": ["#111111", "#1A1A1A", "#262626", "#303030", "#6B6B6B", "#B3B3B3", "#E8E8E8", "#F7F7F7"] },
-      "surface": { "role": "neutral", "displayName": "Raised Charcoal", "canonical": "#222222" },
-      "surface-high": { "role": "neutral", "displayName": "High Charcoal", "canonical": "#2C2C2C" },
-      "ink": { "role": "neutral", "displayName": "Light Ink", "canonical": "#D2D2D2" },
-      "muted": { "role": "neutral", "displayName": "Muted Ink", "canonical": "#A0A0A0" },
-      "outline": { "role": "neutral", "displayName": "Outline", "canonical": "#666666" },
-      "hairline": { "role": "neutral", "displayName": "Hairline", "canonical": "#343434" },
-      "rail": { "role": "neutral", "displayName": "Rail", "canonical": "#3E3E3E" },
-      "ground-light": { "role": "neutral", "displayName": "Ground, light", "canonical": "#EFEFEF" },
-      "surface-light": { "role": "neutral", "displayName": "Surface, light", "canonical": "#F8F8F8" },
-      "surface-high-light": { "role": "neutral", "displayName": "High Surface, light", "canonical": "#E4E4E4" },
-      "ink-light": { "role": "neutral", "displayName": "Ink, light", "canonical": "#2E2E2E" },
-      "muted-light": { "role": "neutral", "displayName": "Muted Ink, light", "canonical": "#626262" },
-      "outline-light": { "role": "neutral", "displayName": "Outline, light", "canonical": "#949494" },
-      "hairline-light": { "role": "neutral", "displayName": "Hairline, light", "canonical": "#D9D9D9" },
-      "rail-light": { "role": "neutral", "displayName": "Rail, light", "canonical": "#CFCFCF" },
-      "line-walk": { "role": "neutral", "displayName": "Walk fallback", "canonical": "#8A8A8A" },
-      "line-bus": { "role": "tertiary", "displayName": "Bus fallback line colour", "canonical": "#2E9BE0" },
-      "line-metro": { "role": "tertiary", "displayName": "Metro fallback line colour", "canonical": "#EF8122" },
-      "line-rem": { "role": "tertiary", "displayName": "REM fallback line colour", "canonical": "#8BC53F" },
-      "line-bike": { "role": "tertiary", "displayName": "Bike fallback line colour", "canonical": "#B07CE8" },
-      "line-train": { "role": "tertiary", "displayName": "Train fallback line colour", "canonical": "#C98F5A" }
+      "blue": {
+        "role": "primary",
+        "displayName": "Trail Blue",
+        "canonical": "#8FB8F2",
+        "tonalRamp": [
+          "#0F2542",
+          "#22395A",
+          "#2D62B5",
+          "#5A8BD6",
+          "#8FB8F2",
+          "#B4D0F6",
+          "#D4E3F9",
+          "#EDF3FC"
+        ]
+      },
+      "on-blue": {
+        "role": "primary",
+        "displayName": "Ink on Blue",
+        "canonical": "#0F2542"
+      },
+      "blue-container": {
+        "role": "primary",
+        "displayName": "Blue Container",
+        "canonical": "#22395A"
+      },
+      "on-blue-container": {
+        "role": "primary",
+        "displayName": "On Blue Container",
+        "canonical": "#D4E3F9"
+      },
+      "blue-light": {
+        "role": "primary",
+        "displayName": "Trail Blue, light (field and text)",
+        "canonical": "#2D62B5"
+      },
+      "on-blue-light": {
+        "role": "primary",
+        "displayName": "Ink on Blue, light",
+        "canonical": "#FFFFFF"
+      },
+      "blue-container-light": {
+        "role": "primary",
+        "displayName": "Blue Container, light",
+        "canonical": "#D5E3F8"
+      },
+      "on-blue-container-light": {
+        "role": "primary",
+        "displayName": "On Blue Container, light",
+        "canonical": "#12305C"
+      },
+      "pale-blue": {
+        "role": "secondary",
+        "displayName": "Pale Blue",
+        "canonical": "#A9C4E6",
+        "tonalRamp": [
+          "#17293F",
+          "#25364D",
+          "#3A669C",
+          "#7096C4",
+          "#A9C4E6",
+          "#CEDDF2",
+          "#DAE6F5",
+          "#F0F5FB"
+        ]
+      },
+      "pale-blue-container": {
+        "role": "secondary",
+        "displayName": "Pale Blue Container (selected state)",
+        "canonical": "#25364D"
+      },
+      "on-pale-blue-container": {
+        "role": "secondary",
+        "displayName": "On Pale Blue Container",
+        "canonical": "#CEDDF2"
+      },
+      "pale-blue-light": {
+        "role": "secondary",
+        "displayName": "Pale Blue, light",
+        "canonical": "#3A669C"
+      },
+      "pale-blue-container-light": {
+        "role": "secondary",
+        "displayName": "Pale Blue Container, light",
+        "canonical": "#DAE6F5"
+      },
+      "on-pale-blue-container-light": {
+        "role": "secondary",
+        "displayName": "On Pale Blue Container, light",
+        "canonical": "#1B3558"
+      },
+      "vermilion": {
+        "role": "tertiary",
+        "displayName": "Vermilion",
+        "canonical": "#DE9584",
+        "tonalRamp": [
+          "#3A0E05",
+          "#55231A",
+          "#A8371C",
+          "#D56A50",
+          "#F2907A",
+          "#F8B3A3",
+          "#FFD3C8",
+          "#FFEDE8"
+        ]
+      },
+      "vermilion-container": {
+        "role": "tertiary",
+        "displayName": "Vermilion Container",
+        "canonical": "#4E2A23"
+      },
+      "on-vermilion-container": {
+        "role": "tertiary",
+        "displayName": "On Vermilion Container",
+        "canonical": "#EFCFC7"
+      },
+      "vermilion-light": {
+        "role": "tertiary",
+        "displayName": "Vermilion, light",
+        "canonical": "#A9503B"
+      },
+      "vermilion-container-light": {
+        "role": "tertiary",
+        "displayName": "Vermilion Container, light",
+        "canonical": "#F3DAD3"
+      },
+      "on-vermilion-container-light": {
+        "role": "tertiary",
+        "displayName": "On Vermilion Container, light",
+        "canonical": "#4A1F15"
+      },
+      "ground": {
+        "role": "neutral",
+        "displayName": "Charcoal Ground",
+        "canonical": "#1B1B1B",
+        "tonalRamp": [
+          "#111111",
+          "#1A1A1A",
+          "#262626",
+          "#303030",
+          "#6B6B6B",
+          "#B3B3B3",
+          "#E8E8E8",
+          "#F7F7F7"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Raised Charcoal",
+        "canonical": "#222222"
+      },
+      "surface-high": {
+        "role": "neutral",
+        "displayName": "High Charcoal",
+        "canonical": "#2C2C2C"
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Light Ink",
+        "canonical": "#D2D2D2"
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted Ink",
+        "canonical": "#A0A0A0"
+      },
+      "outline": {
+        "role": "neutral",
+        "displayName": "Outline",
+        "canonical": "#666666"
+      },
+      "hairline": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "#343434"
+      },
+      "rail": {
+        "role": "neutral",
+        "displayName": "Rail",
+        "canonical": "#3E3E3E"
+      },
+      "ground-light": {
+        "role": "neutral",
+        "displayName": "Ground, light",
+        "canonical": "#EFEFEF"
+      },
+      "surface-light": {
+        "role": "neutral",
+        "displayName": "Surface, light",
+        "canonical": "#F8F8F8"
+      },
+      "surface-high-light": {
+        "role": "neutral",
+        "displayName": "High Surface, light",
+        "canonical": "#E4E4E4"
+      },
+      "surface-bar-light": {
+        "role": "neutral",
+        "displayName": "Floating bar surface, light (Material level 3)",
+        "canonical": "#EDEDED"
+      },
+      "ink-light": {
+        "role": "neutral",
+        "displayName": "Ink, light",
+        "canonical": "#2E2E2E"
+      },
+      "muted-light": {
+        "role": "neutral",
+        "displayName": "Muted Ink, light",
+        "canonical": "#626262"
+      },
+      "outline-light": {
+        "role": "neutral",
+        "displayName": "Outline, light",
+        "canonical": "#949494"
+      },
+      "hairline-light": {
+        "role": "neutral",
+        "displayName": "Hairline, light",
+        "canonical": "#D9D9D9"
+      },
+      "rail-light": {
+        "role": "neutral",
+        "displayName": "Rail, light",
+        "canonical": "#CFCFCF"
+      },
+      "line-walk": {
+        "role": "neutral",
+        "displayName": "Walk fallback",
+        "canonical": "#8A8A8A"
+      },
+      "line-bus": {
+        "role": "tertiary",
+        "displayName": "Bus fallback line colour",
+        "canonical": "#2E9BE0"
+      },
+      "line-metro": {
+        "role": "tertiary",
+        "displayName": "Metro fallback line colour",
+        "canonical": "#EF8122"
+      },
+      "line-rem": {
+        "role": "tertiary",
+        "displayName": "REM fallback line colour",
+        "canonical": "#8BC53F"
+      },
+      "line-bike": {
+        "role": "tertiary",
+        "displayName": "Bike fallback line colour",
+        "canonical": "#B07CE8"
+      },
+      "line-train": {
+        "role": "tertiary",
+        "displayName": "Train fallback line colour",
+        "canonical": "#C98F5A"
+      }
     },
     "typographyMeta": {
-      "display": { "displayName": "Display", "purpose": "One large tabular figure per screen at most; today's step count." },
-      "headline": { "displayName": "Headline", "purpose": "Screen title in the top bar and the time inside the leave pill." },
-      "title-large": { "displayName": "Title Large", "purpose": "Section headings inside a screen." },
-      "title": { "displayName": "Title", "purpose": "Event titles, the word Leave, day headings, stat lines." },
-      "title-small": { "displayName": "Title Small", "purpose": "Stop and station names with their times, event time ranges, alternative routes." },
-      "body": { "displayName": "Body", "purpose": "Places, line names, reasons, form text; platform face." },
-      "body-small": { "displayName": "Body Small", "purpose": "Durations, stop counts, passed stops, free-time line, estimates and notes." },
-      "label": { "displayName": "Label", "purpose": "Buttons, chips, small list headings." },
-      "label-small": { "displayName": "Label Small", "purpose": "Navigation labels and chart axis labels." }
+      "display": {
+        "displayName": "Display",
+        "purpose": "One large tabular figure per screen at most; today's step count."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Screen title in the top bar."
+      },
+      "title-large": {
+        "displayName": "Title Large",
+        "purpose": "Section headings inside a screen."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Event titles, the word Leave, day headings, stat lines."
+      },
+      "title-small": {
+        "displayName": "Title Small",
+        "purpose": "Stop and station names with their times, event time ranges, alternative routes."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Places, line names, reasons, form text; platform face."
+      },
+      "body-small": {
+        "displayName": "Body Small",
+        "purpose": "Durations, stop counts, passed stops, free-time line, estimates and notes."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Buttons, chips, small list headings."
+      },
+      "label-small": {
+        "displayName": "Label Small",
+        "purpose": "Navigation labels and chart axis labels."
+      }
     },
-    "shadows": [],
+    "shadows": [
+      {
+        "name": "floating-bar",
+        "value": "0 6px 14px rgba(0,0,0,0.45)",
+        "purpose": "Under the floating navigation bar only, the single authored shadow. Light scheme: 0 6px 14px rgba(0,0,0,0.16). Android elevation 6."
+      }
+    ],
     "elevation": [
-      { "name": "level1", "value": "#1A1A1A", "purpose": "Dark tonal step; light scheme #FFFFFF." },
-      { "name": "level2", "value": "#1F1F1F", "purpose": "Dark tonal step; light scheme #FAFAFA." },
-      { "name": "level3", "value": "#262626", "purpose": "Dark tonal step; light scheme #F2F2F2." },
-      { "name": "level4", "value": "#2A2A2A", "purpose": "Dark tonal step; light scheme #EEEEEE." },
-      { "name": "level5", "value": "#2E2E2E", "purpose": "Dark tonal step; light scheme #EBEBEB." },
-      { "name": "backdrop", "value": "rgba(0,0,0,0.6)", "purpose": "Scrim behind dialogs in the dark scheme." }
+      {
+        "name": "level1",
+        "value": "#222222",
+        "purpose": "Dark tonal step; light scheme #F8F8F8."
+      },
+      {
+        "name": "level2",
+        "value": "#262626",
+        "purpose": "Dark tonal step; light scheme #F4F4F4."
+      },
+      {
+        "name": "level3",
+        "value": "#2C2C2C",
+        "purpose": "Dark tonal step and the floating navigation bar's surface; light scheme #EDEDED."
+      },
+      {
+        "name": "level4",
+        "value": "#303030",
+        "purpose": "Dark tonal step; light scheme #E9E9E9."
+      },
+      {
+        "name": "level5",
+        "value": "#343434",
+        "purpose": "Dark tonal step; light scheme #E6E6E6."
+      },
+      {
+        "name": "backdrop",
+        "value": "rgba(0,0,0,0.5)",
+        "purpose": "Scrim behind dialogs in the dark scheme."
+      }
     ],
     "motion": [
-      { "name": "ease-layout", "value": "200ms ease-out, opacity on create and delete", "purpose": "Opening, closing and re-laying the trail, passed stops and details. Instant when the system remove-animations setting is on; no layout animation on web." }
+      {
+        "name": "ease-layout",
+        "value": "200ms ease-out, opacity on create and delete",
+        "purpose": "Opening, closing and re-laying the trail, passed stops and details. Instant when the system remove-animations setting is on; no layout animation on web."
+      }
     ],
     "breakpoints": [
-      { "name": "content-max", "value": "720px" }
+      {
+        "name": "content-max",
+        "value": "720px"
+      }
     ],
     "lineColour": {
       "source": "agency route colour when published, otherwise the mode fallback",
       "darkAdjust": "relative luminance below 0.12: mix 45% toward white",
       "lightAdjust": "relative luminance above 0.7: mix 35% toward black"
     },
-    "appearance": { "default": "dark", "options": ["dark", "light", "system"] }
+    "appearance": {
+      "default": "dark",
+      "options": [
+        "dark",
+        "light",
+        "system"
+      ]
+    },
+    "navigation": {
+      "kind": "floating bottom bar",
+      "height": "64px",
+      "radius": "32px",
+      "margin": "12px from the screen edges and the bottom system inset",
+      "maxWidth": "520px, centred on wide windows",
+      "surface": "Material elevation level 3 with a 1px hairline outline",
+      "labels": "below the icon at every width",
+      "selected": "56x30px primary pill with the onPrimary icon",
+      "clearance": "88px plus the bottom inset; scroll content adds 96px more, the add button sits 4px above it, snackbars are lifted by it"
+    },
+    "kit": {
+      "name": "react-native-paper",
+      "system": "Material Design 3",
+      "colour": "expressed entirely through Material colour roles"
+    }
   },
   "components": [
     {
       "name": "Event Block",
       "kind": "card",
       "refersTo": "event-block",
-      "description": "An event on the day view: 2dp ink border, no fill; the trail leaves from under it.",
+      "description": "An event on the day view: 1dp outline-colour border, no fill; the trail leaves from under it.",
       "html": "<button class=\"ds-event\"><span class=\"ds-event-head\"><span class=\"ds-event-title\">Morning Lecture: Distributed Systems</span><span class=\"ds-event-time\">09:00–10:30</span></span><span class=\"ds-event-place\">McConnell Hall, McGill</span></button>",
-      "css": ".ds-event { display: block; width: 100%; text-align: left; background: #111111; color: #E8E8E8; border: 2px solid #E8E8E8; border-radius: 8px; padding: 10px 14px; min-height: 48px; cursor: pointer; transition: background 200ms ease-out; } .ds-event:hover, .ds-event:active { background: #1A1A1A; } .ds-event:focus-visible { outline: 2px solid #F7B500; outline-offset: 2px; } .ds-event-head { display: flex; align-items: baseline; gap: 10px; } .ds-event-title { flex: 1; font: 600 18px/24px 'Barlow Semi Condensed', 'Arial Narrow', sans-serif; } .ds-event-time { font: 600 16px/22px 'Barlow Semi Condensed', 'Arial Narrow', sans-serif; font-variant-numeric: tabular-nums; } .ds-event-place { display: block; font: 400 14px/20px Roboto, system-ui, sans-serif; letter-spacing: 0.25px; color: #B3B3B3; }"
-    },
-    {
-      "name": "Leave Field",
-      "kind": "custom",
-      "refersTo": "leave-pill",
-      "description": "The one gold field per commute: when to leave, with duration and arrival beside it.",
-      "html": "<div class=\"ds-leave\"><span class=\"ds-leave-pill\"><span class=\"ds-leave-word\">Leave</span><span class=\"ds-leave-time\">11:01</span></span><span class=\"ds-leave-meta\">36 min · arrive 11:37</span></div>",
-      "css": ".ds-leave { display: flex; align-items: center; gap: 10px; background: #111111; padding: 6px 8px; } .ds-leave-pill { display: inline-flex; align-items: baseline; gap: 8px; background: #F7B500; color: #111111; border-radius: 6px; padding: 4px 12px; } .ds-leave-word { font: 600 18px/24px 'Barlow Semi Condensed', 'Arial Narrow', sans-serif; } .ds-leave-time { font: 700 28px/36px 'Barlow Semi Condensed', 'Arial Narrow', sans-serif; font-variant-numeric: tabular-nums; } .ds-leave-meta { font: 400 14px/20px Roboto, system-ui, sans-serif; letter-spacing: 0.25px; color: #B3B3B3; font-variant-numeric: tabular-nums; }"
+      "css": ".ds-event { display: block; width: 100%; text-align: left; background: #1B1B1B; color: #D2D2D2; border: 1px solid #666666; border-radius: 8px; padding: 10px 14px; min-height: 48px; cursor: pointer; transition: background 200ms ease-out; } .ds-event:hover, .ds-event:active { background: #222222; } .ds-event:focus-visible { outline: 2px solid #8FB8F2; outline-offset: 2px; } .ds-event-head { display: flex; align-items: baseline; gap: 10px; } .ds-event-title { flex: 1; font: 600 18px/24px 'Barlow Semi Condensed', 'Arial Narrow', sans-serif; } .ds-event-time { font: 600 16px/22px 'Barlow Semi Condensed', 'Arial Narrow', sans-serif; font-variant-numeric: tabular-nums; } .ds-event-place { display: block; font: 400 14px/20px Roboto, system-ui, sans-serif; letter-spacing: 0.25px; color: #A0A0A0; }"
     },
     {
       "name": "Trail",
       "kind": "custom",
       "refersTo": "stop-dot",
       "description": "The trip between two events: dotted for walking, solid in the line's colour for a vehicle, a ringed dot and a name at each change of mode.",
-      "html": "<div class=\"ds-trail\"><div class=\"ds-trail-row\"><span class=\"ds-trail-rail\"><span class=\"ds-trail-dotted\"></span></span><span class=\"ds-trail-seg ds-trail-walk\">Walk <small>4 min</small></span></div><div class=\"ds-trail-row\"><span class=\"ds-trail-rail\"><span class=\"ds-trail-dot\"></span></span><span class=\"ds-trail-stop\"><b>Sherbrooke / Robert-Bourassa <small>stop 52369</small></b><time>11:05</time></span></div><div class=\"ds-trail-row\"><span class=\"ds-trail-rail\"><span class=\"ds-trail-solid\"></span></span><button class=\"ds-trail-seg ds-trail-ride\">Bus 24 Sherbrooke <small>5 min · 4 stops</small><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path fill=\"#B3B3B3\" d=\"M7.41 8.58 12 13.17l4.59-4.59L18 10l-6 6-6-6z\"/></svg></button></div><div class=\"ds-trail-row\"><span class=\"ds-trail-rail\"><span class=\"ds-trail-dot\"></span></span><span class=\"ds-trail-stop\"><b>Saint-Laurent / Sherbrooke <small>stop 52511</small></b><time>11:12</time></span></div></div>",
-      "css": ".ds-trail { background: #111111; color: #E8E8E8; padding-left: 12px; font: 400 14px/20px Roboto, system-ui, sans-serif; } .ds-trail-row { display: flex; } .ds-trail-rail { position: relative; width: 28px; flex: none; display: flex; justify-content: center; } .ds-trail-dotted { position: absolute; top: 1px; bottom: 1px; border-left: 3px dotted #B3B3B3; } .ds-trail-solid { position: absolute; top: 0; bottom: 0; width: 4px; border-radius: 2px; background: #B07CE8; } .ds-trail-dot { width: 12px; height: 12px; margin: 6px 0; border-radius: 6px; border: 2px solid #E8E8E8; background: #111111; box-sizing: border-box; } .ds-trail-seg { flex: 1; display: flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 0 0 8px; background: none; border: 0; color: #E8E8E8; font: inherit; text-align: left; } .ds-trail-walk { color: #B3B3B3; } .ds-trail-ride { min-height: 48px; cursor: pointer; transition: background 200ms ease-out; } .ds-trail-ride svg { margin-left: auto; } .ds-trail-ride:hover, .ds-trail-ride:active { background: #1A1A1A; } .ds-trail-ride:focus-visible { outline: 2px solid #F7B500; outline-offset: -2px; } .ds-trail small { font-size: 12px; letter-spacing: 0.4px; color: #B3B3B3; font-weight: 400; font-family: Roboto, system-ui, sans-serif; font-variant-numeric: tabular-nums; } .ds-trail-stop { flex: 1; display: flex; align-items: center; gap: 8px; padding-left: 8px; font: 600 16px/22px 'Barlow Semi Condensed', 'Arial Narrow', sans-serif; } .ds-trail-stop b { flex: 1; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .ds-trail-stop time { color: #B3B3B3; font-variant-numeric: tabular-nums; }"
+      "html": "<div class=\"ds-trail\"><div class=\"ds-trail-row\"><span class=\"ds-trail-rail\"><span class=\"ds-trail-dotted\"></span></span><span class=\"ds-trail-seg ds-trail-walk\">Walk <small>4 min</small></span></div><div class=\"ds-trail-row\"><span class=\"ds-trail-rail\"><span class=\"ds-trail-dot\"></span></span><span class=\"ds-trail-stop\"><b>Sherbrooke / Robert-Bourassa <small>stop 52369</small></b><time>11:05</time></span></div><div class=\"ds-trail-row\"><span class=\"ds-trail-rail\"><span class=\"ds-trail-solid\"></span></span><button class=\"ds-trail-seg ds-trail-ride\">Bus 24 Sherbrooke <small>5 min · 4 stops</small><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path fill=\"#A0A0A0\" d=\"M7.41 8.58 12 13.17l4.59-4.59L18 10l-6 6-6-6z\"/></svg></button></div><div class=\"ds-trail-row\"><span class=\"ds-trail-rail\"><span class=\"ds-trail-dot\"></span></span><span class=\"ds-trail-stop\"><b>Saint-Laurent / Sherbrooke <small>stop 52511</small></b><time>11:12</time></span></div></div>",
+      "css": ".ds-trail { background: #1B1B1B; color: #D2D2D2; padding-left: 12px; font: 400 14px/20px Roboto, system-ui, sans-serif; } .ds-trail-row { display: flex; } .ds-trail-rail { position: relative; width: 28px; flex: none; display: flex; justify-content: center; } .ds-trail-dotted { position: absolute; top: 1px; bottom: 1px; border-left: 3px dotted #A0A0A0; } .ds-trail-solid { position: absolute; top: 0; bottom: 0; width: 4px; border-radius: 2px; background: #B07CE8; } .ds-trail-dot { width: 12px; height: 12px; margin: 6px 0; border-radius: 6px; border: 2px solid #D2D2D2; background: #1B1B1B; box-sizing: border-box; } .ds-trail-seg { flex: 1; display: flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 0 0 8px; background: none; border: 0; color: #D2D2D2; font: inherit; text-align: left; } .ds-trail-walk { color: #A0A0A0; } .ds-trail-ride { min-height: 48px; cursor: pointer; transition: background 200ms ease-out; } .ds-trail-ride svg { margin-left: auto; } .ds-trail-ride:hover, .ds-trail-ride:active { background: #222222; } .ds-trail-ride:focus-visible { outline: 2px solid #8FB8F2; outline-offset: -2px; } .ds-trail small { font-size: 12px; letter-spacing: 0.4px; color: #A0A0A0; font-weight: 400; font-family: Roboto, system-ui, sans-serif; font-variant-numeric: tabular-nums; } .ds-trail-stop { flex: 1; display: flex; align-items: center; gap: 8px; padding-left: 8px; font: 600 16px/22px 'Barlow Semi Condensed', 'Arial Narrow', sans-serif; } .ds-trail-stop b { flex: 1; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .ds-trail-stop time { color: #A0A0A0; font-variant-numeric: tabular-nums; }"
     },
     {
       "name": "Navigation Bar",
       "kind": "nav",
-      "refersTo": "nav-destination-selected",
-      "description": "Material 3 navigation bar; the selected destination sits on a gold pill.",
-      "html": "<nav class=\"ds-nav\"><a class=\"ds-nav-item ds-nav-on\" href=\"#\"><span class=\"ds-nav-pill\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path fill=\"currentColor\" d=\"M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7m0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5\"/></svg></span>Day</a><a class=\"ds-nav-item\" href=\"#\"><span class=\"ds-nav-pill\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path fill=\"currentColor\" d=\"M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2m0 16H5V9h14z\"/></svg></span>Calendar</a><a class=\"ds-nav-item\" href=\"#\"><span class=\"ds-nav-pill\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path fill=\"currentColor\" d=\"M17 3H7a2 2 0 0 0-2 2v16l7-3 7 3V5a2 2 0 0 0-2-2\"/></svg></span>Places</a></nav>",
-      "css": ".ds-nav { display: flex; height: 72px; padding: 8px 0; box-sizing: border-box; background: #1A1A1A; border-top: 1px solid #303030; } .ds-nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; color: #B3B3B3; text-decoration: none; font: 500 12px/16px Roboto, system-ui, sans-serif; letter-spacing: 0.5px; } .ds-nav-pill { width: 56px; height: 30px; border-radius: 15px; display: flex; align-items: center; justify-content: center; transition: background 200ms ease-out; } .ds-nav-item:hover .ds-nav-pill { background: #262626; } .ds-nav-on { color: #E8E8E8; } .ds-nav-on .ds-nav-pill, .ds-nav-on:hover .ds-nav-pill { background: #F7B500; color: #111111; } .ds-nav-item:focus-visible { outline: 2px solid #F7B500; outline-offset: -2px; }"
+      "refersTo": "nav-bar-floating",
+      "description": "Material 3 navigation bar, floating: fully rounded, inset 12dp, on the level-3 surface with a hairline outline and the one authored shadow; the selected destination sits on a blue pill.",
+      "html": "<div class=\"ds-nav-stage\"><nav class=\"ds-nav\"><a class=\"ds-nav-item ds-nav-on\" href=\"#\"><span class=\"ds-nav-pill\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path fill=\"currentColor\" d=\"M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7m0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5\"/></svg></span>Day</a><a class=\"ds-nav-item\" href=\"#\"><span class=\"ds-nav-pill\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path fill=\"currentColor\" d=\"M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2m0 16H5V9h14z\"/></svg></span>Calendar</a><a class=\"ds-nav-item\" href=\"#\"><span class=\"ds-nav-pill\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path fill=\"currentColor\" d=\"M17 3H7a2 2 0 0 0-2 2v16l7-3 7 3V5a2 2 0 0 0-2-2\"/></svg></span>Places</a></nav></div>",
+      "css": ".ds-nav-stage { background: #1B1B1B; padding: 12px; } .ds-nav { display: flex; height: 64px; max-width: 520px; margin: 0 auto; padding: 6px 0; box-sizing: border-box; background: #2C2C2C; border: 1px solid #343434; border-radius: 32px; box-shadow: 0 6px 14px rgba(0,0,0,0.45); } .ds-nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; color: #A0A0A0; text-decoration: none; font: 500 12px/16px Roboto, system-ui, sans-serif; letter-spacing: 0.5px; } .ds-nav-pill { width: 56px; height: 30px; border-radius: 15px; display: flex; align-items: center; justify-content: center; transition: background 200ms ease-out; } .ds-nav-item:hover .ds-nav-pill { background: #343434; } .ds-nav-on { color: #D2D2D2; } .ds-nav-on .ds-nav-pill, .ds-nav-on:hover .ds-nav-pill { background: #8FB8F2; color: #0F2542; } .ds-nav-item:focus-visible { outline: 2px solid #8FB8F2; outline-offset: -2px; border-radius: 16px; }"
     },
     {
       "name": "Primary Button",
@@ -117,30 +411,30 @@
       "refersTo": "button-primary",
       "description": "The one committing action on a screen or dialog.",
       "html": "<button class=\"ds-btn-primary\">Save home</button>",
-      "css": ".ds-btn-primary { background: #F7B500; color: #111111; border: 0; border-radius: 10px; min-height: 40px; padding: 10px 24px; font: 500 14px/20px Roboto, system-ui, sans-serif; letter-spacing: 0.1px; cursor: pointer; transition: background 200ms ease-out; } .ds-btn-primary:hover { background: #FFCB45; } .ds-btn-primary:active { background: #B88600; } .ds-btn-primary:focus-visible { outline: 2px solid #E8E8E8; outline-offset: 2px; } .ds-btn-primary:disabled { background: rgba(232,232,232,0.12); color: rgba(232,232,232,0.38); cursor: default; }"
+      "css": ".ds-btn-primary { background: #8FB8F2; color: #0F2542; border: 0; border-radius: 10px; min-height: 40px; padding: 10px 24px; font: 500 14px/20px Roboto, system-ui, sans-serif; letter-spacing: 0.1px; cursor: pointer; transition: background 200ms ease-out; } .ds-btn-primary:hover { background: #A6C7F5; } .ds-btn-primary:active { background: #7BA6E6; } .ds-btn-primary:focus-visible { outline: 2px solid #D2D2D2; outline-offset: 2px; } .ds-btn-primary:disabled { background: rgba(210,210,210,0.12); color: rgba(210,210,210,0.38); cursor: default; }"
     },
     {
       "name": "Details Button",
       "kind": "button",
       "description": "Text button in ink that opens a commute's details in place.",
       "html": "<button class=\"ds-btn-text\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path fill=\"currentColor\" d=\"M7.41 8.58 12 13.17l4.59-4.59L18 10l-6 6-6-6z\"/></svg>Details · 4 other options</button>",
-      "css": ".ds-btn-text { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 12px; background: #111111; color: #E8E8E8; border: 0; border-radius: 10px; font: 500 14px/20px Roboto, system-ui, sans-serif; letter-spacing: 0.1px; cursor: pointer; transition: background 200ms ease-out; } .ds-btn-text:hover, .ds-btn-text:active { background: #1A1A1A; } .ds-btn-text:focus-visible { outline: 2px solid #F7B500; outline-offset: 2px; }"
+      "css": ".ds-btn-text { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 12px; background: #1B1B1B; color: #D2D2D2; border: 0; border-radius: 10px; font: 500 14px/20px Roboto, system-ui, sans-serif; letter-spacing: 0.1px; cursor: pointer; transition: background 200ms ease-out; } .ds-btn-text:hover, .ds-btn-text:active { background: #222222; } .ds-btn-text:focus-visible { outline: 2px solid #8FB8F2; outline-offset: 2px; }"
     },
     {
       "name": "Add Button",
       "kind": "button",
       "refersTo": "fab",
-      "description": "Floating gold add-event action, fixed 16dp from the bottom-right.",
+      "description": "Blue add-event action, fixed 16dp from the right and 4dp above the navigation bar's clearance.",
       "html": "<button class=\"ds-fab\" aria-label=\"Add event\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path fill=\"currentColor\" d=\"M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z\"/></svg></button>",
-      "css": ".ds-fab { width: 56px; height: 56px; display: inline-flex; align-items: center; justify-content: center; background: #F7B500; color: #111111; border: 0; border-radius: 8px; cursor: pointer; transition: background 200ms ease-out; } .ds-fab:hover { background: #FFCB45; } .ds-fab:active { background: #B88600; } .ds-fab:focus-visible { outline: 2px solid #E8E8E8; outline-offset: 2px; }"
+      "css": ".ds-fab { width: 56px; height: 56px; display: inline-flex; align-items: center; justify-content: center; background: #8FB8F2; color: #0F2542; border: 0; border-radius: 8px; cursor: pointer; transition: background 200ms ease-out; } .ds-fab:hover { background: #A6C7F5; } .ds-fab:active { background: #7BA6E6; } .ds-fab:focus-visible { outline: 2px solid #D2D2D2; outline-offset: 2px; }"
     },
     {
       "name": "Filter Chip",
       "kind": "chip",
       "refersTo": "chip-selected",
-      "description": "Outlined when off, teal container when on; the state is also written in the label.",
+      "description": "Outlined when off, pale blue container when on; the state is also written in the label.",
       "html": "<button class=\"ds-chip ds-chip-on\" aria-pressed=\"true\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path fill=\"currentColor\" d=\"M10 21v-3H3l5-5H5l5-5H7l5-6 5 6h-3l5 5h-3l5 5h-7v3z\"/></svg>Green routes on</button> <button class=\"ds-chip\" aria-pressed=\"false\">Green routes off</button>",
-      "css": ".ds-chip { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; background: #111111; color: #B3B3B3; border: 1px solid #6B6B6B; border-radius: 4px; font: 500 14px/20px Roboto, system-ui, sans-serif; letter-spacing: 0.1px; cursor: pointer; transition: background 200ms ease-out; } .ds-chip:hover { background: #1A1A1A; } .ds-chip-on { background: #163A37; color: #B4EBE5; border-color: #163A37; } .ds-chip-on:hover { background: #1C4743; } .ds-chip:focus-visible { outline: 2px solid #F7B500; outline-offset: 2px; }"
+      "css": ".ds-chip { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; background: #1B1B1B; color: #A0A0A0; border: 1px solid #666666; border-radius: 4px; font: 500 14px/20px Roboto, system-ui, sans-serif; letter-spacing: 0.1px; cursor: pointer; transition: background 200ms ease-out; } .ds-chip:hover { background: #222222; } .ds-chip-on { background: #25364D; color: #CEDDF2; border-color: #25364D; } .ds-chip-on:hover { background: #2D425E; } .ds-chip:focus-visible { outline: 2px solid #8FB8F2; outline-offset: 2px; }"
     },
     {
       "name": "Text Field",
@@ -148,48 +442,92 @@
       "refersTo": "text-field",
       "description": "Outlined Material text field with nearly square corners.",
       "html": "<label class=\"ds-field\"><span>Home address</span><input type=\"text\" value=\"\" placeholder=\" \"></label>",
-      "css": ".ds-field { position: relative; display: block; background: #111111; padding-top: 8px; } .ds-field span { position: absolute; top: 0; left: 12px; padding: 0 4px; background: #111111; color: #B3B3B3; font: 400 12px/16px Roboto, system-ui, sans-serif; letter-spacing: 0.4px; } .ds-field input { width: 100%; box-sizing: border-box; height: 50px; padding: 0 16px; background: transparent; color: #E8E8E8; border: 1px solid #6B6B6B; border-radius: 2px; font: 400 16px/24px Roboto, system-ui, sans-serif; transition: border-color 200ms ease-out; } .ds-field input:hover { border-color: #B3B3B3; } .ds-field input:focus-visible { outline: none; border: 2px solid #F7B500; }"
+      "css": ".ds-field { position: relative; display: block; background: #1B1B1B; padding-top: 8px; } .ds-field span { position: absolute; top: 0; left: 12px; padding: 0 4px; background: #1B1B1B; color: #A0A0A0; font: 400 12px/16px Roboto, system-ui, sans-serif; letter-spacing: 0.4px; } .ds-field input { width: 100%; box-sizing: border-box; height: 50px; padding: 0 16px; background: transparent; color: #D2D2D2; border: 1px solid #666666; border-radius: 2px; font: 400 16px/24px Roboto, system-ui, sans-serif; transition: border-color 200ms ease-out; } .ds-field input:hover { border-color: #A0A0A0; } .ds-field input:focus-visible { outline: none; border: 2px solid #8FB8F2; }"
     }
   ],
   "narrative": {
     "northStar": "Sentier, night",
-    "overview": "The day is one trail. Events are bordered blocks; between two blocks runs a single vertical line with a small dot wherever the rider changes mode, labelled like a trail marker with the station or stop. The ground is neutral charcoal with no tint, and one flat gold field per trip says when to leave. Everything the rider does not need in the first few seconds waits behind \"Details\" and opens in place.\n\nIt is an Android-first Material 3 app (react-native-paper) and keeps Material's controls, navigation bar and touch targets. What is its own is the trail, the three-job colour scheme and the sign-style condensed face on times, headings and stop names. Dark is the designed scheme and the default; a light scheme with the same colour jobs is selectable in Settings (dark, light, or follow the phone) for direct sunlight.\n\nThe surface is flat. Sections are separated by hairlines and space, not by filled cards. Motion happens only when the user changes state.",
+    "overview": "The day is one trail. Events are bordered blocks; between two blocks runs a single vertical line with a small dot wherever the rider changes mode, labelled like a trail marker with the station or stop. The ground is neutral charcoal with no tint, and each vehicle line is named by a pill in its agency's colour. Contrast is deliberately moderate: a mid charcoal ground, soft grey ink and slightly desaturated accents, with body text still above 4.5:1. Everything the rider does not need in the first few seconds waits behind \"Details\" and opens in place.\n\nIt is an Android-first Material 3 app. The UI kit is react-native-paper and it stays: the colour scheme is expressed entirely through Material colour roles (primary, secondary, error, surface, outline), so every component picks it up without per-component styling. The app keeps Material's controls and touch targets, and its navigation bar is Material's, floated. What is its own is the trail, the minimal blue scheme, the line pills, the floating navigation bar and the sign-style condensed face on times, headings and stop names. Dark is the designed scheme and the default; a light scheme with the same colour jobs is selectable in Settings (dark, light, or follow the phone) for direct sunlight.\n\nThe surface is flat, with one exception: the navigation bar floats over the content on a soft shadow. Sections are separated by hairlines and space, not by filled cards. Motion happens only when the user changes state.",
     "keyCharacteristics": [
-      "Bordered event blocks joined by one vertical line; a dot and a name at each change of mode.",
-      "One gold field per commute: \"Leave HH:MM\".",
-      "Teal for offers and good news, vermilion for warnings, each transit line in its agency's colour.",
+      "Lightly bordered event blocks joined by one vertical line; a dot and a name at each change of mode.",
+      "The day starts and ends at a round marker (a house for home), not at a block: home is a place, not an event.",
+      "A minimal scheme: neutral greys and one accent hue, blue, in two shades.",
+      "Blue marks where you are and what to commit; times on the trail are plain text.",
+      "Pale blue for offers and good news, vermilion for warnings, each transit line in its agency's colour.",
       "Condensed sign face for times, headings and stop names; platform face for body and controls.",
-      "Flat charcoal grounds, hairline rules, no authored shadows.",
+      "Flat charcoal grounds and hairline rules; the one authored shadow is under the floating navigation bar.",
       "Detail on request, in place; nothing animates on load."
     ],
     "rules": [
-      { "name": "The One Gold Field Rule", "body": "A commute has exactly one gold field, and it is the time to leave. Elsewhere gold marks only where you are (selected destination) and the one thing to commit (primary action). Gold is never a text highlight on the dark ground and never decoration.", "section": "colors" },
-      { "name": "The Three Jobs Rule", "body": "Gold says go, teal offers, vermilion warns. A colour never borrows another's job, and a warning always carries an icon or words as well as vermilion.", "section": "colors" },
-      { "name": "The Agency's Colour Rule", "body": "A vehicle segment is the line's own colour, never a theme colour. Only contrast against the ground may adjust it.", "section": "colors" },
-      { "name": "The Sign Face Rule", "body": "The condensed face is for times, headings and stop names. Sentences and control labels stay in the platform face.", "section": "typography" },
-      { "name": "The One File Per Weight Rule", "body": "Each condensed weight is its own font file. Pick the weight by choosing the variant; never set a font weight on a condensed variant. Letter spacing on the condensed face is 0.", "section": "typography" },
-      { "name": "The Tabular Times Rule", "body": "Every clock time, duration and count that sits in a column or changes in place uses tabular numerals.", "section": "typography" },
-      { "name": "The Hairline Rule", "body": "Group with a hairline and space. A filled, raised card around a section or a commute is not part of this system.", "section": "elevation" }
+      {
+        "name": "The One Hue Rule",
+        "body": "Blue is the only accent hue, in two shades: blue and pale blue. No second accent hue is added. Vermilion is a warning, not an accent, and line colours belong to the agencies.",
+        "section": "colors"
+      },
+      {
+        "name": "The Sparing Blue Rule",
+        "body": "The blue field marks only where you are (selected destination, today) and the one thing to commit (primary action). The trail itself carries no blue field. Blue is never decoration and never emphasis inside running text; where it appears as text it is a Material control or a link.",
+        "section": "colors"
+      },
+      {
+        "name": "The Three Jobs Rule",
+        "body": "Blue marks where you are and what to commit, pale blue offers, vermilion warns. A colour never borrows another's job, and a warning always carries an icon or words as well as vermilion.",
+        "section": "colors"
+      },
+      {
+        "name": "The Agency's Colour Rule",
+        "body": "A vehicle segment is the line's own colour, never a theme colour. Only contrast against the ground may adjust it.",
+        "section": "colors"
+      },
+      {
+        "name": "The Sign Face Rule",
+        "body": "The condensed face is for times, headings and stop names. Sentences and control labels stay in the platform face.",
+        "section": "typography"
+      },
+      {
+        "name": "The One File Per Weight Rule",
+        "body": "Each condensed weight is its own font file. Pick the weight by choosing the variant; never set a font weight on a condensed variant. Letter spacing on the condensed face is 0.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tabular Times Rule",
+        "body": "Every clock time, duration and count that sits in a column or changes in place uses tabular numerals.",
+        "section": "typography"
+      },
+      {
+        "name": "The Hairline Rule",
+        "body": "Group with a hairline and space. A filled, raised card around a section or a commute is not part of this system.",
+        "section": "elevation"
+      },
+      {
+        "name": "The One Shadow Rule",
+        "body": "The floating navigation bar is the single authored shadow. Nothing else in app styles is lifted; a new floating element is a change to the system, not an extension of it.",
+        "section": "elevation"
+      }
     ],
     "dos": [
-      "Do give each commute exactly one gold field, the time to leave, with duration and arrival beside it in muted ink.",
+      "Do state each commute's times once, as plain text: leave, duration, arrive; let the day's endpoint markers carry the first leave and the last arrive.",
+      "Do show every vehicle line as a pill with its code on the agency's colour.",
       "Do draw the trip as one continuous vertical line: dotted for walking, solid in the agency's line colour for a vehicle, a 12dp ringed dot with the stop name at each change of mode.",
       "Do show the stop number on bus stops, and only on bus stops.",
       "Do keep reasons, estimates, places, the map and other options behind \"Details\", opened in place.",
       "Do set times, headings and stop names in Barlow Semi Condensed with tabular numerals for times; everything else in the platform face.",
       "Do pair every vermilion warning with an icon or words, and label estimates and simulated data as such.",
       "Do keep every tap target at least 48dp tall.",
-      "Do keep the same colour jobs in the light scheme, with the deeper text-safe gold, teal and vermilion.",
+      "Do keep the same colour jobs in the light scheme, with the deeper blues and vermilion that read as text on a light ground.",
+      "Do set colour through Material colour roles so react-native-paper components pick it up without per-component styling.",
+      "Do keep 88dp plus the bottom system inset clear at the bottom of every screen for the floating navigation bar.",
       "Do ease layout changes over 200ms ease-out and respect the remove-animations setting."
     ],
     "donts": [
-      "Don't put a second gold field on a commute, or use gold for emphasis, icons or decoration.",
+      "Don't put a blue field on a commute, or use blue for emphasis or decoration.",
+      "Don't add a second accent hue; the accents are blue and pale blue, and vermilion is only for warnings.",
       "Don't stack commutes or sections as filled, rounded, elevated cards.",
       "Don't write step-by-step instruction sentences on the trail; a segment is a line name, a duration and a stop count.",
       "Don't draw transfer walks of 5 minutes or less between two vehicles.",
       "Don't recolour a transit line with a theme colour.",
       "Don't set a font weight or letter spacing on a condensed variant.",
-      "Don't add shadows in app styles, or animate anything on load.",
+      "Don't add shadows in app styles other than the floating navigation bar's, or animate anything on load.",
       "Don't show a product name; none exists."
     ]
   }

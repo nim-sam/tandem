@@ -90,7 +90,7 @@ const Segment: React.FC<{ node: IntermodalNode; header?: React.ReactNode; footer
         {!walking && passed.length > 0 ? ` · ${passed.length + 1} stops` : ''}
       </Text>
       {!walking && node.real_time && (
-        <Text variant="bodySmall" style={{ color: late ? tokens.warn : tokens.teal }}>
+        <Text variant="bodySmall" style={{ color: late ? tokens.warn : tokens.offer }}>
           {late ? `${node.delay_minutes} min late` : 'on time'}
         </Text>
       )}
@@ -302,7 +302,7 @@ export const CommuteCard: React.FC<Props> = ({ route, onSelect }) => {
 
             {places.length > 0 && route.slack_minutes >= 10 && (
               <View style={styles.list}>
-                <Text variant="labelLarge" style={{ color: tokens.teal }}>
+                <Text variant="labelLarge" style={{ color: tokens.offer }}>
                   Places that fit in your {formatDuration(route.slack_minutes)} free
                 </Text>
                 {places.map((place) => (
@@ -380,10 +380,10 @@ export const CommuteCard: React.FC<Props> = ({ route, onSelect }) => {
       {route.slack_minutes >= 10 && places.length > 0 && (
         <Pass>
           <View style={styles.free}>
-            <Text variant="bodySmall" style={{ color: tokens.teal, flexShrink: 1 }} numberOfLines={1}>
+            <Text variant="bodySmall" style={{ color: tokens.offer, flexShrink: 1 }} numberOfLines={1}>
               {formatDuration(route.slack_minutes)} free · {places[0].name}
             </Text>
-            <Text variant="bodySmall" numberOfLines={1} style={[styles.tabular, { color: tokens.teal, flexShrink: 0 }]}>
+            <Text variant="bodySmall" numberOfLines={1} style={[styles.tabular, { color: tokens.offer, flexShrink: 0 }]}>
               {places[0].detour_minutes > 1 ? `+${places[0].detour_minutes} min` : 'on your way'}
             </Text>
           </View>

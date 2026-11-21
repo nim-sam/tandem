@@ -2,7 +2,7 @@ import React, { ReactNode } from 'react';
 import { RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { Button, Icon, Text } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useAppTheme, useTokens } from '../theme';
+import { NAV_CLEARANCE, useAppTheme, useTokens } from '../theme';
 
 interface Props {
   title: string;
@@ -50,11 +50,12 @@ export const Screen: React.FC<Props> = ({ title, subtitle, actions, error, onRet
       )}
 
       <ScrollView
-        contentContainerStyle={[styles.content, flush && styles.flush]}
+        // the last row clears the floating navigation bar and the add button above it
+        contentContainerStyle={[styles.content, flush && styles.flush, { paddingBottom: 96 + NAV_CLEARANCE + insets.bottom }]}
         keyboardShouldPersistTaps="handled"
         refreshControl={
           onRefresh ? (
-            <RefreshControl refreshing={!!refreshing} onRefresh={onRefresh} tintColor={tokens.gold} colors={[tokens.gold]} />
+            <RefreshControl refreshing={!!refreshing} onRefresh={onRefresh} tintColor={tokens.accent} colors={[tokens.accent]} />
           ) : undefined
         }
       >

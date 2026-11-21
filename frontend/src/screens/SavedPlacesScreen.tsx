@@ -5,7 +5,7 @@ import { useApp } from '../store/AppContext';
 import { API } from '../api/client';
 import { Screen } from '../components/Screen';
 import { PromptDialog, PromptField } from '../components/PromptDialog';
-import { useAppTheme, useTokens } from '../theme';
+import { NAV_CLEARANCE, useAppTheme, useTokens } from '../theme';
 import { Collection, SavedPlace } from '../types';
 
 interface Prompt {
@@ -150,7 +150,7 @@ export const SavedPlacesScreen: React.FC = () => {
                   <View style={{ flex: 1 }}>
                     <Text variant="bodyLarge">{place.name}</Text>
                     {isHome(place) && (
-                      <Text variant="labelMedium" style={{ color: tokens.teal }}>
+                      <Text variant="labelMedium" style={{ color: tokens.offer }}>
                         Home
                       </Text>
                     )}
@@ -196,7 +196,7 @@ export const SavedPlacesScreen: React.FC = () => {
           </View>
         ))}
 
-        <Button mode="contained" buttonColor={tokens.gold} textColor={tokens.onGold} icon="folder-plus-outline" onPress={newCollection}>
+        <Button mode="contained" buttonColor={tokens.accent} textColor={tokens.onAccent} icon="folder-plus-outline" onPress={newCollection}>
           New collection
         </Button>
         <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
@@ -212,7 +212,7 @@ export const SavedPlacesScreen: React.FC = () => {
         onDismiss={() => setPrompt(null)}
         onSubmit={(values) => prompt?.run(values) ?? Promise.resolve()}
       />
-      <Snackbar visible={!!notice} onDismiss={() => setNotice('')} duration={4000}>
+      <Snackbar visible={!!notice} onDismiss={() => setNotice('')} duration={4000} wrapperStyle={{ bottom: NAV_CLEARANCE }}>
         {notice}
       </Snackbar>
     </View>

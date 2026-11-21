@@ -102,7 +102,7 @@ export const RouteMap: React.FC<Props> = ({ route, height = 260 }) => {
   });
   ends.forEach(function (e, i) {
     all.push([e[0], e[1]]);
-    L.circleMarker([e[0], e[1]], { radius: 8, color: '#ffffff', weight: 3, fillColor: i === 0 ? '#111111' : '#F7B500', fillOpacity: 1 })
+    L.circleMarker([e[0], e[1]], { radius: 8, color: '#ffffff', weight: 3, fillColor: i === 0 ? '#1B1B1B' : '#2D62B5', fillOpacity: 1 })
       .addTo(map).bindPopup(esc((i === 0 ? 'Start: ' : 'Destination: ') + e[2]));
   });
   map.fitBounds(all, { padding: [28, 28] });

@@ -7,7 +7,8 @@ import { CommuteCard } from '../components/CommuteCard';
 import { EventDialog } from '../components/EventDialog';
 import { EndpointDialog } from '../components/EndpointDialog';
 import { useLeaveNotifications } from '../hooks/useLeaveNotifications';
-import { endpointIcon, useTokens } from '../theme';
+import { NAV_CLEARANCE, endpointIcon, useTokens } from '../theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DAY_END, DAY_START, DayEndpoint, EndpointKind, Event, Route } from '../types';
 import { addDays, isNearDay, formatCO2, formatDay, formatDuration, formatTime, fromDateKey, todayKey } from '../utils/format';
 
@@ -120,6 +121,7 @@ const EndpointMarker: React.FC<{
 
 export const DayViewScreen: React.FC = () => {
   const tokens = useTokens();
+  const insets = useSafeAreaInsets();
   const { date, setDate, schedule, loading, error, refresh, selectRoute, preferences, updatePreferences } = useApp();
   const [editing, setEditing] = useState<Event | null>(null);
   const [dialog, setDialog] = useState(false);
@@ -167,7 +169,7 @@ export const DayViewScreen: React.FC = () => {
         {!showing ? (
           loading ? (
             <View style={styles.center}>
-              <ActivityIndicator size="large" color={tokens.gold} />
+              <ActivityIndicator size="large" color={tokens.accent} />
               <Text variant="bodyMedium" style={{ color: tokens.muted }}>
                 Planning your routes…
               </Text>
@@ -246,8 +248,8 @@ export const DayViewScreen: React.FC = () => {
       <FAB
         icon="plus"
         accessibilityLabel="Add event"
-        style={[styles.fab, { backgroundColor: tokens.gold }]}
-        color={tokens.onGold}
+        style={[styles.fab, { backgroundColor: tokens.accent, bottom: NAV_CLEARANCE + insets.bottom + 4 }]}
+        color={tokens.onAccent}
         onPress={() => {
           setEditing(null);
           setDialog(true);
@@ -280,5 +282,5 @@ const styles = StyleSheet.create({
   eventHead: { flexDirection: 'row', alignItems: 'baseline', gap: 10 },
   tabular: { fontVariant: ['tabular-nums'] },
   center: { alignItems: 'center', gap: 8, paddingVertical: 56, paddingHorizontal: 32 },
-  fab: { position: 'absolute', right: 16, bottom: 16 },
+  fab: { position: 'absolute', right: 16 },
 });

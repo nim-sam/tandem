@@ -69,10 +69,10 @@ export const MonthGrid: React.FC<Props> = ({ month, events, onPressDay }) => {
                 style={[styles.cell, { borderTopColor: tokens.hairline, minHeight: wide ? 104 : 64 }]}
               >
                 <View style={wide ? styles.cellWide : styles.cellNarrow}>
-                  <View style={[styles.number, isToday && { backgroundColor: tokens.gold }]}>
+                  <View style={[styles.number, isToday && { backgroundColor: tokens.accent }]}>
                     <Text
                       variant="titleSmall"
-                      style={[styles.tabular, { color: isToday ? tokens.onGold : outside ? tokens.muted : tokens.post }, outside && !isToday && { opacity: 0.6 }]}
+                      style={[styles.tabular, { color: isToday ? tokens.onAccent : outside ? tokens.muted : tokens.post }, outside && !isToday && { opacity: 0.6 }]}
                     >
                       {date.getDate()}
                     </Text>

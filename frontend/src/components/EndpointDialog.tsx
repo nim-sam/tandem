@@ -159,7 +159,7 @@ export const EndpointDialog: React.FC<Props> = ({ visible, which, date, endpoint
           )}
           <View style={{ flex: 1 }} />
           <Button onPress={onDismiss}>Cancel</Button>
-          <Button mode="contained" buttonColor={tokens.gold} textColor={tokens.onGold} onPress={save} loading={busy} disabled={busy}>
+          <Button mode="contained" buttonColor={tokens.accent} textColor={tokens.onAccent} onPress={save} loading={busy} disabled={busy}>
             Save
           </Button>
         </Dialog.Actions>
