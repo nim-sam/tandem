@@ -2,6 +2,7 @@ package transit
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/nim-sam/codejam16/backend/internal/domain"
@@ -31,3 +32,8 @@ type Provider interface {
 type WalkPlanner interface {
 	PlanWalk(ctx context.Context, origin, dest domain.Location, depart time.Time) (domain.Route, error)
 }
+
+// ErrNoItineraries means the provider answered, and there is no way to make
+// the trip by transit (too far, wrong region, no service at that time). It is
+// a real answer, not an outage, so it must not be papered over with mock data.
+var ErrNoItineraries = errors.New("no transit itinerary between these places")

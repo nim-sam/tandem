@@ -123,7 +123,7 @@ func (p *MotisProvider) Plan(ctx context.Context, req PlanRequest) ([]domain.Rou
 		routes = append(routes, r)
 	}
 	if len(routes) == 0 {
-		return nil, fmt.Errorf("transit API returned no itineraries")
+		return nil, ErrNoItineraries
 	}
 	return routes, nil
 }
@@ -346,20 +346,31 @@ func isAccessible(v any) bool {
 func (p *MotisProvider) Geocode(ctx context.Context, text string) (domain.Location, error) {
 	q := url.Values{}
 	q.Set("text", text)
-	q.Set("place", "45.5019,-73.5674")
+	q.Set("place", fmt.Sprintf("%.4f,%.4f", serviceLat, serviceLon))
+	q.Set("placeBias", "5") // weigh closeness to the service area well above text similarity
 	var results []struct {
-		Name        string  `json:"name"`
-		Lat         float64 `json:"lat"`
-		Lon         float64 `json:"lon"`
-		Street      string  `json:"street"`
-		HouseNumber string  `json:"houseNumber"`
+		Name string  `json:"name"`
+		Lat  float64 `json:"lat"`
+		Lon  float64 `json:"lon"`
 	}
 	if err := p.get(ctx, "/api/v1/geocode?"+q.Encode(), &results); err != nil {
 		return domain.Location{}, err
 	}
-	if len(results) == 0 {
-		return domain.Location{}, fmt.Errorf("no geocoding match for %q", text)
+	// The geocoder is worldwide and ranks by name first, so a misspelt
+	// "McGill" can match a building in Texas. A place the transit network
+	// cannot reach is not a usable answer: take the best match in the region.
+	for _, r := range results {
+		if HaversineMeters(serviceLat, serviceLon, r.Lat, r.Lon) <= serviceRadiusMeters {
+			return domain.Location{Name: text, Address: r.Name, Latitude: r.Lat, Longitude: r.Lon}, nil
+		}
 	}
-	r := results[0]
-	return domain.Location{Name: text, Address: r.Name, Latitude: r.Lat, Longitude: r.Lon}, nil
+	return domain.Location{}, fmt.Errorf("no match for %q in the Montreal region", text)
 }
+
+// The region the app plans trips in: greater Montreal and the commuter-rail
+// catchment around it.
+const (
+	serviceLat          = 45.5019
+	serviceLon          = -73.5674
+	serviceRadiusMeters = 150_000
+)

@@ -259,6 +259,16 @@ func (s *RoutingService) planCommute(ctx context.Context, userID string, prefs d
 		c.OriginEventID, c.DestinationEventID = t.origID, t.destID
 		c.Weather = weather
 		c.IsTight = t.due != nil && c.ArrivalTime.After(*t.due)
+		// Where service is hourly, the options differ far more in when they
+		// run than in how long they take. Count the time spent waiting:
+		// an option that arrives two hours early is not a "faster" one.
+		wait := c.DepartureTime.Sub(t.when)
+		if t.arriveBy {
+			wait = t.when.Sub(c.ArrivalTime)
+		}
+		if wait > 0 {
+			c.WaitMinutes = int(wait.Minutes())
+		}
 		if t.freeFrom != nil {
 			c.SlackMinutes = int(c.DepartureTime.Sub(*t.freeFrom).Minutes())
 			c.IsTight = c.IsTight || c.DepartureTime.Before(*t.freeFrom)
@@ -413,7 +423,7 @@ func (s *RoutingService) candidates(ctx context.Context, req transit.PlanRequest
 		case hit:
 			// Better an itinerary planned earlier than none (or a made-up one).
 			log.Printf("transit provider %q failed (%v); using the route saved %s", s.primary.Name(), err, fetchedAt.Format(time.RFC3339))
-		case s.fallback == nil:
+		case s.fallback == nil || errors.Is(err, transit.ErrNoItineraries):
 			return nil, err
 		default:
 			log.Printf("transit provider %q failed (%v); using %q", s.primary.Name(), err, s.fallback.Name())
@@ -498,6 +508,7 @@ func (s *RoutingService) enrich(r *domain.Route) {
 
 func features(r domain.Route, prefs domain.UserPreferences) domain.FeatureVector {
 	total := math.Max(1, float64(r.TotalDurationMinutes))
+	elapsed := total + float64(r.WaitMinutes) // door to deadline, not just the ride
 	modeMinutes := map[domain.TransitMode]float64{}
 	for _, n := range r.Nodes {
 		modeMinutes[n.Mode] += float64(n.DurationMinutes)
@@ -514,7 +525,7 @@ func features(r domain.Route, prefs domain.UserPreferences) domain.FeatureVector
 	}
 	walk := float64(r.WalkMinutes)
 	return domain.FeatureVector{
-		domain.FeatDuration:     round3(total / 60),
+		domain.FeatDuration:     round3(elapsed / 60),
 		domain.FeatTransfers:    round3(float64(r.TransferCount) / 3),
 		domain.FeatWalk:         round3(walk / 30),
 		domain.FeatOverWalk:     round3(math.Max(0, walk-float64(prefs.MaxWalkingMinutes)) / 15),

@@ -91,6 +91,9 @@ type Route struct {
 	IsParkWalk   bool     `json:"is_park_walk"`      // walking route deliberately routed through a park
 	Weather      *Weather `json:"weather,omitempty"` // forecast at departure time
 	IsTight      bool     `json:"is_tight"`          // does not fit between the two events
+	// WaitMinutes is the idle time this option costs on top of the ride:
+	// arriving earlier than needed, or leaving later than the user is free.
+	WaitMinutes int `json:"wait_minutes"`
 
 	// Ranking. Score is weights . features; Reason is a short human
 	// explanation of why this option ranked where it did.

@@ -292,3 +292,39 @@ func TestPlannedRoutesArePersisted(t *testing.T) {
 type stubDown struct{ failingProvider }
 
 func (stubDown) Name() string { return "stub" }
+
+// hourlyProvider offers a quick trip that runs two hours off the requested
+// time and a slower one that runs right on it.
+type hourlyProvider struct{}
+
+func (hourlyProvider) Name() string { return "hourly" }
+func (hourlyProvider) Plan(ctx context.Context, req transit.PlanRequest) ([]domain.Route, error) {
+	mk := func(id string, offset, minutes int) domain.Route {
+		dep := req.Time.Add(time.Duration(offset) * time.Minute)
+		if req.ArriveBy {
+			dep = req.Time.Add(-time.Duration(offset+minutes) * time.Minute)
+		}
+		arr := dep.Add(time.Duration(minutes) * time.Minute)
+		return domain.Route{ID: id, DepartureTime: dep, ArrivalTime: arr, Source: "hourly", Nodes: []domain.IntermodalNode{{
+			Mode: domain.ModeBus, TransitLine: id, DurationMinutes: minutes, DistanceMeters: 9000, VehicleAccessible: true,
+			DepartureTime: dep, ArrivalTime: arr}}}
+	}
+	return []domain.Route{mk("quick-but-2h-off", 120, 40), mk("on-time", 5, 60)}, nil
+}
+
+func TestRankingCountsWaiting(t *testing.T) {
+	svc, repo := newTestService(hourlyProvider{})
+	prefs := repo.GetUserPreferences("default_user")
+	prefs.HomeLocation = &domain.Location{Name: "Home", Latitude: 45.59, Longitude: -73.78}
+	repo.SaveUserPreferences(prefs)
+	sched, _ := svc.GetDaySchedule(context.Background(), "default_user", time.Date(2026, 11, 23, 0, 0, 0, 0, time.Local), nil)
+	if len(sched.Commutes) != 3 {
+		t.Fatalf("want 3 commutes, got %d", len(sched.Commutes))
+	}
+	for _, c := range sched.Commutes {
+		if c.ID != "on-time" || c.WaitMinutes != 5 {
+			t.Errorf("%s -> %s: picked %s (waits %d min); arriving two hours early or leaving two hours late should lose",
+				c.OriginEventID, c.DestinationEventID, c.ID, c.WaitMinutes)
+		}
+	}
+}
