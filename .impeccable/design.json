@@ -4,234 +4,204 @@
   "title": "Design System: Sentier",
   "extensions": {
     "colorMeta": {
-      "blue": {
+      "primary": {
         "role": "primary",
-        "displayName": "Trail Blue",
-        "canonical": "#8FB8F2",
+        "displayName": "Primary Blue",
+        "canonical": "#234F91",
         "tonalRamp": [
-          "#0F2542",
-          "#22395A",
-          "#2D62B5",
-          "#5A8BD6",
-          "#8FB8F2",
-          "#B4D0F6",
-          "#D4E3F9",
-          "#EDF3FC"
+          "#0D1626",
+          "#163866",
+          "#234F91",
+          "#5279B8",
+          "#A9BDE0",
+          "#DFE8F7",
+          "#F1F5FC",
+          "#FFFFFF"
         ]
       },
-      "on-blue": {
+      "deep": {
         "role": "primary",
-        "displayName": "Ink on Blue",
-        "canonical": "#0F2542"
+        "displayName": "Deep Blue",
+        "canonical": "#163866"
       },
-      "blue-container": {
+      "medium": {
         "role": "primary",
-        "displayName": "Blue Container",
-        "canonical": "#22395A"
+        "displayName": "Medium Blue",
+        "canonical": "#5279B8"
       },
-      "on-blue-container": {
+      "soft": {
         "role": "primary",
-        "displayName": "On Blue Container",
-        "canonical": "#D4E3F9"
+        "displayName": "Soft Blue",
+        "canonical": "#A9BDE0"
       },
-      "blue-light": {
+      "pale": {
         "role": "primary",
-        "displayName": "Trail Blue, light (field and text)",
-        "canonical": "#2D62B5"
+        "displayName": "Pale Blue",
+        "canonical": "#DFE8F7"
       },
-      "on-blue-light": {
+      "ice": {
         "role": "primary",
-        "displayName": "Ink on Blue, light",
+        "displayName": "Ice (ground)",
+        "canonical": "#F1F5FC"
+      },
+      "white": {
+        "role": "primary",
+        "displayName": "White (cards)",
         "canonical": "#FFFFFF"
       },
-      "blue-container-light": {
-        "role": "primary",
-        "displayName": "Blue Container, light",
-        "canonical": "#D5E3F8"
-      },
-      "on-blue-container-light": {
-        "role": "primary",
-        "displayName": "On Blue Container, light",
-        "canonical": "#12305C"
-      },
-      "pale-blue": {
+      "offer": {
         "role": "secondary",
-        "displayName": "Pale Blue",
-        "canonical": "#A9C4E6",
-        "tonalRamp": [
-          "#17293F",
-          "#25364D",
-          "#3A669C",
-          "#7096C4",
-          "#A9C4E6",
-          "#CEDDF2",
-          "#DAE6F5",
-          "#F0F5FB"
-        ]
-      },
-      "pale-blue-container": {
-        "role": "secondary",
-        "displayName": "Pale Blue Container (selected state)",
-        "canonical": "#25364D"
-      },
-      "on-pale-blue-container": {
-        "role": "secondary",
-        "displayName": "On Pale Blue Container",
-        "canonical": "#CEDDF2"
-      },
-      "pale-blue-light": {
-        "role": "secondary",
-        "displayName": "Pale Blue, light",
-        "canonical": "#3A669C"
-      },
-      "pale-blue-container-light": {
-        "role": "secondary",
-        "displayName": "Pale Blue Container, light",
-        "canonical": "#DAE6F5"
-      },
-      "on-pale-blue-container-light": {
-        "role": "secondary",
-        "displayName": "On Pale Blue Container, light",
-        "canonical": "#1B3558"
-      },
-      "vermilion": {
-        "role": "tertiary",
-        "displayName": "Vermilion",
-        "canonical": "#DE9584",
-        "tonalRamp": [
-          "#3A0E05",
-          "#55231A",
-          "#A8371C",
-          "#D56A50",
-          "#F2907A",
-          "#F8B3A3",
-          "#FFD3C8",
-          "#FFEDE8"
-        ]
-      },
-      "vermilion-container": {
-        "role": "tertiary",
-        "displayName": "Vermilion Container",
-        "canonical": "#4E2A23"
-      },
-      "on-vermilion-container": {
-        "role": "tertiary",
-        "displayName": "On Vermilion Container",
-        "canonical": "#EFCFC7"
-      },
-      "vermilion-light": {
-        "role": "tertiary",
-        "displayName": "Vermilion, light",
-        "canonical": "#A9503B"
-      },
-      "vermilion-container-light": {
-        "role": "tertiary",
-        "displayName": "Vermilion Container, light",
-        "canonical": "#F3DAD3"
-      },
-      "on-vermilion-container-light": {
-        "role": "tertiary",
-        "displayName": "On Vermilion Container, light",
-        "canonical": "#4A1F15"
-      },
-      "ground": {
-        "role": "neutral",
-        "displayName": "Charcoal Ground",
-        "canonical": "#1B1B1B",
-        "tonalRamp": [
-          "#111111",
-          "#1A1A1A",
-          "#262626",
-          "#303030",
-          "#6B6B6B",
-          "#B3B3B3",
-          "#E8E8E8",
-          "#F7F7F7"
-        ]
-      },
-      "surface": {
-        "role": "neutral",
-        "displayName": "Raised Charcoal",
-        "canonical": "#222222"
-      },
-      "surface-high": {
-        "role": "neutral",
-        "displayName": "High Charcoal",
-        "canonical": "#2C2C2C"
-      },
-      "ink": {
-        "role": "neutral",
-        "displayName": "Light Ink",
-        "canonical": "#D2D2D2"
-      },
-      "muted": {
-        "role": "neutral",
-        "displayName": "Muted Ink",
-        "canonical": "#A0A0A0"
-      },
-      "outline": {
-        "role": "neutral",
-        "displayName": "Outline",
-        "canonical": "#666666"
-      },
-      "hairline": {
-        "role": "neutral",
-        "displayName": "Hairline",
-        "canonical": "#343434"
+        "displayName": "Offer Blue",
+        "canonical": "#456DAD"
       },
       "rail": {
         "role": "neutral",
         "displayName": "Rail",
-        "canonical": "#3E3E3E"
+        "canonical": "#C5D2E8"
       },
-      "ground-light": {
+      "on-deep-muted": {
         "role": "neutral",
-        "displayName": "Ground, light",
-        "canonical": "#EFEFEF"
+        "displayName": "On-deep muted",
+        "canonical": "#C3D2EC"
       },
-      "surface-light": {
+      "ink": {
         "role": "neutral",
-        "displayName": "Surface, light",
-        "canonical": "#F8F8F8"
+        "displayName": "Ink",
+        "canonical": "#14243D"
       },
-      "surface-high-light": {
+      "muted": {
         "role": "neutral",
-        "displayName": "High Surface, light",
-        "canonical": "#E4E4E4"
+        "displayName": "Muted Ink",
+        "canonical": "#5B6B84"
       },
-      "surface-bar-light": {
+      "outline": {
         "role": "neutral",
-        "displayName": "Floating bar surface, light (Material level 3)",
-        "canonical": "#EDEDED"
+        "displayName": "Outline",
+        "canonical": "#A7B4C9"
       },
-      "ink-light": {
+      "hairline": {
         "role": "neutral",
-        "displayName": "Ink, light",
-        "canonical": "#2E2E2E"
+        "displayName": "Hairline divider",
+        "canonical": "#E1E7F1"
       },
-      "muted-light": {
-        "role": "neutral",
-        "displayName": "Muted Ink, light",
-        "canonical": "#626262"
+      "warn": {
+        "role": "tertiary",
+        "displayName": "Muted Red",
+        "canonical": "#B4483F",
+        "tonalRamp": [
+          "#4A1712",
+          "#5A1B15",
+          "#4D2824",
+          "#B4483F",
+          "#E79C94",
+          "#F6D5D1",
+          "#F8E4E1",
+          "#FFFFFF"
+        ]
       },
-      "outline-light": {
-        "role": "neutral",
-        "displayName": "Outline, light",
-        "canonical": "#949494"
+      "warn-container": {
+        "role": "tertiary",
+        "displayName": "Muted Red container",
+        "canonical": "#F8E4E1"
       },
-      "hairline-light": {
-        "role": "neutral",
-        "displayName": "Hairline, light",
-        "canonical": "#D9D9D9"
+      "on-warn-container": {
+        "role": "tertiary",
+        "displayName": "On Muted Red container",
+        "canonical": "#5A1B15"
       },
-      "rail-light": {
+      "primary-dark": {
+        "role": "primary",
+        "displayName": "Primary, dark (the soft blue)",
+        "canonical": "#A9BDE0"
+      },
+      "on-primary-dark": {
+        "role": "primary",
+        "displayName": "Ink on primary, dark",
+        "canonical": "#10294D"
+      },
+      "deep-dark": {
+        "role": "primary",
+        "displayName": "Emphasis card and containers, dark",
+        "canonical": "#223F70"
+      },
+      "offer-dark": {
+        "role": "secondary",
+        "displayName": "Offer Blue, dark",
+        "canonical": "#8FA9D6"
+      },
+      "soft-dark": {
+        "role": "primary",
+        "displayName": "Soft Blue, dark",
+        "canonical": "#3A5384"
+      },
+      "pale-dark": {
+        "role": "primary",
+        "displayName": "Pale fill, dark",
+        "canonical": "#20304D"
+      },
+      "rail-dark": {
         "role": "neutral",
-        "displayName": "Rail, light",
-        "canonical": "#CFCFCF"
+        "displayName": "Rail, dark",
+        "canonical": "#35476A"
+      },
+      "ground-dark": {
+        "role": "neutral",
+        "displayName": "Navy ground",
+        "canonical": "#0D1626"
+      },
+      "surface-dark": {
+        "role": "neutral",
+        "displayName": "Navy surface (cards)",
+        "canonical": "#162338"
+      },
+      "surface-bar-dark": {
+        "role": "neutral",
+        "displayName": "Navigation bar surface, dark (elevation level 4)",
+        "canonical": "#213252"
+      },
+      "ink-dark": {
+        "role": "neutral",
+        "displayName": "Ink, dark",
+        "canonical": "#E4EAF5"
+      },
+      "muted-dark": {
+        "role": "neutral",
+        "displayName": "Muted Ink, dark",
+        "canonical": "#9DABC4"
+      },
+      "outline-dark": {
+        "role": "neutral",
+        "displayName": "Outline, dark",
+        "canonical": "#4A5C7C"
+      },
+      "hairline-dark": {
+        "role": "neutral",
+        "displayName": "Hairline divider, dark",
+        "canonical": "#24344F"
+      },
+      "warn-dark": {
+        "role": "tertiary",
+        "displayName": "Muted Red, dark",
+        "canonical": "#E79C94"
+      },
+      "on-warn-dark": {
+        "role": "tertiary",
+        "displayName": "Ink on Muted Red, dark",
+        "canonical": "#4A1712"
+      },
+      "warn-container-dark": {
+        "role": "tertiary",
+        "displayName": "Muted Red container, dark",
+        "canonical": "#4D2824"
+      },
+      "on-warn-container-dark": {
+        "role": "tertiary",
+        "displayName": "On Muted Red container, dark",
+        "canonical": "#F6D5D1"
       },
       "line-walk": {
         "role": "neutral",
-        "displayName": "Walk fallback",
+        "displayName": "Walk fallback (map)",
         "canonical": "#8A8A8A"
       },
       "line-bus": {
@@ -263,88 +233,118 @@
     "typographyMeta": {
       "display": {
         "displayName": "Display",
-        "purpose": "One large tabular figure per screen at most; today's step count."
+        "purpose": "One large tabular figure per screen at most; today's step count on the deep card."
       },
       "headline": {
         "displayName": "Headline",
-        "purpose": "Screen title in the top bar."
+        "purpose": "The page title."
+      },
+      "headline-small": {
+        "displayName": "Headline Small",
+        "purpose": "Dialog titles."
       },
       "title-large": {
         "displayName": "Title Large",
-        "purpose": "Section headings inside a screen."
+        "purpose": "Section headings inside a card; the figures on the Day summary card."
       },
       "title": {
         "displayName": "Title",
-        "purpose": "Event titles, the word Leave, day headings, stat lines."
+        "purpose": "Event titles, endpoint names, card titles, stat lines."
       },
       "title-small": {
         "displayName": "Title Small",
-        "purpose": "Stop and station names with their times, event time ranges, alternative routes."
+        "purpose": "Stop and station names with their times, leave and arrive times, calendar day numbers."
+      },
+      "body-large": {
+        "displayName": "Body Large",
+        "purpose": "The date beside the page title, row titles in Settings and Places, field text."
       },
       "body": {
         "displayName": "Body",
-        "purpose": "Places, line names, reasons, form text; platform face."
+        "purpose": "Places, line names, reasons, helper sentences."
       },
       "body-small": {
         "displayName": "Body Small",
-        "purpose": "Durations, stop counts, passed stops, free-time line, estimates and notes."
+        "purpose": "Durations, stop counts, passed stops, estimates and notes."
+      },
+      "label-large": {
+        "displayName": "Label Large",
+        "purpose": "Buttons, small list headings, the code on a line pill (set Bold at 14dp)."
       },
       "label": {
         "displayName": "Label",
-        "purpose": "Buttons, chips, small list headings."
+        "purpose": "Time tags, chart weekday labels."
       },
       "label-small": {
         "displayName": "Label Small",
-        "purpose": "Navigation labels and chart axis labels."
+        "purpose": "Navigation labels (SemiBold when selected), hour labels, weekday headings, chart values."
       }
     },
     "shadows": [
       {
+        "name": "card",
+        "value": "0 6px 18px rgba(22,56,102,0.09)",
+        "purpose": "cardShadow: under white and deep cards, event cards, endpoint markers, the open Details card and the address suggestion list, in light only. Android: elevation 2 with shadowColor #163866. None in dark."
+      },
+      {
         "name": "floating-bar",
-        "value": "0 6px 14px rgba(0,0,0,0.45)",
-        "purpose": "Under the floating navigation bar only, the single authored shadow. Light scheme: 0 6px 14px rgba(0,0,0,0.16). Android elevation 6."
+        "value": "0 8px 22px rgba(22,56,102,0.14)",
+        "purpose": "The navigation bar's stronger setting of the same deep-blue shadow, because content scrolls behind it. Android elevation 8. None in dark."
       }
     ],
     "elevation": [
       {
-        "name": "level1",
-        "value": "#222222",
-        "purpose": "Dark tonal step; light scheme #F8F8F8."
+        "name": "light",
+        "value": "#FFFFFF",
+        "purpose": "Every Material elevation level is white in light; depth is ice, white, pale, deep plus the card shadow."
       },
       {
-        "name": "level2",
-        "value": "#262626",
-        "purpose": "Dark tonal step; light scheme #F4F4F4."
+        "name": "level1-dark",
+        "value": "#162338",
+        "purpose": "Navy tonal step (cards)."
       },
       {
-        "name": "level3",
-        "value": "#2C2C2C",
-        "purpose": "Dark tonal step and the floating navigation bar's surface; light scheme #EDEDED."
+        "name": "level2-dark",
+        "value": "#1A2941",
+        "purpose": "Navy tonal step."
       },
       {
-        "name": "level4",
-        "value": "#303030",
-        "purpose": "Dark tonal step; light scheme #E9E9E9."
+        "name": "level3-dark",
+        "value": "#1E2E4A",
+        "purpose": "Navy tonal step."
       },
       {
-        "name": "level5",
-        "value": "#343434",
-        "purpose": "Dark tonal step; light scheme #E6E6E6."
+        "name": "level4-dark",
+        "value": "#213252",
+        "purpose": "Navy tonal step; the floating navigation bar's surface in dark."
+      },
+      {
+        "name": "level5-dark",
+        "value": "#243759",
+        "purpose": "Navy tonal step."
       },
       {
         "name": "backdrop",
-        "value": "rgba(0,0,0,0.5)",
-        "purpose": "Scrim behind dialogs in the dark scheme."
+        "value": "rgba(15,32,60,0.42)",
+        "purpose": "Scrim behind dialogs in light; rgba(4,9,18,0.6) in dark."
       }
     ],
     "motion": [
       {
         "name": "ease-layout",
         "value": "200ms ease-out, opacity on create and delete",
-        "purpose": "Opening, closing and re-laying the trail, passed stops and details. Instant when the system remove-animations setting is on; no layout animation on web."
+        "purpose": "Opening, closing and re-laying the trail, passed stops and details. Instant when the system remove-animations setting is on; no layout animation on web. Nothing animates on load."
       }
     ],
     "breakpoints": [
+      {
+        "name": "month-lines",
+        "value": "600px"
+      },
+      {
+        "name": "nav-max",
+        "value": "520px"
+      },
       {
         "name": "content-max",
         "value": "720px"
@@ -352,141 +352,207 @@
     ],
     "lineColour": {
       "source": "agency route colour when published, otherwise the mode fallback",
+      "scope": "the line pill and that line's stretch of the route (trail and map) only",
+      "lightAdjust": "relative luminance above 0.7: mix 30% toward black",
       "darkAdjust": "relative luminance below 0.12: mix 45% toward white",
-      "lightAdjust": "relative luminance above 0.7: mix 35% toward black"
+      "pillInk": "#14243D when the fill's luminance is above 0.3, otherwise #FFFFFF"
     },
     "appearance": {
-      "default": "dark",
+      "default": "light",
       "options": [
         "dark",
         "light",
         "system"
-      ]
+      ],
+      "decidedBy": "user",
+      "decidedOn": "2026-11-21"
+    },
+    "userDecisions": [
+      {
+        "date": "2026-11-21",
+        "decision": "Transit lines keep their agencies' own colours, but only on the small line pills and on that line's stretch of the route. This is data, not an accent."
+      },
+      {
+        "date": "2026-11-21",
+        "decision": "Warnings and errors keep a muted red (light #B4483F, dark #E79C94, with containers), always paired with an icon or words. It is the single non-blue UI colour."
+      },
+      {
+        "date": "2026-11-21",
+        "decision": "Light is the default theme; a navy dark theme from the same blue family remains selectable in Settings (dark / light / system)."
+      }
+    ],
+    "shape": {
+      "card": "22px",
+      "block": "16px",
+      "control": "14px",
+      "tag": "8px",
+      "pill": "999px",
+      "paperRoundness": 4,
+      "paperDerived": "buttons and segmented controls 20px (pill), dialogs 28px, chips 8px, outlined text fields, menus and snackbars 4px"
+    },
+    "typeface": {
+      "family": "Figtree",
+      "files": [
+        "Figtree_400Regular",
+        "Figtree_500Medium",
+        "Figtree_600SemiBold",
+        "Figtree_700Bold"
+      ],
+      "rule": "Each weight is its own font file; fontWeight is never set on text. Letter spacing 0."
+    },
+    "icons": {
+      "set": "Material Community Icons",
+      "style": "outline variants where one exists",
+      "sizes": "14 to 22px"
     },
     "navigation": {
       "kind": "floating bottom bar",
-      "height": "64px",
-      "radius": "32px",
-      "margin": "12px from the screen edges and the bottom system inset",
+      "height": "68px",
+      "radius": "34px (full round)",
+      "margin": "14px from the screen edges and the bottom system inset",
       "maxWidth": "520px, centred on wide windows",
-      "surface": "Material elevation level 3 with a 1px hairline outline",
-      "labels": "below the icon at every width",
-      "selected": "56x30px primary pill with the onPrimary icon",
-      "clearance": "88px plus the bottom inset; scroll content adds 96px more, the add button sits 4px above it, snackbars are lifted by it"
+      "surface": "white with the floating-bar shadow and no outline; elevation level 4 with no shadow in dark",
+      "labels": "12px below the icon at every width",
+      "selected": "52x30px solid primary pill, onPrimary 21px icon, primary SemiBold label",
+      "clearance": "96px plus the bottom inset; scroll content adds 96px more, the add button sits just above it, snackbars are lifted by it"
     },
     "kit": {
       "name": "react-native-paper",
       "system": "Material Design 3",
-      "colour": "expressed entirely through Material colour roles"
+      "colour": "expressed through Material colour roles; job-named tokens from useTokens where a role name does not say enough"
     }
   },
   "components": [
     {
-      "name": "Event Block",
+      "name": "Card",
       "kind": "card",
-      "refersTo": "event-block",
-      "description": "An event on the day view: 1dp outline-colour border, no fill; the trail leaves from under it.",
-      "html": "<button class=\"ds-event\"><span class=\"ds-event-head\"><span class=\"ds-event-title\">Morning Lecture: Distributed Systems</span><span class=\"ds-event-time\">09:00–10:30</span></span><span class=\"ds-event-place\">McConnell Hall, McGill</span></button>",
-      "css": ".ds-event { display: block; width: 100%; text-align: left; background: #1B1B1B; color: #D2D2D2; border: 1px solid #666666; border-radius: 8px; padding: 10px 14px; min-height: 48px; cursor: pointer; transition: background 200ms ease-out; } .ds-event:hover, .ds-event:active { background: #222222; } .ds-event:focus-visible { outline: 2px solid #8FB8F2; outline-offset: 2px; } .ds-event-head { display: flex; align-items: baseline; gap: 10px; } .ds-event-title { flex: 1; font: 600 18px/24px 'Barlow Semi Condensed', 'Arial Narrow', sans-serif; } .ds-event-time { font: 600 16px/22px 'Barlow Semi Condensed', 'Arial Narrow', sans-serif; font-variant-numeric: tabular-nums; } .ds-event-place { display: block; font: 400 14px/20px Roboto, system-ui, sans-serif; letter-spacing: 0.25px; color: #A0A0A0; }"
+      "refersTo": "card",
+      "description": "The container everything is grouped in: 22dp corners, 18dp padding, no border, the card shadow. Tones: white (default), pale (quiet, no shadow), deep (the one emphasis card on a screen).",
+      "html": "<div class=\"ds-card-stage\"><div class=\"ds-card ds-card-deep\"><div class=\"ds-card-stats\"><div><b>1 h 24</b><span>travelling</span></div><div><b>1.2 kg</b><span>CO₂ saved, est.</span></div><div><b>6,420</b><span>steps on foot</span></div></div></div><div class=\"ds-card\"><h4>Count my steps with</h4><div class=\"ds-card-pale\">Counting with this phone.</div></div></div>",
+      "css": ".ds-card-stage { background: #F1F5FC; padding: 20px; display: grid; gap: 14px; font-family: Figtree, system-ui, sans-serif; color: #14243D; } .ds-card { background: #FFFFFF; border-radius: 22px; padding: 18px; box-shadow: 0 6px 18px rgba(22,56,102,0.09); } .ds-card h4 { margin: 0 0 12px; font-weight: 600; font-size: 17px; line-height: 24px; } .ds-card-pale { background: #DFE8F7; color: #163866; border-radius: 22px; padding: 18px; font-size: 15px; line-height: 21px; } .ds-card-deep { background: #163866; color: #FFFFFF; } .ds-card-stats { display: flex; gap: 12px; } .ds-card-stats div { flex: 1; display: grid; gap: 2px; } .ds-card-stats b { font-weight: 600; font-size: 20px; line-height: 26px; font-variant-numeric: tabular-nums; } .ds-card-stats span { color: #C3D2EC; font-size: 13px; line-height: 18px; }"
+    },
+    {
+      "name": "Event Card",
+      "kind": "card",
+      "refersTo": "event-card",
+      "description": "An event on the Day view: a white card with the time range in a pale pill tag and an outline-icon location row; the trail leaves from under it.",
+      "html": "<div class=\"ds-event-stage\"><button class=\"ds-event\"><span class=\"ds-event-head\"><span class=\"ds-event-title\">Morning Lecture: Distributed Systems</span><span class=\"ds-event-time\">09:00–10:30</span></span><span class=\"ds-event-place\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" d=\"M12 21s-6.5-6.6-6.5-11.5a6.5 6.5 0 0 1 13 0C18.5 14.4 12 21 12 21z\"/><circle cx=\"12\" cy=\"9.5\" r=\"2.3\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/></svg>McConnell Engineering Building</span></button></div>",
+      "css": ".ds-event-stage { background: #F1F5FC; padding: 20px; } .ds-event { display: grid; gap: 6px; width: 100%; text-align: left; background: #FFFFFF; color: #14243D; border: 0; border-radius: 22px; padding: 16px 18px; box-shadow: 0 6px 18px rgba(22,56,102,0.09); cursor: pointer; font-family: Figtree, system-ui, sans-serif; transition: background 200ms ease-out; } .ds-event:hover { background: #F7F9FD; } .ds-event:focus-visible { outline: 2px solid #234F91; outline-offset: 2px; } .ds-event-head { display: flex; align-items: center; gap: 10px; } .ds-event-title { flex: 1; font-weight: 600; font-size: 17px; line-height: 24px; } .ds-event-time { background: #DFE8F7; color: #163866; border-radius: 999px; padding: 4px 10px; font-weight: 500; font-size: 13px; line-height: 18px; font-variant-numeric: tabular-nums; white-space: nowrap; } .ds-event-place { display: flex; align-items: center; gap: 6px; color: #5B6B84; font-size: 15px; line-height: 21px; }"
     },
     {
       "name": "Trail",
       "kind": "custom",
       "refersTo": "stop-dot",
-      "description": "The trip between two events: dotted for walking, solid in the line's colour for a vehicle, a ringed dot and a name at each change of mode.",
-      "html": "<div class=\"ds-trail\"><div class=\"ds-trail-row\"><span class=\"ds-trail-rail\"><span class=\"ds-trail-dotted\"></span></span><span class=\"ds-trail-seg ds-trail-walk\">Walk <small>4 min</small></span></div><div class=\"ds-trail-row\"><span class=\"ds-trail-rail\"><span class=\"ds-trail-dot\"></span></span><span class=\"ds-trail-stop\"><b>Sherbrooke / Robert-Bourassa <small>stop 52369</small></b><time>11:05</time></span></div><div class=\"ds-trail-row\"><span class=\"ds-trail-rail\"><span class=\"ds-trail-solid\"></span></span><button class=\"ds-trail-seg ds-trail-ride\">Bus 24 Sherbrooke <small>5 min · 4 stops</small><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path fill=\"#A0A0A0\" d=\"M7.41 8.58 12 13.17l4.59-4.59L18 10l-6 6-6-6z\"/></svg></button></div><div class=\"ds-trail-row\"><span class=\"ds-trail-rail\"><span class=\"ds-trail-dot\"></span></span><span class=\"ds-trail-stop\"><b>Saint-Laurent / Sherbrooke <small>stop 52511</small></b><time>11:12</time></span></div></div>",
-      "css": ".ds-trail { background: #1B1B1B; color: #D2D2D2; padding-left: 12px; font: 400 14px/20px Roboto, system-ui, sans-serif; } .ds-trail-row { display: flex; } .ds-trail-rail { position: relative; width: 28px; flex: none; display: flex; justify-content: center; } .ds-trail-dotted { position: absolute; top: 1px; bottom: 1px; border-left: 3px dotted #A0A0A0; } .ds-trail-solid { position: absolute; top: 0; bottom: 0; width: 4px; border-radius: 2px; background: #B07CE8; } .ds-trail-dot { width: 12px; height: 12px; margin: 6px 0; border-radius: 6px; border: 2px solid #D2D2D2; background: #1B1B1B; box-sizing: border-box; } .ds-trail-seg { flex: 1; display: flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 0 0 8px; background: none; border: 0; color: #D2D2D2; font: inherit; text-align: left; } .ds-trail-walk { color: #A0A0A0; } .ds-trail-ride { min-height: 48px; cursor: pointer; transition: background 200ms ease-out; } .ds-trail-ride svg { margin-left: auto; } .ds-trail-ride:hover, .ds-trail-ride:active { background: #222222; } .ds-trail-ride:focus-visible { outline: 2px solid #8FB8F2; outline-offset: -2px; } .ds-trail small { font-size: 12px; letter-spacing: 0.4px; color: #A0A0A0; font-weight: 400; font-family: Roboto, system-ui, sans-serif; font-variant-numeric: tabular-nums; } .ds-trail-stop { flex: 1; display: flex; align-items: center; gap: 8px; padding-left: 8px; font: 600 16px/22px 'Barlow Semi Condensed', 'Arial Narrow', sans-serif; } .ds-trail-stop b { flex: 1; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .ds-trail-stop time { color: #A0A0A0; font-variant-numeric: tabular-nums; }"
+      "description": "The trip between two event cards, drawn on the ice ground: a pale free-time pill, a dotted soft-blue line with a pale walk pill for walking, a solid line in the agency's colour with a line pill for a vehicle, a ringed blue dot at each stop.",
+      "html": "<div class=\"ds-trail\"><div class=\"ds-trail-row\"><span class=\"ds-trail-rail\"><span class=\"ds-trail-plain\"></span></span><span class=\"ds-trail-pass\"><span class=\"ds-trail-free\">31 min free · Café Olimpico<b>+4 min</b></span></span></div><div class=\"ds-trail-row\"><span class=\"ds-trail-rail\"><span class=\"ds-trail-dotted\"></span></span><span class=\"ds-trail-seg\"><span class=\"ds-trail-pill ds-trail-walkpill\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path fill=\"currentColor\" d=\"M14.12 10H19V8.2h-3.62l-2-3.33c-.3-.5-.84-.84-1.46-.84c-.18 0-.34.03-.5.08L6 5.8V11h1.8V7.33l2.11-.66L6 22h1.9l2.87-8.1L13 17v5h1.8v-6.41l-2.49-4.54l.73-2.87M14 3.8c1 0 1.8-.8 1.8-1.8S15 .2 14 .2S12.2 1 12.2 2S13 3.8 14 3.8\"/></svg></span><span class=\"ds-trail-muted\">Walk</span><span class=\"ds-trail-small\">6 min</span></span></div><div class=\"ds-trail-row\"><span class=\"ds-trail-rail\"><span class=\"ds-trail-dot\"></span></span><span class=\"ds-trail-stop\"><span>Sherbrooke</span><span class=\"ds-trail-time\">11:04</span></span></div><div class=\"ds-trail-row\"><span class=\"ds-trail-rail\"><span class=\"ds-trail-solid\"></span></span><span class=\"ds-trail-seg\"><span class=\"ds-trail-pill ds-trail-linepill\">2</span><span>Orange</span><span class=\"ds-trail-small\">9 min · 5 stops</span><span class=\"ds-trail-ok\">on time</span></span></div><div class=\"ds-trail-row\"><span class=\"ds-trail-rail\"><span class=\"ds-trail-dot\"></span></span><span class=\"ds-trail-stop\"><span>Bonaventure</span><span class=\"ds-trail-time\">11:13</span></span></div><div class=\"ds-trail-row\"><span class=\"ds-trail-rail\"><span class=\"ds-trail-plain\"></span></span><span class=\"ds-trail-pass\"><button class=\"ds-trail-details\">Details · 2 other options</button></span></div></div>",
+      "css": ".ds-trail { background: #F1F5FC; color: #14243D; padding: 12px 20px 12px 32px; font-family: Figtree, system-ui, sans-serif; font-size: 15px; line-height: 21px; } .ds-trail-row { display: flex; } .ds-trail-rail { position: relative; width: 28px; display: flex; justify-content: center; flex: none; } .ds-trail-plain { position: absolute; top: 0; bottom: 0; width: 2px; background: #C5D2E8; } .ds-trail-dotted { position: absolute; top: 1px; bottom: 1px; border-left: 3px dotted #A9BDE0; } .ds-trail-solid { position: absolute; top: 0; bottom: 0; width: 4px; border-radius: 2px; background: #EF8122; } .ds-trail-dot { width: 12px; height: 12px; box-sizing: border-box; border-radius: 6px; border: 2.5px solid #234F91; background: #FFFFFF; margin: 7px 0; } .ds-trail-pass { flex: 1; padding: 6px 0 6px 8px; } .ds-trail-free { display: flex; gap: 6px; background: #DFE8F7; color: #163866; border-radius: 999px; padding: 6px 12px; font-size: 13px; line-height: 18px; } .ds-trail-free b { margin-left: auto; font-weight: 500; } .ds-trail-seg { flex: 1; display: flex; align-items: center; gap: 8px; min-height: 36px; padding-left: 8px; } .ds-trail-pill { min-width: 32px; height: 24px; box-sizing: border-box; padding: 0 7px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; } .ds-trail-walkpill { background: #DFE8F7; color: #234F91; } .ds-trail-linepill { background: #EF8122; color: #14243D; font-weight: 700; font-size: 14px; font-variant-numeric: tabular-nums; } .ds-trail-muted { color: #5B6B84; } .ds-trail-small { color: #5B6B84; font-size: 13px; font-variant-numeric: tabular-nums; } .ds-trail-ok { color: #456DAD; font-size: 13px; } .ds-trail-stop { flex: 1; display: flex; align-items: center; gap: 8px; padding-left: 8px; font-weight: 600; font-size: 15px; line-height: 20px; } .ds-trail-time { margin-left: auto; color: #5B6B84; font-variant-numeric: tabular-nums; } .ds-trail-details { background: none; border: 0; border-radius: 20px; min-height: 40px; padding: 0 12px; margin-left: -12px; color: #234F91; font: inherit; font-weight: 600; cursor: pointer; transition: background 200ms ease-out; } .ds-trail-details:hover { background: rgba(35,79,145,0.08); } .ds-trail-details:focus-visible { outline: 2px solid #234F91; outline-offset: 2px; }"
     },
     {
       "name": "Navigation Bar",
       "kind": "nav",
       "refersTo": "nav-bar-floating",
-      "description": "Material 3 navigation bar, floating: fully rounded, inset 12dp, on the level-3 surface with a hairline outline and the one authored shadow; the selected destination sits on a blue pill.",
-      "html": "<div class=\"ds-nav-stage\"><nav class=\"ds-nav\"><a class=\"ds-nav-item ds-nav-on\" href=\"#\"><span class=\"ds-nav-pill\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path fill=\"currentColor\" d=\"M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7m0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5\"/></svg></span>Day</a><a class=\"ds-nav-item\" href=\"#\"><span class=\"ds-nav-pill\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path fill=\"currentColor\" d=\"M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2m0 16H5V9h14z\"/></svg></span>Calendar</a><a class=\"ds-nav-item\" href=\"#\"><span class=\"ds-nav-pill\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path fill=\"currentColor\" d=\"M17 3H7a2 2 0 0 0-2 2v16l7-3 7 3V5a2 2 0 0 0-2-2\"/></svg></span>Places</a></nav></div>",
-      "css": ".ds-nav-stage { background: #1B1B1B; padding: 12px; } .ds-nav { display: flex; height: 64px; max-width: 520px; margin: 0 auto; padding: 6px 0; box-sizing: border-box; background: #2C2C2C; border: 1px solid #343434; border-radius: 32px; box-shadow: 0 6px 14px rgba(0,0,0,0.45); } .ds-nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; color: #A0A0A0; text-decoration: none; font: 500 12px/16px Roboto, system-ui, sans-serif; letter-spacing: 0.5px; } .ds-nav-pill { width: 56px; height: 30px; border-radius: 15px; display: flex; align-items: center; justify-content: center; transition: background 200ms ease-out; } .ds-nav-item:hover .ds-nav-pill { background: #343434; } .ds-nav-on { color: #D2D2D2; } .ds-nav-on .ds-nav-pill, .ds-nav-on:hover .ds-nav-pill { background: #8FB8F2; color: #0F2542; } .ds-nav-item:focus-visible { outline: 2px solid #8FB8F2; outline-offset: -2px; border-radius: 16px; }"
+      "description": "A floating white pill: 68dp tall, inset 14dp, capped at 520dp, soft blue-tinted shadow, outline icons; the selected destination sits on a solid blue pill with a blue semibold label.",
+      "html": "<div class=\"ds-nav-stage\"><nav class=\"ds-nav\"><a class=\"ds-nav-item ds-nav-on\" href=\"#\"><span class=\"ds-nav-pill\"><svg width=\"21\" height=\"21\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M6 4a2 2 0 1 0 0 4a2 2 0 0 0 0-4zM18 16a2 2 0 1 0 0 4a2 2 0 0 0 0-4zM6 8v4a4 4 0 0 0 4 4h6\"/></svg></span>Day</a><a class=\"ds-nav-item\" href=\"#\"><span class=\"ds-nav-pill\"><svg width=\"21\" height=\"21\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M5 6h14v14H5zM5 10h14M8 3v4M16 3v4\"/></svg></span>Calendar</a><a class=\"ds-nav-item\" href=\"#\"><span class=\"ds-nav-pill\"><svg width=\"21\" height=\"21\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M7 4h10v16l-5-3l-5 3z\"/></svg></span>Places</a><a class=\"ds-nav-item\" href=\"#\"><span class=\"ds-nav-pill\"><svg width=\"21\" height=\"21\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M3 12h4l2-5l4 10l2-5h6\"/></svg></span>Activity</a><a class=\"ds-nav-item\" href=\"#\"><span class=\"ds-nav-pill\"><svg width=\"21\" height=\"21\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M12 9a3 3 0 1 0 0 6a3 3 0 0 0 0-6zM12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1\"/></svg></span>Settings</a></nav></div>",
+      "css": ".ds-nav-stage { background: #F1F5FC; padding: 14px; } .ds-nav { display: flex; height: 68px; max-width: 520px; margin: 0 auto; padding: 8px 6px; box-sizing: border-box; background: #FFFFFF; border-radius: 34px; box-shadow: 0 8px 22px rgba(22,56,102,0.14); } .ds-nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; color: #5B6B84; text-decoration: none; font-family: Figtree, system-ui, sans-serif; font-weight: 500; font-size: 12px; line-height: 16px; } .ds-nav-pill { width: 52px; height: 30px; border-radius: 15px; display: flex; align-items: center; justify-content: center; transition: background 200ms ease-out; } .ds-nav-item:hover .ds-nav-pill { background: #DFE8F7; } .ds-nav-on { color: #234F91; font-weight: 600; } .ds-nav-on .ds-nav-pill, .ds-nav-on:hover .ds-nav-pill { background: #234F91; color: #FFFFFF; } .ds-nav-item:focus-visible { outline: 2px solid #234F91; outline-offset: -2px; border-radius: 16px; }"
     },
     {
       "name": "Primary Button",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "The one committing action on a screen or dialog.",
-      "html": "<button class=\"ds-btn-primary\">Save home</button>",
-      "css": ".ds-btn-primary { background: #8FB8F2; color: #0F2542; border: 0; border-radius: 10px; min-height: 40px; padding: 10px 24px; font: 500 14px/20px Roboto, system-ui, sans-serif; letter-spacing: 0.1px; cursor: pointer; transition: background 200ms ease-out; } .ds-btn-primary:hover { background: #A6C7F5; } .ds-btn-primary:active { background: #7BA6E6; } .ds-btn-primary:focus-visible { outline: 2px solid #D2D2D2; outline-offset: 2px; } .ds-btn-primary:disabled { background: rgba(210,210,210,0.12); color: rgba(210,210,210,0.38); cursor: default; }"
+      "description": "Material contained button: blue fill, white label, pill. One per screen or dialog.",
+      "html": "<button class=\"ds-btn-primary\">Save</button>",
+      "css": ".ds-btn-primary { background: #234F91; color: #FFFFFF; border: 0; border-radius: 20px; min-height: 40px; padding: 0 24px; font-family: Figtree, system-ui, sans-serif; font-weight: 600; font-size: 15px; line-height: 20px; cursor: pointer; transition: background 200ms ease-out; } .ds-btn-primary:hover { background: #163866; } .ds-btn-primary:focus-visible { outline: 2px solid #234F91; outline-offset: 2px; } .ds-btn-primary:active { background: #163866; }"
     },
     {
-      "name": "Details Button",
+      "name": "Tonal Button",
       "kind": "button",
-      "description": "Text button in ink that opens a commute's details in place.",
-      "html": "<button class=\"ds-btn-text\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path fill=\"currentColor\" d=\"M7.41 8.58 12 13.17l4.59-4.59L18 10l-6 6-6-6z\"/></svg>Details · 4 other options</button>",
-      "css": ".ds-btn-text { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 12px; background: #1B1B1B; color: #D2D2D2; border: 0; border-radius: 10px; font: 500 14px/20px Roboto, system-ui, sans-serif; letter-spacing: 0.1px; cursor: pointer; transition: background 200ms ease-out; } .ds-btn-text:hover, .ds-btn-text:active { background: #222222; } .ds-btn-text:focus-visible { outline: 2px solid #8FB8F2; outline-offset: 2px; }"
+      "refersTo": "button-tonal",
+      "description": "Material tonal button on the pale blue container; import and connect actions.",
+      "html": "<button class=\"ds-btn-tonal\">Choose a calendar file</button>",
+      "css": ".ds-btn-tonal { background: #DFE8F7; color: #163866; border: 0; border-radius: 20px; min-height: 40px; padding: 0 24px; font-family: Figtree, system-ui, sans-serif; font-weight: 600; font-size: 15px; line-height: 20px; cursor: pointer; transition: background 200ms ease-out; } .ds-btn-tonal:hover { background: #CFDCF2; } .ds-btn-tonal:focus-visible { outline: 2px solid #234F91; outline-offset: 2px; }"
     },
     {
       "name": "Add Button",
       "kind": "button",
       "refersTo": "fab",
-      "description": "Blue add-event action, fixed 16dp from the right and 4dp above the navigation bar's clearance.",
-      "html": "<button class=\"ds-fab\" aria-label=\"Add event\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path fill=\"currentColor\" d=\"M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z\"/></svg></button>",
-      "css": ".ds-fab { width: 56px; height: 56px; display: inline-flex; align-items: center; justify-content: center; background: #8FB8F2; color: #0F2542; border: 0; border-radius: 8px; cursor: pointer; transition: background 200ms ease-out; } .ds-fab:hover { background: #A6C7F5; } .ds-fab:active { background: #7BA6E6; } .ds-fab:focus-visible { outline: 2px solid #D2D2D2; outline-offset: 2px; }"
+      "description": "A 56dp round blue button with a white plus, 18dp from the right, just above the navigation bar's clearance.",
+      "html": "<button class=\"ds-fab\" aria-label=\"Add event\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" d=\"M12 5v14M5 12h14\"/></svg></button>",
+      "css": ".ds-fab { width: 56px; height: 56px; border-radius: 28px; border: 0; background: #234F91; color: #FFFFFF; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; transition: background 200ms ease-out; } .ds-fab:hover { background: #163866; } .ds-fab:focus-visible { outline: 2px solid #234F91; outline-offset: 2px; }"
     },
     {
-      "name": "Filter Chip",
+      "name": "Selected Chip",
       "kind": "chip",
       "refersTo": "chip-selected",
-      "description": "Outlined when off, pale blue container when on; the state is also written in the label.",
-      "html": "<button class=\"ds-chip ds-chip-on\" aria-pressed=\"true\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path fill=\"currentColor\" d=\"M10 21v-3H3l5-5H5l5-5H7l5-6 5 6h-3l5 5h-3l5 5h-7v3z\"/></svg>Green routes on</button> <button class=\"ds-chip\" aria-pressed=\"false\">Green routes off</button>",
-      "css": ".ds-chip { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; background: #1B1B1B; color: #A0A0A0; border: 1px solid #666666; border-radius: 4px; font: 500 14px/20px Roboto, system-ui, sans-serif; letter-spacing: 0.1px; cursor: pointer; transition: background 200ms ease-out; } .ds-chip:hover { background: #222222; } .ds-chip-on { background: #25364D; color: #CEDDF2; border-color: #25364D; } .ds-chip-on:hover { background: #2D425E; } .ds-chip:focus-visible { outline: 2px solid #8FB8F2; outline-offset: 2px; }"
+      "description": "Material chip, 8dp corners: outlined when idle, pale fill with deep-blue ink when selected.",
+      "html": "<span class=\"ds-chips\"><button class=\"ds-chip ds-chip-on\">Home</button><button class=\"ds-chip\">Library</button></span>",
+      "css": ".ds-chips { display: inline-flex; gap: 8px; } .ds-chip { background: #FFFFFF; color: #5B6B84; border: 1px solid #A7B4C9; border-radius: 8px; min-height: 32px; padding: 0 12px; font-family: Figtree, system-ui, sans-serif; font-weight: 600; font-size: 15px; line-height: 20px; cursor: pointer; transition: background 200ms ease-out; } .ds-chip:hover { background: #F1F5FC; } .ds-chip-on, .ds-chip-on:hover { background: #DFE8F7; border-color: #DFE8F7; color: #163866; } .ds-chip:focus-visible { outline: 2px solid #234F91; outline-offset: 2px; }"
     },
     {
       "name": "Text Field",
       "kind": "input",
       "refersTo": "text-field",
-      "description": "Outlined Material text field with nearly square corners.",
-      "html": "<label class=\"ds-field\"><span>Home address</span><input type=\"text\" value=\"\" placeholder=\" \"></label>",
-      "css": ".ds-field { position: relative; display: block; background: #1B1B1B; padding-top: 8px; } .ds-field span { position: absolute; top: 0; left: 12px; padding: 0 4px; background: #1B1B1B; color: #A0A0A0; font: 400 12px/16px Roboto, system-ui, sans-serif; letter-spacing: 0.4px; } .ds-field input { width: 100%; box-sizing: border-box; height: 50px; padding: 0 16px; background: transparent; color: #D2D2D2; border: 1px solid #666666; border-radius: 2px; font: 400 16px/24px Roboto, system-ui, sans-serif; transition: border-color 200ms ease-out; } .ds-field input:hover { border-color: #A0A0A0; } .ds-field input:focus-visible { outline: none; border: 2px solid #8FB8F2; }"
+      "description": "Outlined Material text field on white, 4dp corners, label on the outline; the outline turns blue on focus.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-field-label\">Title</span><input class=\"ds-field-input\" value=\"Coffee with Sam\"></label>",
+      "css": ".ds-field { position: relative; display: block; font-family: Figtree, system-ui, sans-serif; } .ds-field-label { position: absolute; top: -8px; left: 10px; padding: 0 4px; background: #FFFFFF; color: #5B6B84; font-size: 12px; line-height: 16px; } .ds-field-input { width: 100%; box-sizing: border-box; height: 56px; padding: 0 14px; background: #FFFFFF; color: #14243D; border: 1px solid #A7B4C9; border-radius: 4px; font: inherit; font-size: 16px; } .ds-field-input:hover { border-color: #5B6B84; } .ds-field-input:focus-visible { outline: none; border: 2px solid #234F91; }"
+    },
+    {
+      "name": "Error Card",
+      "kind": "custom",
+      "refersTo": "error-card",
+      "description": "The error under the page title: muted-red container, 16dp corners, an alert icon, the message and Retry.",
+      "html": "<div class=\"ds-error\" role=\"alert\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"9\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><path stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" d=\"M12 7.5v5.5M12 16.5v.1\"/></svg><span>Could not reach the server.</span><button class=\"ds-error-retry\">Retry</button></div>",
+      "css": ".ds-error { display: flex; align-items: center; gap: 10px; background: #F8E4E1; color: #5A1B15; border-radius: 16px; padding: 10px 8px 10px 16px; font-family: Figtree, system-ui, sans-serif; font-size: 15px; line-height: 21px; } .ds-error span { flex: 1; } .ds-error-retry { background: none; border: 0; border-radius: 20px; min-height: 40px; padding: 0 12px; color: #5A1B15; font: inherit; font-weight: 600; cursor: pointer; } .ds-error-retry:hover { background: rgba(90,27,21,0.08); } .ds-error-retry:focus-visible { outline: 2px solid #5A1B15; outline-offset: 2px; }"
     }
   ],
   "narrative": {
-    "northStar": "Sentier, night",
-    "overview": "The day is one trail. Events are bordered blocks; between two blocks runs a single vertical line with a small dot wherever the rider changes mode, labelled like a trail marker with the station or stop. The ground is neutral charcoal with no tint, and each vehicle line is named by a pill in its agency's colour. Contrast is deliberately moderate: a mid charcoal ground, soft grey ink and slightly desaturated accents, with body text still above 4.5:1. Everything the rider does not need in the first few seconds waits behind \"Details\" and opens in place.\n\nIt is an Android-first Material 3 app. The UI kit is react-native-paper and it stays: the colour scheme is expressed entirely through Material colour roles (primary, secondary, error, surface, outline), so every component picks it up without per-component styling. The app keeps Material's controls and touch targets, and its navigation bar is Material's, floated. What is its own is the trail, the minimal blue scheme, the line pills, the floating navigation bar and the sign-style condensed face on times, headings and stop names. Dark is the designed scheme and the default; a light scheme with the same colour jobs is selectable in Settings (dark, light, or follow the phone) for direct sunlight.\n\nThe surface is flat, with one exception: the navigation bar floats over the content on a soft shadow. Sections are separated by hairlines and space, not by filled cards. Motion happens only when the user changes state.",
+    "northStar": "One blue, in layers",
+    "overview": "The app is a quiet stack of surfaces in a single hue. The ground is ice blue, content sits on white cards with generously rounded corners and one soft shadow, selected and quiet states are pale blue, and each screen has at most one deep-blue card for the thing that matters most. Blue is the only accent; depth comes from tonal contrast between these layers. There are no gradients and no decoration.\n\nThis direction was set by the user on 2026-11-21 and replaced the previous visual world outright. The brief: clean, minimalist, mobile-first, calm and approachable; soft, generously rounded corners; rounded white cards on an ice-blue ground with subtle shadows; layered surfaces; a modern sans-serif with clear hierarchy; minimalist line icons; a floating pill navigation bar; and a strict monochromatic blue accent system (Primary, Deep, Medium, Soft, Pale, Ice, White), with neutral grey used sparingly.\n\nThree decisions were made by the user on 2026-11-21 and are part of the system:\n1. Transit lines keep their agencies' own colours, but only on the small line pills and on that line's stretch of the route, because riders recognise lines by colour. This is data, not an accent.\n2. Warnings and errors keep a muted red, always paired with an icon or words. It is the single non-blue UI colour.\n3. Light is the default theme. A navy dark theme from the same blue family remains selectable in Settings (dark, light, or follow the phone).\n\nIt is an Android-first app built with Expo and React Native. The UI kit is react-native-paper (Material Design 3) and the scheme is expressed through Material colour roles (primary, secondary, tertiary, error, background, surface, surfaceVariant, outline, elevation levels), so the kit's buttons, fields, switches, chips, dialogs and menus pick the scheme up without per-component styling. A small set of job-named tokens (`useTokens`: accent, offer, warn, deep, pale, soft, rail, muted, card) covers the places where a Material role name does not say enough.\n\nWhat is the app's own: the day drawn as one trail between white event cards, the line pills, the three-tone card, the floating navigation bar and the Figtree type scale. Motion happens only when the user changes state.",
     "keyCharacteristics": [
-      "Lightly bordered event blocks joined by one vertical line; a dot and a name at each change of mode.",
-      "The day starts and ends at a round marker (a house for home), not at a block: home is a place, not an event.",
-      "A minimal scheme: neutral greys and one accent hue, blue, in two shades.",
-      "Blue marks where you are and what to commit; times on the trail are plain text.",
-      "Pale blue for offers and good news, vermilion for warnings, each transit line in its agency's colour.",
-      "Condensed sign face for times, headings and stop names; platform face for body and controls.",
-      "Flat charcoal grounds and hairline rules; the one authored shadow is under the floating navigation bar.",
+      "Ice-blue ground, white cards at 22dp corners, one soft blue-tinted shadow.",
+      "One accent hue. Every highlight, active state, chart and control is a shade or tint of the same blue.",
+      "At most one deep-blue card per screen, for the screen's headline figures.",
+      "Agency line colours on line pills and their stretch of route only; a muted red for warnings only.",
+      "Figtree in four weights, each its own font file; clear steps from 26dp page titles to 12dp labels.",
+      "Outline icons from Material Community Icons.",
+      "A floating white pill navigation bar; the selected destination on a solid blue pill.",
+      "Light by default; a navy dark theme with tonal depth and no shadows.",
       "Detail on request, in place; nothing animates on load."
     ],
     "rules": [
       {
-        "name": "The One Hue Rule",
-        "body": "Blue is the only accent hue, in two shades: blue and pale blue. No second accent hue is added. Vermilion is a warning, not an accent, and line colours belong to the agencies.",
-        "section": "colors"
-      },
-      {
-        "name": "The Sparing Blue Rule",
-        "body": "The blue field marks only where you are (selected destination, today) and the one thing to commit (primary action). The trail itself carries no blue field. Blue is never decoration and never emphasis inside running text; where it appears as text it is a Material control or a link.",
-        "section": "colors"
-      },
-      {
-        "name": "The Three Jobs Rule",
-        "body": "Blue marks where you are and what to commit, pale blue offers, vermilion warns. A colour never borrows another's job, and a warning always carries an icon or words as well as vermilion.",
+        "name": "The Blue Only Rule",
+        "body": "Blue is the only accent. Every highlight, active state, chart, meter and control is a shade, tint or opacity of the same blue family. No second accent hue, no gradients, no decorative colour. Depth is made by tone: ice, white, pale, deep.",
         "section": "colors"
       },
       {
         "name": "The Agency's Colour Rule",
-        "body": "A vehicle segment is the line's own colour, never a theme colour. Only contrast against the ground may adjust it.",
+        "body": "A transit line's own colour appears in exactly two places: its line pill and its stretch of the route, on the trail and on the map. It is data, not an accent. It is never used for a theme job, and a theme colour never recolours a line; only contrast against the ground may adjust it.",
+        "section": "colors",
+        "decidedBy": "user",
+        "decidedOn": "2026-11-21"
+      },
+      {
+        "name": "The Muted Red Rule",
+        "body": "Warnings and errors use the muted red, the single non-blue colour in the interface, and always carry an icon or words as well. Red is never an accent, a brand colour or a chart series.",
+        "section": "colors",
+        "decidedBy": "user",
+        "decidedOn": "2026-11-21"
+      },
+      {
+        "name": "The One Deep Card Rule",
+        "body": "A screen has at most one deep-blue card, holding its headline figures. Day: the day's totals plus the green-routes switch. Activity: today's steps. Calendar, Places and Settings have none.",
         "section": "colors"
       },
       {
-        "name": "The Sign Face Rule",
-        "body": "The condensed face is for times, headings and stop names. Sentences and control labels stay in the platform face.",
-        "section": "typography"
+        "name": "The Light First Rule",
+        "body": "Light is the default theme. The navy theme keeps the same roles from the same blue family and is chosen in Settings (dark, light, system).",
+        "section": "colors",
+        "decidedBy": "user",
+        "decidedOn": "2026-11-21"
       },
       {
         "name": "The One File Per Weight Rule",
-        "body": "Each condensed weight is its own font file. Pick the weight by choosing the variant; never set a font weight on a condensed variant. Letter spacing on the condensed face is 0.",
+        "body": "Each weight is its own font file. Choose the weight by choosing the variant or the `Font` family; never set `fontWeight` on text. Every variant declares weight 400 so the platform does not synthesise a second bold.",
         "section": "typography"
       },
       {
@@ -495,40 +561,39 @@
         "section": "typography"
       },
       {
-        "name": "The Hairline Rule",
-        "body": "Group with a hairline and space. A filled, raised card around a section or a commute is not part of this system.",
+        "name": "The One Shadow Rule",
+        "body": "There is one shadow: soft, low and tinted with the deep blue. It goes under cards and floating controls in light, and nowhere in dark. No black shadows, no hard or offset shadows, no glows.",
         "section": "elevation"
       },
       {
-        "name": "The One Shadow Rule",
-        "body": "The floating navigation bar is the single authored shadow. Nothing else in app styles is lifted; a new floating element is a change to the system, not an extension of it.",
+        "name": "The Tone Before Shadow Rule",
+        "body": "Separate things by tone first: white on ice, pale on white, deep for the one emphasis. Inside a card, separate rows with a hairline divider or space, not with another raised surface.",
         "section": "elevation"
       }
     ],
     "dos": [
-      "Do state each commute's times once, as plain text: leave, duration, arrive; let the day's endpoint markers carry the first leave and the last arrive.",
-      "Do show every vehicle line as a pill with its code on the agency's colour.",
-      "Do draw the trip as one continuous vertical line: dotted for walking, solid in the agency's line colour for a vehicle, a 12dp ringed dot with the stop name at each change of mode.",
-      "Do show the stop number on bus stops, and only on bus stops.",
-      "Do keep reasons, estimates, places, the map and other options behind \"Details\", opened in place.",
-      "Do set times, headings and stop names in Barlow Semi Condensed with tabular numerals for times; everything else in the platform face.",
-      "Do pair every vermilion warning with an icon or words, and label estimates and simulated data as such.",
-      "Do keep every tap target at least 48dp tall.",
-      "Do keep the same colour jobs in the light scheme, with the deeper blues and vermilion that read as text on a light ground.",
-      "Do set colour through Material colour roles so react-native-paper components pick it up without per-component styling.",
-      "Do keep 88dp plus the bottom system inset clear at the bottom of every screen for the floating navigation bar.",
-      "Do ease layout changes over 200ms ease-out and respect the remove-animations setting."
+      "**Do** build every screen from the same layers: ice ground, white cards (22dp corners, 18dp padding, 14dp apart), pale for selected and quiet states, deep for the one emphasis card.",
+      "**Do** use the `Card` component and the `Radius`, `Space` and `cardShadow` tokens rather than new values.",
+      "**Do** set colour through Material colour roles and `useTokens`, so react-native-paper components and both themes pick it up.",
+      "**Do** show every vehicle line as a pill with its code on the agency's colour, and draw its stretch of the route in that colour.",
+      "**Do** pair every muted-red warning with an icon or words, and label estimates and sample data as such.",
+      "**Do** choose a Figtree weight by choosing the type variant or `Font` family, and use tabular numerals for times, durations and counts.",
+      "**Do** distinguish chart series by shade of blue (primary for the highlighted series, soft for the rest) and say in words what the darker shade means.",
+      "**Do** keep reasons, estimates, places, the map and other options behind \"Details\", opened in place.",
+      "**Do** keep every tap target at least 48dp tall, and keep 96dp plus the bottom system inset clear at the bottom of every screen for the floating navigation bar.",
+      "**Do** ease layout changes over 200ms ease-out and respect the remove-animations setting."
     ],
     "donts": [
-      "Don't put a blue field on a commute, or use blue for emphasis or decoration.",
-      "Don't add a second accent hue; the accents are blue and pale blue, and vermilion is only for warnings.",
-      "Don't stack commutes or sections as filled, rounded, elevated cards.",
-      "Don't write step-by-step instruction sentences on the trail; a segment is a line name, a duration and a stop count.",
-      "Don't draw transfer walks of 5 minutes or less between two vehicles.",
-      "Don't recolour a transit line with a theme colour.",
-      "Don't set a font weight or letter spacing on a condensed variant.",
-      "Don't add shadows in app styles other than the floating navigation bar's, or animate anything on load.",
-      "Don't show a product name; none exists."
+      "**Don't** add a second accent hue, a gradient or decorative colour; blue is the only accent.",
+      "**Don't** use an agency's line colour anywhere except that line's pill and its stretch of the route, and don't recolour a line with a theme colour.",
+      "**Don't** use the muted red for anything but warnings, errors and destructive actions, or on its own without an icon or words.",
+      "**Don't** put more than one deep-blue card on a screen.",
+      "**Don't** set `fontWeight` or letter spacing on text.",
+      "**Don't** add a shadow other than the card shadow, tint one with black, or use any shadow in the dark theme.",
+      "**Don't** draw a border around a card; use tone and the shadow.",
+      "**Don't** write step-by-step instruction sentences on the trail, or draw transfer walks of 5 minutes or less between two vehicles.",
+      "**Don't** animate anything on load.",
+      "**Don't** show a product name; none exists."
     ]
   }
 }

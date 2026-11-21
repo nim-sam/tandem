@@ -315,7 +315,7 @@ func (r *Repository) GetUserPreferences(userID string) domain.UserPreferences {
 		pref.HealthProvider = domain.ProviderPhone
 	}
 	if pref.Appearance == "" {
-		pref.Appearance = "dark"
+		pref.Appearance = "light"
 	}
 	return pref
 }

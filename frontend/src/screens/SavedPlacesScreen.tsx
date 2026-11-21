@@ -5,6 +5,7 @@ import { useApp } from '../store/AppContext';
 import { API } from '../api/client';
 import { Screen } from '../components/Screen';
 import { PromptDialog, PromptField } from '../components/PromptDialog';
+import { Card } from '../components/Card';
 import { NAV_CLEARANCE, useAppTheme, useTokens } from '../theme';
 import { Collection, SavedPlace } from '../types';
 
@@ -106,7 +107,7 @@ export const SavedPlacesScreen: React.FC = () => {
         )}
 
         {collections.map((col) => (
-          <View key={col.id} style={[styles.card, { borderBottomColor: tokens.hairline }]}>
+          <Card key={col.id} style={styles.card}>
             <View style={styles.head}>
               <View style={{ flex: 1 }}>
                 <Text variant="titleLarge">{col.name}</Text>
@@ -150,7 +151,7 @@ export const SavedPlacesScreen: React.FC = () => {
                   <View style={{ flex: 1 }}>
                     <Text variant="bodyLarge">{place.name}</Text>
                     {isHome(place) && (
-                      <Text variant="labelMedium" style={{ color: tokens.offer }}>
+                      <Text variant="labelMedium" style={{ color: tokens.accent }}>
                         Home
                       </Text>
                     )}
@@ -193,7 +194,7 @@ export const SavedPlacesScreen: React.FC = () => {
             <Button mode="text" icon="plus" style={styles.add} onPress={() => addPlace(col)}>
               Add a place
             </Button>
-          </View>
+          </Card>
         ))}
 
         <Button mode="contained" buttonColor={tokens.accent} textColor={tokens.onAccent} icon="folder-plus-outline" onPress={newCollection}>
@@ -221,7 +222,7 @@ export const SavedPlacesScreen: React.FC = () => {
 
 const styles = StyleSheet.create({
   root: { flex: 1 },
-  card: { borderBottomWidth: StyleSheet.hairlineWidth, paddingBottom: 8, gap: 4 },
+  card: { gap: 4, paddingBottom: 10, paddingRight: 8 },
   head: { flexDirection: 'row', alignItems: 'center' },
   place: { flexDirection: 'row', alignItems: 'center', minHeight: 56, paddingVertical: 8 },
   add: { alignSelf: 'flex-start', marginLeft: -8 },

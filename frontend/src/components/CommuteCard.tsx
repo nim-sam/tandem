@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button, Icon, Text, TouchableRipple } from 'react-native-paper';
 import { DAY_END, DAY_START, IntermodalNode, Route } from '../types';
-import { inkOn, lineColor, useAppTheme, useTokens } from '../theme';
+import { Font, Radius, cardShadow, inkOn, lineColor, useAppTheme, useTokens } from '../theme';
 import { formatCO2, formatDuration, formatTime } from '../utils/format';
 import { easeLayout } from '../utils/motion';
 import { RouteMap } from './RouteMap';
@@ -32,11 +32,10 @@ export const LinePill: React.FC<{ node: IntermodalNode }> = ({ node }) => {
 
 // The walking counterpart of a line pill: same size, a walker instead of a code.
 const WalkPill: React.FC = () => {
-  const theme = useAppTheme();
   const tokens = useTokens();
   return (
-    <View style={[styles.linePill, { backgroundColor: theme.colors.surfaceVariant }]}>
-      <Icon source="walk" size={16} color={tokens.muted} />
+    <View style={[styles.linePill, { backgroundColor: tokens.pale }]}>
+      <Icon source="walk" size={16} color={tokens.accent} />
     </View>
   );
 };
@@ -112,7 +111,7 @@ const Segment: React.FC<{ node: IntermodalNode; header?: React.ReactNode; footer
     <View style={styles.row}>
       <View style={styles.rail}>
         {walking ? (
-          <View style={[styles.dotted, { borderColor: tokens.muted }]} />
+          <View style={[styles.dotted, { borderColor: tokens.soft }]} />
         ) : (
           <View style={[styles.solid, { backgroundColor: color }]} />
         )}
@@ -163,7 +162,7 @@ const Stop: React.FC<{ name: string; code?: string; time: string }> = ({ name, c
   return (
     <View style={styles.row}>
       <View style={styles.rail}>
-        <View style={[styles.dot, { borderColor: theme.colors.onSurface, backgroundColor: theme.colors.background }]} />
+        <View style={[styles.dot, { borderColor: theme.colors.primary, backgroundColor: theme.colors.surface }]} />
       </View>
       <View style={styles.stop}>
         <Text variant="titleSmall" style={{ flex: 1 }} numberOfLines={1}>
@@ -268,7 +267,7 @@ export const CommuteCard: React.FC<Props> = ({ route, onSelect }) => {
         <View style={styles.actions}>
           <Button
             mode="text"
-            textColor={theme.colors.onSurface}
+            textColor={tokens.accent}
             icon={open ? 'chevron-up' : 'chevron-down'}
             contentStyle={styles.target}
             onPress={() => {
@@ -282,7 +281,7 @@ export const CommuteCard: React.FC<Props> = ({ route, onSelect }) => {
         </View>
 
         {open && (
-          <View style={styles.details}>
+          <View style={[styles.details, { backgroundColor: tokens.card }, cardShadow(theme.dark)]}>
             <Text variant="bodyMedium">
               {route.reason}
               <Text style={{ color: tokens.muted }}>
@@ -379,11 +378,12 @@ export const CommuteCard: React.FC<Props> = ({ route, onSelect }) => {
     <View style={styles.commute}>
       {route.slack_minutes >= 10 && places.length > 0 && (
         <Pass>
-          <View style={styles.free}>
-            <Text variant="bodySmall" style={{ color: tokens.offer, flexShrink: 1 }} numberOfLines={1}>
+          <View style={[styles.free, { backgroundColor: tokens.pale }]}>
+            <Icon source="clock-outline" size={14} color={tokens.onPale} />
+            <Text variant="bodySmall" style={{ color: tokens.onPale, flex: 1 }} numberOfLines={1}>
               {formatDuration(route.slack_minutes)} free · {places[0].name}
             </Text>
-            <Text variant="bodySmall" numberOfLines={1} style={[styles.tabular, { color: tokens.offer, flexShrink: 0 }]}>
+            <Text variant="labelMedium" numberOfLines={1} style={[styles.tabular, { color: tokens.onPale, flexShrink: 0 }]}>
               {places[0].detour_minutes > 1 ? `+${places[0].detour_minutes} min` : 'on your way'}
             </Text>
           </View>
@@ -446,7 +446,7 @@ const styles = StyleSheet.create({
   plain: { position: 'absolute', top: 0, bottom: 0, width: 2 },
   dotted: { position: 'absolute', top: 1, bottom: 1, width: 0, borderLeftWidth: 3, borderStyle: 'dotted' },
   solid: { position: 'absolute', top: 0, bottom: 0, width: 4, borderRadius: 2 },
-  dot: { width: 12, height: 12, borderRadius: 6, borderWidth: 2, marginVertical: 6 },
+  dot: { width: 12, height: 12, borderRadius: 6, borderWidth: 2.5, marginVertical: 7 },
   segment: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 36, paddingLeft: 8 },
   segmentTarget: { minHeight: 48, justifyContent: 'center' },
   passed: { flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 26, paddingLeft: 8 },
@@ -455,14 +455,14 @@ const styles = StyleSheet.create({
   pass: { flex: 1, paddingLeft: 8, paddingVertical: 6, minWidth: 0 },
   joined: { paddingLeft: 8, paddingVertical: 6 },
   times: { minHeight: 24 },
-  linePill: { minWidth: 30, height: 22, borderRadius: 6, paddingHorizontal: 6, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
-  lineCode: { lineHeight: 22, fontWeight: '700' },
+  linePill: { minWidth: 32, height: 24, borderRadius: Radius.tag, paddingHorizontal: 7, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
+  lineCode: { lineHeight: 24, fontSize: 14, fontFamily: Font.bold },
   pills: { flex: 1, flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 6 },
   warning: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 6 },
   actions: { flexDirection: 'row', marginLeft: -12 },
   target: { minHeight: 48 },
-  free: { flexDirection: 'row', gap: 6 },
-  details: { gap: 10, paddingTop: 8, paddingBottom: 8 },
+  free: { flexDirection: 'row', alignItems: 'center', gap: 6, borderRadius: Radius.pill, paddingHorizontal: 12, paddingVertical: 6, marginTop: 4 },
+  details: { gap: 12, padding: 16, borderRadius: Radius.block, marginRight: 2, marginBottom: 10 },
   list: { gap: 4 },
   place: { flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 24 },
   option: { borderTopWidth: StyleSheet.hairlineWidth, paddingVertical: 10, minHeight: 56, justifyContent: 'center', marginTop: 8 },

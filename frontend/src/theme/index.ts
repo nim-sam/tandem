@@ -1,127 +1,159 @@
+import { Platform, ViewStyle } from 'react-native';
 import { MD3LightTheme, MD3DarkTheme, MD3Theme, configureFonts, useTheme } from 'react-native-paper';
 import { TransitMode } from '../types';
 
-// "Sentier": the day is one trail on a neutral ground.
-// The scheme is minimal: neutral greys carry the screen and one hue, blue,
-// does every accent job in two shades.
-//   blue (primary)        where you are and what to commit: the selected tab,
-//                         today, the add button, a dialog's one committing button
-//   pale blue (secondary) offers and good news (free time, on time, found on
-//                         the map); its container is the selected state of chips
-//   vermilion (error)     warnings only (stairs, late, does not fit); the one
-//                         colour outside the blues, because a warning must not
-//                         look like an accent
-//   line colours          each transit line's own colour, on pills and the trail
-// These are Material 3 colour roles, so every react-native-paper component
-// picks them up without per-component styling.
+// A calm, card-based interface in one hue. Blue is the only accent: every
+// highlight, active state, chart and control is a shade, tint or opacity of
+// the same blue, and depth comes from tone (ice ground, white cards, pale
+// selected states, deep emphasis) plus one soft shadow.
+//
+// Two colours sit outside the blues, each for a reason that is not decoration:
+//   a muted red     warnings and errors only, always with an icon or words
+//   line colours    a transit line's own colour on its pill and its stretch of
+//                   the route, because riders know lines by colour
+//
+// Everything is expressed as Material 3 colour roles, so react-native-paper's
+// components pick the scheme up without per-component styling.
 
-const DISPLAY = 'BarlowSemiCondensed_700Bold';
-const TITLE = 'BarlowSemiCondensed_600SemiBold';
+export const Blue = {
+  deep: '#163866', // strong emphasis: the summary card, dark sections
+  primary: '#234F91', // primary buttons, active states, important icons
+  medium: '#5279B8', // secondary fills, charts, supporting elements
+  soft: '#A9BDE0', // progress tracks, card accents, the trail's rail
+  pale: '#DFE8F7', // subtle card backgrounds, selected states
+  ice: '#F1F5FC', // the ground
+  white: '#FFFFFF', // cards and foreground surfaces
+};
 
-// Times and headings are set in a sign-style condensed face; body text and
-// controls stay in the platform face. Each weight is its own font file, so
-// fontWeight stays '400' here and must not be overridden on these variants.
-const fonts = configureFonts({
-  config: {
-    displaySmall: { fontFamily: DISPLAY, fontWeight: '400', letterSpacing: 0 },
-    headlineLarge: { fontFamily: DISPLAY, fontWeight: '400', letterSpacing: 0 },
-    headlineMedium: { fontFamily: DISPLAY, fontWeight: '400', letterSpacing: 0 },
-    headlineSmall: { fontFamily: DISPLAY, fontWeight: '400', letterSpacing: 0 },
-    titleLarge: { fontFamily: TITLE, fontWeight: '400', letterSpacing: 0 },
-    titleMedium: { fontFamily: TITLE, fontWeight: '400', fontSize: 18, lineHeight: 24, letterSpacing: 0 },
-    titleSmall: { fontFamily: TITLE, fontWeight: '400', fontSize: 16, lineHeight: 22, letterSpacing: 0 },
-  },
+// One typeface, Figtree, in four weights. Each weight is its own font file, so
+// fontWeight stays '400' here and must not be set on text: pick the variant.
+export const Font = {
+  regular: 'Figtree_400Regular',
+  medium: 'Figtree_500Medium',
+  semibold: 'Figtree_600SemiBold',
+  bold: 'Figtree_700Bold',
+};
+
+const face = (fontFamily: string, fontSize: number, lineHeight: number) => ({
+  fontFamily,
+  fontWeight: '400' as const,
+  fontSize,
+  lineHeight,
+  letterSpacing: 0,
 });
 
-// Contrast is deliberately moderate: soft grey ink on mid charcoal, and blues
-// that are clear without being loud. Body text clears WCAG AA (4.5:1) in both schemes.
-export const DarkTheme: MD3Theme = {
-  ...MD3DarkTheme,
-  fonts,
-  roundness: 2,
-  colors: {
-    ...MD3DarkTheme.colors,
-    primary: '#8FB8F2',
-    onPrimary: '#0F2542',
-    primaryContainer: '#22395A',
-    onPrimaryContainer: '#D4E3F9',
-    secondary: '#A9C4E6',
-    onSecondary: '#17293F',
-    secondaryContainer: '#25364D',
-    onSecondaryContainer: '#CEDDF2',
-    tertiary: '#DE9584',
-    onTertiary: '#3B1810',
-    tertiaryContainer: '#4E2A23',
-    onTertiaryContainer: '#EFCFC7',
-    error: '#DE9584',
-    onError: '#3B1810',
-    errorContainer: '#4E2A23',
-    onErrorContainer: '#EFCFC7',
-    background: '#1B1B1B',
-    onBackground: '#D2D2D2',
-    surface: '#222222',
-    onSurface: '#D2D2D2',
-    surfaceVariant: '#2C2C2C',
-    onSurfaceVariant: '#A0A0A0',
-    outline: '#666666',
-    outlineVariant: '#343434',
-    inverseSurface: '#D2D2D2',
-    inverseOnSurface: '#222222',
-    inversePrimary: '#2D62B5',
-    surfaceDisabled: 'rgba(210,210,210,0.12)',
-    onSurfaceDisabled: 'rgba(210,210,210,0.38)',
-    backdrop: 'rgba(0,0,0,0.5)',
-    elevation: {
-      level0: 'transparent',
-      level1: '#222222',
-      level2: '#262626',
-      level3: '#2C2C2C',
-      level4: '#303030',
-      level5: '#343434',
-    },
+const fonts = configureFonts({
+  config: {
+    displayLarge: face(Font.bold, 48, 54),
+    displayMedium: face(Font.bold, 40, 46),
+    displaySmall: face(Font.bold, 34, 40),
+    headlineLarge: face(Font.bold, 30, 36),
+    headlineMedium: face(Font.bold, 26, 32), // page titles
+    headlineSmall: face(Font.bold, 22, 28), // dialog titles
+    titleLarge: face(Font.semibold, 20, 26), // section headings
+    titleMedium: face(Font.semibold, 17, 24), // card titles
+    titleSmall: face(Font.semibold, 15, 20), // stop names, times
+    bodyLarge: face(Font.regular, 16, 24),
+    bodyMedium: face(Font.regular, 15, 21),
+    bodySmall: face(Font.regular, 13, 18),
+    labelLarge: face(Font.semibold, 15, 20), // buttons
+    labelMedium: face(Font.medium, 13, 18),
+    labelSmall: face(Font.medium, 12, 16),
+    default: face(Font.regular, 15, 21),
   },
-};
+});
 
 export const LightTheme: MD3Theme = {
   ...MD3LightTheme,
   fonts,
-  roundness: 2,
+  roundness: 4, // Material's scale: 4dp fields x this, pill buttons, 28dp dialogs
   colors: {
     ...MD3LightTheme.colors,
-    primary: '#2D62B5',
-    onPrimary: '#FFFFFF',
-    primaryContainer: '#D5E3F8',
-    onPrimaryContainer: '#12305C',
-    secondary: '#3A669C',
-    onSecondary: '#FFFFFF',
-    secondaryContainer: '#DAE6F5',
-    onSecondaryContainer: '#1B3558',
-    tertiary: '#A9503B',
-    onTertiary: '#F8F8F8',
-    tertiaryContainer: '#F3DAD3',
-    onTertiaryContainer: '#4A1F15',
-    error: '#A9503B',
-    onError: '#F8F8F8',
-    errorContainer: '#F3DAD3',
-    onErrorContainer: '#4A1F15',
-    background: '#EFEFEF',
-    onBackground: '#2E2E2E',
-    surface: '#F8F8F8',
-    onSurface: '#2E2E2E',
-    surfaceVariant: '#E4E4E4',
-    onSurfaceVariant: '#626262',
-    outline: '#949494',
-    outlineVariant: '#D9D9D9',
-    inverseSurface: '#2C2C2C',
-    inverseOnSurface: '#E8E8E8',
-    inversePrimary: '#8FB8F2',
+    primary: Blue.primary,
+    onPrimary: Blue.white,
+    primaryContainer: Blue.pale,
+    onPrimaryContainer: Blue.deep,
+    secondary: '#456DAD', // medium blue, deepened a step so it also reads as text
+    onSecondary: Blue.white,
+    secondaryContainer: Blue.pale,
+    onSecondaryContainer: Blue.deep,
+    tertiary: Blue.medium,
+    onTertiary: Blue.white,
+    tertiaryContainer: Blue.pale,
+    onTertiaryContainer: Blue.deep,
+    error: '#B4483F',
+    onError: Blue.white,
+    errorContainer: '#F8E4E1',
+    onErrorContainer: '#5A1B15',
+    background: Blue.ice,
+    onBackground: '#14243D',
+    surface: Blue.white,
+    onSurface: '#14243D', // ink: a near-black blue
+    surfaceVariant: Blue.pale,
+    onSurfaceVariant: '#5B6B84', // secondary text: a desaturated blue-grey
+    outline: '#A7B4C9',
+    outlineVariant: '#E1E7F1',
+    inverseSurface: Blue.deep,
+    inverseOnSurface: Blue.ice,
+    inversePrimary: Blue.soft,
+    surfaceDisabled: 'rgba(20,36,61,0.10)',
+    onSurfaceDisabled: 'rgba(20,36,61,0.38)',
+    backdrop: 'rgba(15,32,60,0.42)',
     elevation: {
       level0: 'transparent',
-      level1: '#F8F8F8',
-      level2: '#F4F4F4',
-      level3: '#EDEDED',
-      level4: '#E9E9E9',
-      level5: '#E6E6E6',
+      level1: Blue.white,
+      level2: Blue.white,
+      level3: Blue.white,
+      level4: Blue.white,
+      level5: Blue.white,
+    },
+  },
+};
+
+// The same family at night: navy grounds, the soft and pale blues as accents.
+export const DarkTheme: MD3Theme = {
+  ...MD3DarkTheme,
+  fonts,
+  roundness: 4,
+  colors: {
+    ...MD3DarkTheme.colors,
+    primary: Blue.soft,
+    onPrimary: '#10294D',
+    primaryContainer: '#223F70',
+    onPrimaryContainer: Blue.pale,
+    secondary: '#8FA9D6',
+    onSecondary: '#10294D',
+    secondaryContainer: '#223F70',
+    onSecondaryContainer: Blue.pale,
+    tertiary: '#8FA9D6',
+    onTertiary: '#10294D',
+    tertiaryContainer: '#223F70',
+    onTertiaryContainer: Blue.pale,
+    error: '#E79C94',
+    onError: '#4A1712',
+    errorContainer: '#4D2824',
+    onErrorContainer: '#F6D5D1',
+    background: '#0D1626',
+    onBackground: '#E4EAF5',
+    surface: '#162338',
+    onSurface: '#E4EAF5',
+    surfaceVariant: '#20304D',
+    onSurfaceVariant: '#9DABC4',
+    outline: '#4A5C7C',
+    outlineVariant: '#24344F',
+    inverseSurface: Blue.pale,
+    inverseOnSurface: Blue.deep,
+    inversePrimary: Blue.primary,
+    surfaceDisabled: 'rgba(228,234,245,0.10)',
+    onSurfaceDisabled: 'rgba(228,234,245,0.38)',
+    backdrop: 'rgba(4,9,18,0.6)',
+    elevation: {
+      level0: 'transparent',
+      level1: '#162338',
+      level2: '#1A2941',
+      level3: '#1E2E4A',
+      level4: '#213252',
+      level5: '#243759',
     },
   },
 };
@@ -131,23 +163,47 @@ export const useAppTheme = () => useTheme<MD3Theme>();
 // Colours by job, for the places Material's role names do not say enough.
 export const useTokens = () => {
   const theme = useAppTheme();
+  const dark = theme.dark;
   return {
-    accent: theme.colors.primary, // the flat blue field: selected tab, today, primary action
+    accent: theme.colors.primary, // the solid blue: active tab, today, primary action
     onAccent: theme.colors.onPrimary,
     offer: theme.colors.secondary, // offers and good news, as text and icons
     warn: theme.colors.error,
-    rail: theme.dark ? '#3E3E3E' : '#CFCFCF', // the trail line
-    post: theme.colors.onSurface, // event markers
-    border: theme.colors.outline, // event blocks, endpoint markers
+    deep: dark ? '#223F70' : Blue.deep, // the emphasis card
+    onDeep: dark ? Blue.pale : Blue.white,
+    onDeepMuted: dark ? '#A9BDE0' : '#C3D2EC',
+    pale: theme.colors.surfaceVariant, // selected states, quiet fills
+    onPale: theme.colors.onPrimaryContainer,
+    soft: dark ? '#3A5384' : Blue.soft, // tracks and the unselected series of a chart
+    rail: dark ? '#35476A' : '#C5D2E8', // the trail line
+    post: theme.colors.onSurface, // primary text and markers
+    border: theme.colors.outline,
     hairline: theme.colors.outlineVariant,
     muted: theme.colors.onSurfaceVariant,
+    card: theme.colors.surface,
   };
 };
+
+// Shape. One radius per kind of thing, used everywhere.
+export const Radius = { card: 22, block: 16, control: 14, pill: 999, tag: 8 };
+
+// Space. Screens use a 20dp gutter; cards 18dp of padding; 14dp between cards.
+export const Space = { gutter: 20, card: 18, gap: 14 };
+
+// The one shadow: soft, low and tinted blue, under cards and floating controls.
+// On the navy theme depth is tonal instead, so there is none.
+export const cardShadow = (dark: boolean): ViewStyle =>
+  dark
+    ? {}
+    : Platform.select<ViewStyle>({
+        android: { elevation: 2, shadowColor: '#163866' },
+        default: { shadowColor: '#163866', shadowOpacity: 0.09, shadowRadius: 18, shadowOffset: { width: 0, height: 6 } },
+      }) ?? {};
 
 // The navigation bar floats over the content. Anything pinned to the bottom of
 // a screen (the add button, snackbars, the last row of a list) keeps this much
 // clear, plus the system's bottom inset.
-export const NAV_BAR = { height: 64, margin: 12 };
+export const NAV_BAR = { height: 68, margin: 14 };
 export const NAV_CLEARANCE = NAV_BAR.height + NAV_BAR.margin * 2;
 
 // Fallback colours per mode, used when the agency does not publish a line colour.
@@ -176,18 +232,18 @@ const mix = (hex: string, target: number, amount: number): string => {
 };
 
 // A line's own colour for its blaze. Agency colours that would vanish against
-// the ground (navy on charcoal, yellow on white) are pulled toward the ink.
+// the ground (navy on navy, yellow on white) are pulled toward the ink.
 export const lineColor = (mode: TransitMode, routeColor: string | undefined, dark: boolean): string => {
   const valid = routeColor && /^[0-9a-fA-F]{6}$/.test(routeColor);
   let color = mode !== 'walk' && valid ? `#${routeColor}` : TransitModeColors[mode] ?? '#8A8A8A';
   const l = luminance(color);
   if (dark && l < 0.12) color = mix(color, 255, 0.45);
-  if (!dark && l > 0.7) color = mix(color, 0, 0.35);
+  if (!dark && l > 0.7) color = mix(color, 0, 0.3);
   return color;
 };
 
 // Black or white, whichever reads better on the given fill.
-export const inkOn = (fill: string): string => (luminance(fill) > 0.3 ? '#161616' : '#F4F4F4');
+export const inkOn = (fill: string): string => (luminance(fill) > 0.3 ? '#14243D' : '#FFFFFF');
 
 export const modeIcon = (mode: TransitMode): string =>
   ({ walk: 'walk', metro: 'subway-variant', rem: 'train', bus: 'bus', bike: 'bike', train: 'train-variant' })[mode] ??

@@ -16,7 +16,7 @@ type UserPreferences struct {
 	// HealthProvider is where step counts come from: "phone" (the phone's
 	// pedometer, real data), or "fitbit" / "garmin" (simulated for now).
 	HealthProvider HealthProvider `json:"health_provider"`
-	// Appearance is the app theme: "dark" (default), "light", or "system".
+	// Appearance is the app theme: "light" (default), "dark", or "system".
 	Appearance string `json:"appearance"`
 }
 
@@ -33,6 +33,6 @@ func DefaultUserPreferences(userID string) UserPreferences {
 		AllowThirdPlaceDetours: true,
 		StepGoalDaily:          8000,
 		HealthProvider:         ProviderPhone,
-		Appearance:             "dark",
+		Appearance:             "light",
 	}
 }

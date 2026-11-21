@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { ActivityIndicator, Icon, Text, TextInput, TouchableRipple } from 'react-native-paper';
 import { API } from '../api/client';
 import { Location } from '../types';
-import { useTokens } from '../theme';
+import { cardShadow, useAppTheme, useTokens } from '../theme';
 
 interface Props {
   label: string;
@@ -20,6 +20,7 @@ const DEBOUNCE_MS = 300;
 // fixes the coordinates there and then, so an address is known to resolve
 // before the form is saved. The list opens in place, under the field.
 export const AddressInput: React.FC<Props> = ({ label, value, onChangeText, onPick, resolved }) => {
+  const theme = useAppTheme();
   const tokens = useTokens();
   const [suggestions, setSuggestions] = useState<Location[]>([]);
   const [searching, setSearching] = useState(false);
@@ -82,7 +83,7 @@ export const AddressInput: React.FC<Props> = ({ label, value, onChangeText, onPi
       />
 
       {open && (
-        <View style={[styles.list, { borderColor: tokens.border }]} accessibilityRole="list">
+        <View style={[styles.list, { backgroundColor: tokens.card, borderColor: tokens.hairline }, cardShadow(theme.dark)]} accessibilityRole="list">
           {suggestions.map((s, i) => {
             const city = s.address && s.address !== s.name ? s.address.slice(s.name.length).replace(/^,\s*/, '') : '';
             return (
@@ -128,7 +129,7 @@ export const AddressInput: React.FC<Props> = ({ label, value, onChangeText, onPi
 };
 
 const styles = StyleSheet.create({
-  list: { borderWidth: 1, borderTopWidth: 0, borderBottomLeftRadius: 6, borderBottomRightRadius: 6, marginTop: -1 },
+  list: { borderWidth: 1, borderRadius: 14, marginTop: 6, overflow: 'hidden' },
   option: { minHeight: 48, justifyContent: 'center', paddingHorizontal: 12 },
   optionRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   status: { marginTop: 4, marginLeft: 4 },

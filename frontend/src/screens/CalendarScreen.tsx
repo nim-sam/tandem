@@ -19,6 +19,7 @@ import { API } from '../api/client';
 import { Screen } from '../components/Screen';
 import { EventDialog } from '../components/EventDialog';
 import { GoogleSync } from '../components/GoogleSync';
+import { Card } from '../components/Card';
 import { GridCommute, TimeGrid } from '../components/TimeGrid';
 import { MonthGrid, monthRange } from '../components/MonthGrid';
 import { NAV_CLEARANCE, endpointIcon, useTokens } from '../theme';
@@ -208,8 +209,10 @@ export const CalendarScreen: React.FC = () => {
         </View>
 
         {mode === 'month' ? (
-          <View style={styles.grid}>
-            <MonthGrid month={cursor} events={events} onPressDay={openDay} />
+          <View style={styles.pad}>
+            <Card flush style={styles.grid}>
+              <MonthGrid month={cursor} events={events} onPressDay={openDay} />
+            </Card>
           </View>
         ) : (
           <>
@@ -236,7 +239,8 @@ export const CalendarScreen: React.FC = () => {
                 </Button>
               </View>
             )}
-            <View style={styles.grid}>
+            <View style={styles.pad}>
+              <Card flush style={styles.grid}>
               <TimeGrid
                 days={mode === 'day' ? [date] : Array.from({ length: 7 }, (_, i) => addDays(from, i))}
                 events={events}
@@ -246,6 +250,7 @@ export const CalendarScreen: React.FC = () => {
                 onPressDay={openDay}
                 onPressCommute={openTrail}
               />
+              </Card>
             </View>
           </>
         )}
@@ -319,9 +324,9 @@ export const CalendarScreen: React.FC = () => {
 const styles = StyleSheet.create({
   root: { flex: 1 },
   pad: { paddingHorizontal: 20 },
-  grid: { paddingHorizontal: 8 },
+  grid: { paddingHorizontal: 10, paddingVertical: 12 },
   dayBar: { flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 48 },
   dialog: { maxWidth: 520, width: '92%', alignSelf: 'center' },
   import: { gap: 10 },
-  fab: { position: 'absolute', right: 16 },
+  fab: { position: 'absolute', right: 18, borderRadius: 28 },
 });

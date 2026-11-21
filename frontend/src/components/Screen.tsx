@@ -2,7 +2,7 @@ import React, { ReactNode } from 'react';
 import { RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { Button, Icon, Text } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { NAV_CLEARANCE, useAppTheme, useTokens } from '../theme';
+import { NAV_CLEARANCE, Radius, Space, useAppTheme, useTokens } from '../theme';
 
 interface Props {
   title: string;
@@ -16,18 +16,19 @@ interface Props {
   children: ReactNode;
 }
 
-// Shared page frame: top bar on the ground colour, an inline error strip, scrolling content.
+// Shared page frame: a large title on the ice ground with its actions, an
+// error card when something failed, then the scrolling content.
 export const Screen: React.FC<Props> = ({ title, subtitle, actions, error, onRetry, refreshing, onRefresh, flush, children }) => {
   const theme = useAppTheme();
   const tokens = useTokens();
   const insets = useSafeAreaInsets();
   return (
     <View style={[styles.root, { backgroundColor: theme.colors.background }]}>
-      <View style={[styles.bar, { paddingTop: insets.top + 12, borderBottomColor: tokens.hairline }]}>
+      <View style={[styles.bar, { paddingTop: insets.top + 16 }]}>
         <View style={styles.titles} accessibilityRole="header">
           <Text variant="headlineMedium">{title}</Text>
           {!!subtitle && (
-            <Text variant="bodyMedium" style={{ color: tokens.muted }} numberOfLines={1}>
+            <Text variant="bodyLarge" style={{ color: tokens.muted }} numberOfLines={1}>
               {subtitle}
             </Text>
           )}
@@ -70,15 +71,24 @@ const styles = StyleSheet.create({
   bar: {
     flexDirection: 'row',
     alignItems: 'flex-end',
-    paddingLeft: 20,
+    paddingLeft: Space.gutter,
     paddingRight: 8,
-    paddingBottom: 10,
-    borderBottomWidth: StyleSheet.hairlineWidth,
+    paddingBottom: 6,
     minHeight: 64,
   },
   titles: { flex: 1, flexDirection: 'row', alignItems: 'baseline', gap: 10, paddingBottom: 4 },
   actions: { flexDirection: 'row', alignItems: 'center' },
-  error: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 20, paddingVertical: 10 },
-  content: { padding: 20, paddingBottom: 96, gap: 16, maxWidth: 720, width: '100%', alignSelf: 'center' },
+  error: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginHorizontal: Space.gutter,
+    marginTop: 8,
+    paddingLeft: 16,
+    paddingRight: 8,
+    paddingVertical: 10,
+    borderRadius: Radius.block,
+  },
+  content: { padding: Space.gutter, paddingTop: 14, gap: Space.gap, maxWidth: 720, width: '100%', alignSelf: 'center' },
   flush: { paddingHorizontal: 0 },
 });

@@ -1,47 +1,57 @@
 import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { ActivityIndicator, Chip, FAB, Icon, IconButton, Text, TouchableRipple } from 'react-native-paper';
+import { ActivityIndicator, FAB, Icon, IconButton, Switch, Text, TouchableRipple } from 'react-native-paper';
 import { useApp } from '../store/AppContext';
 import { Screen } from '../components/Screen';
 import { CommuteCard } from '../components/CommuteCard';
 import { EventDialog } from '../components/EventDialog';
 import { EndpointDialog } from '../components/EndpointDialog';
 import { useLeaveNotifications } from '../hooks/useLeaveNotifications';
-import { NAV_CLEARANCE, endpointIcon, useTokens } from '../theme';
+import { Blue, NAV_CLEARANCE, Radius, Space, cardShadow, endpointIcon, useAppTheme, useTokens } from '../theme';
+import { Card } from '../components/Card';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DAY_END, DAY_START, DayEndpoint, EndpointKind, Event, Route } from '../types';
 import { addDays, isNearDay, formatCO2, formatDay, formatDuration, formatTime, fromDateKey, todayKey } from '../utils/format';
 
-// An event is a lightly bordered block; the line to the next event leaves from
-// under it. Tapping it opens the event's details.
+// An event is a white card; the line to the next event leaves from under it.
+// Tapping it opens the event's details.
 const EventBlock: React.FC<{ event: Event; onPress: () => void }> = ({ event, onPress }) => {
+  const theme = useAppTheme();
   const tokens = useTokens();
   const located = !!(event.location.latitude || event.location.longitude);
   return (
-    <TouchableRipple
-      onPress={onPress}
-      accessibilityRole="button"
-      accessibilityLabel={`${event.title}, ${formatTime(event.start_time)} to ${formatTime(event.end_time)}. Show details.`}
-      style={[styles.event, { borderColor: tokens.border }]}
-    >
-      <View>
-        <View style={styles.eventHead}>
-          <Text variant="titleMedium" style={{ flex: 1 }} numberOfLines={2}>
-            {event.title}
-          </Text>
-          <Text variant="titleSmall" style={styles.tabular}>
-            {formatTime(event.start_time)}–{formatTime(event.end_time)}
-          </Text>
+    <View style={[styles.event, { backgroundColor: tokens.card }, cardShadow(theme.dark)]}>
+      <TouchableRipple
+        onPress={onPress}
+        borderless
+        accessibilityRole="button"
+        accessibilityLabel={`${event.title}, ${formatTime(event.start_time)} to ${formatTime(event.end_time)}. Show details.`}
+        style={styles.eventTouch}
+      >
+        <View style={styles.eventBody}>
+          <View style={styles.eventHead}>
+            <Text variant="titleMedium" style={{ flex: 1 }} numberOfLines={2}>
+              {event.title}
+            </Text>
+            <View style={[styles.timeTag, { backgroundColor: tokens.pale }]}>
+              <Text variant="labelMedium" style={[styles.tabular, { color: tokens.onPale }]}>
+                {formatTime(event.start_time)}–{formatTime(event.end_time)}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.eventPlace}>
+            <Icon source={located ? 'map-marker-outline' : 'map-marker-alert-outline'} size={16} color={located ? tokens.muted : tokens.warn} />
+            <Text variant="bodyMedium" style={{ flex: 1, color: located ? tokens.muted : tokens.warn }} numberOfLines={2}>
+              {event.location.name
+                ? located
+                  ? event.location.name
+                  : `${event.location.name}: not found on the map, so no route is planned`
+                : 'No location'}
+            </Text>
+          </View>
         </View>
-        <Text variant="bodyMedium" style={{ color: located ? tokens.muted : tokens.warn }} numberOfLines={2}>
-          {event.location.name
-            ? located
-              ? event.location.name
-              : `${event.location.name}: not found on the map, so no route is planned`
-            : 'No location'}
-        </Text>
-      </View>
-    </TouchableRipple>
+      </TouchableRipple>
+    </View>
   );
 };
 
@@ -67,6 +77,7 @@ const EndpointMarker: React.FC<{
   time?: string;
   onPress: () => void;
 }> = ({ which, endpoint, time, onPress }) => {
+  const theme = useAppTheme();
   const tokens = useTokens();
   const starts = which === 'origin';
   const name = endpoint ? (endpoint.is_home ? 'Home' : endpoint.location.name) : 'Set your home';
@@ -94,10 +105,12 @@ const EndpointMarker: React.FC<{
         <View
           style={[
             styles.marker,
-            { borderColor: tokens.border, borderStyle: endpoint ? 'solid' : 'dashed' },
+            endpoint
+              ? [{ backgroundColor: tokens.card }, cardShadow(theme.dark)]
+              : { borderWidth: 1.5, borderStyle: 'dashed', borderColor: tokens.border },
           ]}
         >
-          <Icon source={icon} size={22} color={endpoint ? tokens.post : tokens.muted} />
+          <Icon source={icon} size={22} color={endpoint ? tokens.accent : tokens.muted} />
         </View>
         <View style={{ flex: 1, minWidth: 0 }}>
           <Text variant="titleMedium" numberOfLines={1} style={{ color: endpoint ? tokens.post : tokens.muted }}>
@@ -110,8 +123,11 @@ const EndpointMarker: React.FC<{
           )}
         </View>
         {!!time && (
-          <Text variant="titleSmall" style={[styles.tabular, { color: tokens.muted }]}>
-            {starts ? 'leave' : 'arrive'} {time}
+          <Text variant="bodyMedium" style={[styles.tabular, { color: tokens.muted }]}>
+            {starts ? 'leave' : 'arrive'}{' '}
+            <Text variant="titleSmall" style={{ color: tokens.post }}>
+              {time}
+            </Text>
           </Text>
         )}
       </View>
@@ -177,29 +193,54 @@ export const DayViewScreen: React.FC = () => {
           ) : null
         ) : (
           <>
-            <View style={styles.summary}>
-              <Chip
-                icon="pine-tree"
-                selected={nature}
-                showSelectedCheck={false}
-                mode={nature ? 'flat' : 'outlined'}
-                onPress={() => preferences && updatePreferences({ ...preferences, prefer_nature_routes: !nature })}
-                accessibilityLabel={`Prefer green routes: ${nature ? 'on' : 'off'}`}
-                hitSlop={{ top: 8, bottom: 8 }}
-              >
-                Green routes {nature ? 'on' : 'off'}
-              </Chip>
-              {showing.commutes.length > 0 && (
-                <Text variant="bodySmall" style={[styles.totals, { color: tokens.muted }]}>
-                  {formatDuration(showing.summary.total_commute_minutes)} travelling{'\n'}
-                  about {formatCO2(showing.summary.total_co2_saved_grams)} CO₂ saved
-                </Text>
-              )}
+            {/* The day at a glance: the one deep card on the screen. */}
+            <View style={styles.pad}>
+              <Card tone="deep" style={styles.summary}>
+                {showing.commutes.length > 0 && (
+                  <View style={styles.stats}>
+                    {[
+                      [formatDuration(showing.summary.total_commute_minutes), 'travelling'],
+                      [formatCO2(showing.summary.total_co2_saved_grams), 'CO₂ saved, est.'],
+                      [showing.summary.total_steps.toLocaleString(), 'steps on foot'],
+                    ].map(([value, label]) => (
+                      <View key={label} style={styles.stat}>
+                        <Text variant="titleLarge" style={[styles.tabular, { color: tokens.onDeep }]} numberOfLines={1}>
+                          {value}
+                        </Text>
+                        <Text variant="bodySmall" style={{ color: tokens.onDeepMuted }} numberOfLines={1}>
+                          {label}
+                        </Text>
+                      </View>
+                    ))}
+                  </View>
+                )}
+                <View style={styles.green}>
+                  <Icon source="leaf" size={20} color={tokens.onDeep} />
+                  <View style={{ flex: 1 }}>
+                    <Text variant="titleSmall" style={{ color: tokens.onDeep }}>
+                      Green routes
+                    </Text>
+                    <Text variant="bodySmall" style={{ color: tokens.onDeepMuted }}>
+                      {nature ? 'Walks through parks are favoured' : 'Routes are ranked without favouring parks'}
+                    </Text>
+                  </View>
+                  <Switch
+                    value={nature}
+                    color={Blue.soft}
+                    onValueChange={() => {
+                      if (preferences) updatePreferences({ ...preferences, prefer_nature_routes: !nature });
+                    }}
+                    accessibilityLabel={`Prefer green routes: ${nature ? 'on' : 'off'}`}
+                  />
+                </View>
+              </Card>
             </View>
 
             {showing.events.length === 0 ? (
               <View style={styles.center}>
-                <Icon source="calendar-blank-outline" size={48} color={tokens.muted} />
+                <View style={[styles.emptyIcon, { backgroundColor: tokens.pale }]}>
+                  <Icon source="calendar-blank-outline" size={30} color={tokens.accent} />
+                </View>
                 <Text variant="titleMedium">Nothing planned</Text>
                 <Text variant="bodyMedium" style={{ color: tokens.muted, textAlign: 'center' }}>
                   Add an event with the + button, or import a calendar from the Calendar tab.
@@ -248,7 +289,7 @@ export const DayViewScreen: React.FC = () => {
       <FAB
         icon="plus"
         accessibilityLabel="Add event"
-        style={[styles.fab, { backgroundColor: tokens.accent, bottom: NAV_CLEARANCE + insets.bottom + 4 }]}
+        style={[styles.fab, { backgroundColor: tokens.accent, bottom: NAV_CLEARANCE + insets.bottom + 2 }]}
         color={tokens.onAccent}
         onPress={() => {
           setEditing(null);
@@ -269,18 +310,26 @@ export const DayViewScreen: React.FC = () => {
 
 const styles = StyleSheet.create({
   root: { flex: 1 },
-  summary: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 20 },
-  totals: { flex: 1, textAlign: 'right', fontVariant: ['tabular-nums'] },
-  day: { paddingHorizontal: 20 },
-  event: { borderWidth: 1, borderRadius: 8, paddingHorizontal: 14, paddingVertical: 10, minHeight: 48 },
+  pad: { paddingHorizontal: Space.gutter },
+  summary: { gap: 16 },
+  stats: { flexDirection: 'row', gap: 12 },
+  stat: { flex: 1, gap: 2 },
+  green: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 48 },
+  day: { paddingHorizontal: Space.gutter, paddingTop: 6 },
+  event: { borderRadius: Radius.card },
+  eventTouch: { borderRadius: Radius.card },
+  eventBody: { paddingHorizontal: Space.card, paddingVertical: 16, gap: 6, minHeight: 48 },
+  eventHead: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  eventPlace: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  timeTag: { borderRadius: Radius.pill, paddingHorizontal: 10, paddingVertical: 4 },
   // The marker is centred on the trail's rail (12dp inset + half of the 28dp rail column).
-  endpoint: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 48, paddingLeft: 4 },
-  marker: { width: 44, height: 44, borderRadius: 22, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
+  endpoint: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 48, paddingLeft: 4, paddingVertical: 2 },
+  marker: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
   // Lines up with the trail's rail: 12dp inset, centred in its 28dp column.
   stay: { height: 24, paddingLeft: 12, width: 40, alignItems: 'center' },
   stayLine: { flex: 1, width: 2 },
-  eventHead: { flexDirection: 'row', alignItems: 'baseline', gap: 10 },
   tabular: { fontVariant: ['tabular-nums'] },
-  center: { alignItems: 'center', gap: 8, paddingVertical: 56, paddingHorizontal: 32 },
-  fab: { position: 'absolute', right: 16 },
+  center: { alignItems: 'center', gap: 10, paddingVertical: 56, paddingHorizontal: 32 },
+  emptyIcon: { width: 64, height: 64, borderRadius: 32, alignItems: 'center', justifyContent: 'center' },
+  fab: { position: 'absolute', right: 18, borderRadius: 28 },
 });

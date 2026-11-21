@@ -8,20 +8,23 @@ import { CalendarScreen } from '../screens/CalendarScreen';
 import { SavedPlacesScreen } from '../screens/SavedPlacesScreen';
 import { HealthScreen } from '../screens/HealthScreen';
 import { PreferencesScreen } from '../screens/PreferencesScreen';
-import { NAV_BAR, useAppTheme, useTokens } from '../theme';
+import { Font, NAV_BAR, cardShadow, useAppTheme, useTokens } from '../theme';
 
 const Tab = createBottomTabNavigator();
 
+// Line icons throughout: an outline while idle, the same outline on the solid
+// blue pill when selected.
 const TABS = [
   { name: 'Day', component: DayViewScreen, icon: 'map-marker-path' },
-  { name: 'Calendar', component: CalendarScreen, icon: 'calendar-month' },
-  { name: 'Places', component: SavedPlacesScreen, icon: 'bookmark-multiple' },
-  { name: 'Activity', component: HealthScreen, icon: 'shoe-print' },
-  { name: 'Settings', component: PreferencesScreen, icon: 'tune-variant' },
+  { name: 'Calendar', component: CalendarScreen, icon: 'calendar-blank-outline' },
+  { name: 'Places', component: SavedPlacesScreen, icon: 'bookmark-outline' },
+  { name: 'Activity', component: HealthScreen, icon: 'heart-pulse' },
+  { name: 'Settings', component: PreferencesScreen, icon: 'cog-outline' },
 ] as const;
 
-// Material 3 navigation bar, floating: a rounded bar inset from the screen
-// edges, content scrolling behind it. The selected destination sits on a blue pill.
+// The navigation bar floats: a white pill inset from the screen edges with a
+// soft shadow, content scrolling behind it. The selected section sits on a
+// solid blue pill.
 export const TabNavigator: React.FC = () => {
   const theme = useAppTheme();
   const tokens = useTokens();
@@ -40,20 +43,17 @@ export const TabNavigator: React.FC = () => {
           right: side,
           bottom: insets.bottom + NAV_BAR.margin,
           height: NAV_BAR.height,
-          paddingTop: 6,
-          paddingBottom: 6,
+          paddingTop: 8,
+          paddingBottom: 8,
+          paddingHorizontal: 6,
           borderRadius: NAV_BAR.height / 2,
-          backgroundColor: theme.colors.elevation.level3,
-          borderTopWidth: 1, // the bar's own outline, all the way round
-          borderWidth: 1,
-          borderColor: tokens.hairline,
-          borderTopColor: tokens.hairline,
-          // Lifted off the content it floats over.
-          elevation: 6,
-          shadowColor: '#000000',
-          shadowOpacity: theme.dark ? 0.45 : 0.16,
-          shadowRadius: 14,
-          shadowOffset: { width: 0, height: 6 },
+          backgroundColor: theme.dark ? theme.colors.elevation.level4 : theme.colors.surface,
+          borderTopWidth: 0,
+          ...cardShadow(theme.dark),
+          elevation: theme.dark ? 0 : 8,
+          shadowOpacity: theme.dark ? 0 : 0.14,
+          shadowRadius: 22,
+          shadowOffset: { width: 0, height: 8 },
         },
       }}
     >
@@ -66,7 +66,7 @@ export const TabNavigator: React.FC = () => {
             tabBarIcon: ({ focused }) => (
               <View
                 style={{
-                  width: 56,
+                  width: 52,
                   height: 30,
                   borderRadius: 15,
                   alignItems: 'center',
@@ -74,14 +74,20 @@ export const TabNavigator: React.FC = () => {
                   backgroundColor: focused ? tokens.accent : 'transparent',
                 }}
               >
-                <Icon source={tab.icon} size={22} color={focused ? tokens.onAccent : tokens.muted} />
+                <Icon source={tab.icon} size={21} color={focused ? tokens.onAccent : tokens.muted} />
               </View>
             ),
             // Rendered here because the built-in label box clips text on web.
             tabBarLabel: ({ focused }) => (
               <Text
                 variant="labelMedium"
-                style={{ color: focused ? theme.colors.onSurface : tokens.muted, lineHeight: 16, marginTop: 2 }}
+                style={{
+                  color: focused ? tokens.accent : tokens.muted,
+                  fontFamily: focused ? Font.semibold : Font.medium,
+                  fontSize: 12,
+                  lineHeight: 16,
+                  marginTop: 3,
+                }}
               >
                 {tab.name}
               </Text>

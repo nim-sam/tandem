@@ -144,9 +144,9 @@ export const TimeGrid: React.FC<Props> = ({ days, events, commutes = [], onPress
                   onPress={() => onPressEvent(event)}
                   accessibilityRole="button"
                   accessibilityLabel={`${event.title}, all day. Show details.`}
-                  style={[styles.allDayChip, { backgroundColor: theme.colors.surfaceVariant, borderColor: tokens.border }]}
+                  style={[styles.allDayChip, { backgroundColor: tokens.pale }]}
                 >
-                  <Text variant="labelSmall" numberOfLines={1}>
+                  <Text variant="labelSmall" numberOfLines={1} style={{ color: tokens.onPale }}>
                     {event.title}
                   </Text>
                 </TouchableRipple>
@@ -195,7 +195,7 @@ export const TimeGrid: React.FC<Props> = ({ days, events, commutes = [], onPress
                     accessibilityLabel={`Travel: leave ${formatTime(route.departure_time)}, arrive ${formatTime(
                       route.arrival_time
                     )}, ${lineSummary(route)}. Open the route.`}
-                    style={[styles.commute, { top: y(start), height, borderColor: route.is_tight ? tokens.warn : tokens.border }]}
+                    style={[styles.commute, { top: y(start), height, borderColor: route.is_tight ? tokens.warn : tokens.soft }]}
                   >
                     <View style={styles.commuteRow}>
                       <Icon source={icon} size={14} color={route.is_tight ? tokens.warn : tokens.muted} />
@@ -224,13 +224,13 @@ export const TimeGrid: React.FC<Props> = ({ days, events, commutes = [], onPress
                     height: height - 2,
                     left: `${(col / cols) * 100}%`,
                     width: `${100 / cols}%`,
-                    backgroundColor: theme.colors.surfaceVariant,
-                    borderColor: tokens.border,
+                    backgroundColor: tokens.pale,
+                    borderColor: tokens.card, // a gap between neighbours, not an outline
                   },
                 ]}
               >
                 <View style={week ? styles.eventInnerWeek : styles.eventInner}>
-                  <Text variant={week ? 'labelSmall' : 'titleSmall'} numberOfLines={height < 40 ? 1 : 2}>
+                  <Text variant={week ? 'labelSmall' : 'titleSmall'} numberOfLines={week || height < 40 ? 1 : 2} style={{ color: tokens.onPale }}>
                     {event.title}
                   </Text>
                   {!week && height >= 44 && (
@@ -263,15 +263,15 @@ const styles = StyleSheet.create({
   allDay: { flexDirection: 'row', borderBottomWidth: StyleSheet.hairlineWidth, paddingVertical: 4 },
   allDayLabel: { width: GUTTER, justifyContent: 'center' },
   allDayColumn: { flex: 1, gap: 2, paddingHorizontal: 1 },
-  allDayChip: { borderWidth: 1, borderRadius: 4, paddingHorizontal: 4, minHeight: 24, justifyContent: 'center' },
+  allDayChip: { borderRadius: 8, paddingHorizontal: 6, minHeight: 24, justifyContent: 'center' },
   grid: { flexDirection: 'row', marginTop: 8 },
   hour: { position: 'absolute', left: 0 },
   column: { flex: 1, borderLeftWidth: StyleSheet.hairlineWidth },
   slot: { height: HOUR, borderTopWidth: StyleSheet.hairlineWidth },
-  event: { position: 'absolute', borderWidth: 1, borderRadius: 6, overflow: 'hidden' },
+  event: { position: 'absolute', borderWidth: 1, borderRadius: 10, overflow: 'hidden' },
   eventInner: { paddingHorizontal: 8, paddingVertical: 2 },
   eventInnerWeek: { paddingHorizontal: 3, paddingVertical: 2 },
-  commute: { position: 'absolute', left: 0, right: 0, borderWidth: 1, borderStyle: 'dashed', borderRadius: 6, justifyContent: 'center' },
+  commute: { position: 'absolute', left: 0, right: 0, borderWidth: 1.5, borderStyle: 'dashed', borderRadius: 10, justifyContent: 'center' },
   commuteRow: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 8 },
   now: { position: 'absolute', left: 0, right: 0, height: 2 },
   nowDot: { position: 'absolute', left: -4, top: -3, width: 8, height: 8, borderRadius: 4 },

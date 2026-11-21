@@ -97,7 +97,7 @@ export const MonthGrid: React.FC<Props> = ({ month, events, onPressDay }) => {
                     dayEvents.length > 0 && (
                       <View style={styles.dots}>
                         {dayEvents.slice(0, 3).map((e) => (
-                          <View key={e.id} style={[styles.dot, { backgroundColor: outside ? tokens.muted : tokens.post }]} />
+                          <View key={e.id} style={[styles.dot, { backgroundColor: outside ? tokens.soft : tokens.accent }]} />
                         ))}
                         {dayEvents.length > 3 && (
                           <Text variant="labelSmall" style={{ color: tokens.muted, lineHeight: 12 }}>

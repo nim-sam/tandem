@@ -4,8 +4,10 @@ import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { PaperProvider } from 'react-native-paper';
 import { useFonts } from 'expo-font';
-import { BarlowSemiCondensed_600SemiBold } from '@expo-google-fonts/barlow-semi-condensed/600SemiBold';
-import { BarlowSemiCondensed_700Bold } from '@expo-google-fonts/barlow-semi-condensed/700Bold';
+import { Figtree_400Regular } from '@expo-google-fonts/figtree/400Regular';
+import { Figtree_500Medium } from '@expo-google-fonts/figtree/500Medium';
+import { Figtree_600SemiBold } from '@expo-google-fonts/figtree/600SemiBold';
+import { Figtree_700Bold } from '@expo-google-fonts/figtree/700Bold';
 import {
   NavigationContainer,
   DefaultTheme as NavLight,
@@ -15,12 +17,12 @@ import { LightTheme, DarkTheme } from './src/theme';
 import { AppProvider, useApp } from './src/store/AppContext';
 import { TabNavigator } from './src/navigation/TabNavigator';
 
-// Dark unless the user picked light (or "match my phone") in Settings.
+// Light unless the user picked dark (or "match my phone") in Settings.
 const Themed: React.FC = () => {
   const { preferences } = useApp();
   const system = useColorScheme();
-  const appearance = preferences?.appearance ?? 'dark';
-  const dark = appearance === 'dark' || (appearance === 'system' && system !== 'light');
+  const appearance = preferences?.appearance ?? 'light';
+  const dark = appearance === 'dark' || (appearance === 'system' && system === 'dark');
   const theme = dark ? DarkTheme : LightTheme;
   const base = dark ? NavDark : NavLight;
   const navTheme = {
@@ -28,7 +30,7 @@ const Themed: React.FC = () => {
     colors: {
       ...base.colors,
       background: theme.colors.background,
-      card: theme.colors.surface,
+      card: theme.colors.background,
       text: theme.colors.onSurface,
       border: theme.colors.outlineVariant,
       primary: theme.colors.primary,
@@ -46,11 +48,11 @@ const Themed: React.FC = () => {
 };
 
 export default function App() {
-  const [fontsLoaded, fontError] = useFonts({ BarlowSemiCondensed_600SemiBold, BarlowSemiCondensed_700Bold });
+  const [fontsLoaded, fontError] = useFonts({ Figtree_400Regular, Figtree_500Medium, Figtree_600SemiBold, Figtree_700Bold });
   // Hold the first frame on the ground colour until the typeface is ready,
   // so headings never flash in a fallback face. If loading fails, carry on.
   if (!fontsLoaded && !fontError) {
-    return <View style={{ flex: 1, backgroundColor: DarkTheme.colors.background }} />;
+    return <View style={{ flex: 1, backgroundColor: LightTheme.colors.background }} />;
   }
   return (
     <SafeAreaProvider>

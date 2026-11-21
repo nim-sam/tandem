@@ -7,6 +7,7 @@ import { API } from '../api/client';
 import { Screen } from '../components/Screen';
 import { NAV_CLEARANCE, useAppTheme, useTokens } from '../theme';
 import { AddressInput } from '../components/AddressInput';
+import { Card } from '../components/Card';
 import { Appearance, LearnedWeights, Location, TransitMode, UserPreferences } from '../types';
 
 const MODES: { mode: TransitMode; label: string }[] = [
@@ -138,7 +139,7 @@ export const PreferencesScreen: React.FC = () => {
   return (
     <View style={styles.root}>
       <Screen title="Settings">
-        <View style={[styles.card, { borderBottomColor: tokens.hairline }]}>
+        <Card style={styles.card}>
           <Text variant="titleLarge">How you like to travel</Text>
           {MODES.map(({ mode, label }) => (
             <View key={mode} style={styles.modeRow}>
@@ -166,9 +167,9 @@ export const PreferencesScreen: React.FC = () => {
           <Row title="Suggest places for free time" hint="Cafés, libraries and parks that fit before you need to leave.">
             <Switch value={preferences.allow_third_place_detours} onValueChange={(v) => save({ allow_third_place_detours: v })} />
           </Row>
-        </View>
+        </Card>
 
-        <View style={[styles.card, { borderBottomColor: tokens.hairline }]}>
+        <Card style={styles.card}>
           <Text variant="titleLarge">Timing and goals</Text>
           <View style={styles.numbers}>
             <TextInput
@@ -198,9 +199,9 @@ export const PreferencesScreen: React.FC = () => {
             onChangeText={(t) => setNumbers((n) => ({ ...n, goal: t }))}
             onBlur={() => saveNumber('goal')}
           />
-        </View>
+        </Card>
 
-        <View style={[styles.card, { borderBottomColor: tokens.hairline }]}>
+        <Card style={styles.card}>
           <Text variant="titleLarge">Home</Text>
           <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
             Every day starts and ends at home: the app plans the trip to your first event, tells you when to leave, and plans the trip back after your last one. Tap the home marker on a day to start or end that day somewhere else.
@@ -243,9 +244,9 @@ export const PreferencesScreen: React.FC = () => {
               Remove home
             </Button>
           )}
-        </View>
+        </Card>
 
-        <View style={[styles.card, { borderBottomColor: tokens.hairline }]}>
+        <Card style={styles.card}>
           <Text variant="titleLarge">What the app has learned about you</Text>
           {!learned || !learned.ml_agent_online ? (
             <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
@@ -272,7 +273,7 @@ export const PreferencesScreen: React.FC = () => {
                     <View
                       style={{
                         width: `${Math.round((Math.abs(value) / strongest) * 100)}%`,
-                        backgroundColor: tokens.offer,
+                        backgroundColor: tokens.accent,
                         height: '100%',
                         borderRadius: 4,
                       }}
@@ -297,12 +298,12 @@ export const PreferencesScreen: React.FC = () => {
               </Button>
             </>
           )}
-        </View>
+        </Card>
 
-        <View style={[styles.card, { borderBottomColor: tokens.hairline }]}>
+        <Card style={styles.card}>
           <Text variant="titleLarge">Appearance</Text>
           <SegmentedButtons
-            value={preferences.appearance ?? 'dark'}
+            value={preferences.appearance ?? 'light'}
             onValueChange={(value) => save({ appearance: value as Appearance })}
             buttons={[
               { value: 'dark', label: 'Dark', icon: 'weather-night' },
@@ -313,7 +314,7 @@ export const PreferencesScreen: React.FC = () => {
           <Text variant="bodySmall" style={{ color: tokens.muted }}>
             Light is easier to read in direct sunlight. Auto follows your phone's setting.
           </Text>
-        </View>
+        </Card>
 
         <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
           Transit data from{' '}
@@ -336,7 +337,7 @@ export const PreferencesScreen: React.FC = () => {
 
 const styles = StyleSheet.create({
   root: { flex: 1 },
-  card: { borderBottomWidth: StyleSheet.hairlineWidth, paddingBottom: 24, gap: 12 },
+  card: { gap: 14 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   modeRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   modeLabel: { width: 96 },
