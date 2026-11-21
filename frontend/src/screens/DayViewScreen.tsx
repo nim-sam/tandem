@@ -44,6 +44,18 @@ const EventBlock: React.FC<{ event: Event; onPress: () => void }> = ({ event, on
   );
 };
 
+// Two events held at the same place (the server plans no commute between
+// points closer than about 100 m).
+const samePlace = (a: Event, b?: Event): boolean => {
+  if (!b) return false;
+  const la = a.location;
+  const lb = b.location;
+  if ((la.latitude || la.longitude) && (lb.latitude || lb.longitude)) {
+    return Math.abs(la.latitude - lb.latitude) <= 0.001 && Math.abs(la.longitude - lb.longitude) <= 0.001;
+  }
+  return !!la.name && la.name.trim().toLowerCase() === lb.name.trim().toLowerCase();
+};
+
 // Where the day starts or ends. It is a place, not an event, so it is drawn as
 // a round marker on the trail (a house for home, otherwise the icon that suits
 // the place) rather than a block. The time beside it comes from the commute:
@@ -200,7 +212,7 @@ export const DayViewScreen: React.FC = () => {
                   onPress={() => setEndpointDialog('origin')}
                 />
                 {renderCommute(fromStart)}
-                {showing.events.map((event) => (
+                {showing.events.map((event, i) => (
                   <View key={event.id}>
                     <EventBlock
                       event={event}
@@ -210,6 +222,13 @@ export const DayViewScreen: React.FC = () => {
                       }}
                     />
                     {renderCommute(commuteFrom(event.id))}
+                    {/* Staying put: the next event is at the same place, so a short
+                        plain line joins the two blocks with nothing to say. */}
+                    {!commuteFrom(event.id) && samePlace(event, showing.events[i + 1]) && (
+                      <View style={styles.stay} accessibilityLabel="Same place as the next event">
+                        <View style={[styles.stayLine, { backgroundColor: tokens.rail }]} />
+                      </View>
+                    )}
                   </View>
                 ))}
                 <EndpointMarker
@@ -255,6 +274,9 @@ const styles = StyleSheet.create({
   // The marker is centred on the trail's rail (12dp inset + half of the 28dp rail column).
   endpoint: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 48, paddingLeft: 4 },
   marker: { width: 44, height: 44, borderRadius: 22, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
+  // Lines up with the trail's rail: 12dp inset, centred in its 28dp column.
+  stay: { height: 24, paddingLeft: 12, width: 40, alignItems: 'center' },
+  stayLine: { flex: 1, width: 2 },
   eventHead: { flexDirection: 'row', alignItems: 'baseline', gap: 10 },
   tabular: { fontVariant: ['tabular-nums'] },
   center: { alignItems: 'center', gap: 8, paddingVertical: 56, paddingHorizontal: 32 },
