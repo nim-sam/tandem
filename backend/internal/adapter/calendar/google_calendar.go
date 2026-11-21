@@ -170,25 +170,3 @@ func (g *GoogleCalendarAdapter) do(ctx context.Context, method, path, token stri
 
 // ErrGoogleAuth means the access token is missing, expired or lacks the calendar scope.
 var ErrGoogleAuth = fmt.Errorf("google sign-in expired or was not granted calendar access")
-
-// DemoEvents are three canned events for today, used ONLY when no Google
-// account is connected so the sync button still shows something in a demo.
-// Callers must mark the result as simulated.
-func DemoEvents() []domain.Event {
-	now := time.Now()
-	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
-	mk := func(n int, title, name, addr string, lat, lon float64, startH, endH float64) domain.Event {
-		return domain.Event{
-			ID: fmt.Sprintf("gcal-demo-%d", n), Title: title,
-			Location:   domain.Location{Name: name, Address: addr, Latitude: lat, Longitude: lon},
-			StartTime:  today.Add(time.Duration(startH * float64(time.Hour))),
-			EndTime:    today.Add(time.Duration(endH * float64(time.Hour))),
-			IsExternal: true, ExternalSource: "google-demo", CreatedAt: now, UpdatedAt: now,
-		}
-	}
-	return []domain.Event{
-		mk(1, "Morning Lecture: McGill Engineering", "McConnell Building, McGill", "3480 Rue University, Montreal", 45.5048, -73.5760, 9, 10.5),
-		mk(2, "Project Sync @ Mila", "Mila Quebec AI Institute", "6666 Rue Saint-Urbain, Montreal", 45.5312, -73.6138, 12, 13.5),
-		mk(3, "Client Demo: South Shore", "Solar Uniquartier", "Brossard, QC", 45.4485, -73.4357, 15.5, 17),
-	}
-}

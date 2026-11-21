@@ -86,15 +86,15 @@ unavailable during the demo, the same client works against a self-hosted MOTIS
 | Third-place suggestions | `places/third_places.go` | 5 hand-picked places + ~1,500 cafés, libraries and community centres from OpenStreetMap. Suggested when free time before leaving covers the detour. Detour time is a straight-line estimate. |
 | Live delays | `transit/motis.go` | Each leg carries `real_time` and `delay_minutes` when the feed provides them. Provider responses are cached 15 minutes, so this is not second-by-second. |
 | .ics import | `adapter/calendar/ics_parser.go` | Live. Locations geocoded. Recurring events (DAILY/WEEKLY/MONTHLY/YEARLY with INTERVAL, COUNT, UNTIL, BYDAY) expanded; EXDATE is not handled. |
-| Google Calendar | `adapter/calendar/google_calendar.go` | Real client for Calendar API v3 (fetch, create, update, delete) using an access token from the app's Google sign-in. **Tested only against a fake server**: needs OAuth client IDs in `frontend/.env` to use for real. Without them the app loads labelled demo events. |
+| Google Calendar | `adapter/calendar/google_calendar.go` | Real client for Calendar API v3 (fetch, create, update, delete) using an access token from the app's Google sign-in. **Tested only against a fake server**: needs OAuth client IDs in `frontend/.env` to use for real. Without them the sync button is not shown. |
 | Event editing | `service/calendar_service.go` | Add, edit, delete; `GET /calendar/events?from=&to=` for week views. |
-| Step counts | `frontend/src/hooks/usePhoneSteps.ts`, `service/health_service.go` | Phone pedometer is real (exact on iOS; Android counts only while the app is open). Fitbit / Garmin are **simulated** and labelled. |
+| Step counts | `frontend/src/hooks/usePhoneSteps.ts`, `service/health_service.go` | Phone pedometer is real (exact on iOS; Android counts only while the app is open). |
 | Weekly totals, streak | `service/health_service.go` `GetWeekStats` | From the day's planned routes (not measured), plus measured phone steps. |
 | "Why this route" | `GET /api/ml/weights`, Settings screen | Shows what the ranking agent has learned; can be reset. |
 | Saved places | `service/place_service.go` | Collections with create, rename, delete; places with add (geocoded), move, delete; usable as an event location or as home. |
 | Storage | `adapter/repository/sqlite.go` | One SQLite database, `backend/data/app.db` (`DATA_PATH`), via the pure-Go `modernc.org/sqlite` driver: events, collections, preferences, day stats, per-day start/end places, planned routes and route choices. Starts empty (no seed data). Single user. |
 
-Not built: user accounts (one hardcoded user), Fitbit/Garmin integrations.
+Not built: user accounts (one hardcoded user), smartwatch integrations.
 
 ## Map: prototype vs. release
 

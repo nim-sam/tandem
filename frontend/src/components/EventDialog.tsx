@@ -19,7 +19,6 @@ interface Props {
 
 const SOURCE_LABEL: Record<string, string> = {
   google: 'From Google Calendar',
-  'google-demo': 'Demo event',
   ics: 'Imported from a calendar file',
 };
 

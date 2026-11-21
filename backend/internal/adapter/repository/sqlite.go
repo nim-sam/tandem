@@ -311,9 +311,6 @@ func (r *Repository) GetUserPreferences(userID string) domain.UserPreferences {
 	if !r.get(&pref, `SELECT data FROM preferences WHERE user_id = ?`, userID) {
 		return domain.DefaultUserPreferences(userID)
 	}
-	if pref.HealthProvider == "" {
-		pref.HealthProvider = domain.ProviderPhone
-	}
 	if pref.Appearance == "" {
 		pref.Appearance = "light"
 	}

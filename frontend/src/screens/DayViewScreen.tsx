@@ -221,7 +221,7 @@ export const DayViewScreen: React.FC = () => {
                       Green routes
                     </Text>
                     <Text variant="bodySmall" style={{ color: tokens.onDeepMuted }}>
-                      {nature ? 'Walks through parks are favoured' : 'Routes are ranked without favouring parks'}
+                      {nature ? 'Walks through parks are favoured, and a park walk is offered when it is dry' : 'Routes are ranked without favouring parks'}
                     </Text>
                   </View>
                   <Switch

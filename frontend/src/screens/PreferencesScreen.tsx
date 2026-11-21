@@ -111,11 +111,6 @@ export const PreferencesScreen: React.FC = () => {
 
   const saveHome = async () => {
     setHomeError('');
-    if (!home.trim()) {
-      await save({ home_location: null });
-      setNotice('Home removed. Your day now starts and ends at your events.');
-      return;
-    }
     setBusy(true);
     try {
       const found = homePicked ?? (await API.geocode(home.trim()));
@@ -160,9 +155,6 @@ export const PreferencesScreen: React.FC = () => {
           ))}
           <Row title="Step-free routes only" hint="Strongly favours stations with elevators and accessible vehicles.">
             <Switch value={preferences.require_elevator} onValueChange={(v) => save({ require_elevator: v })} />
-          </Row>
-          <Row title="Prefer green routes" hint="Favours walks through parks, and offers a park walk when you have time. Skipped in rain.">
-            <Switch value={preferences.prefer_nature_routes} onValueChange={(v) => save({ prefer_nature_routes: v })} />
           </Row>
           <Row title="Suggest places for free time" hint="Cafés, libraries and parks that fit before you need to leave.">
             <Switch value={preferences.allow_third_place_detours} onValueChange={(v) => save({ allow_third_place_detours: v })} />

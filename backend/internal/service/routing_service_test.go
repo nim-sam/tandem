@@ -54,7 +54,7 @@ func TestDayScheduleRanksByPreferencesAndCaches(t *testing.T) {
 	svc, repo := newTestService(stub)
 	day := time.Date(2026, 11, 23, 0, 0, 0, 0, time.Local)
 
-	sched, err := svc.GetDaySchedule(context.Background(), "default_user", day, nil)
+	sched, err := svc.GetDaySchedule(context.Background(), "default_user", day)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -81,7 +81,7 @@ func TestDayScheduleRanksByPreferencesAndCaches(t *testing.T) {
 	prefs := repo.GetUserPreferences("default_user")
 	prefs.AvoidedModes = []domain.TransitMode{domain.ModeMetro}
 	repo.SaveUserPreferences(prefs)
-	sched, _ = svc.GetDaySchedule(context.Background(), "default_user", day, nil)
+	sched, _ = svc.GetDaySchedule(context.Background(), "default_user", day)
 	if got := sched.Commutes[0].ID; got != "bus" {
 		t.Errorf("with the metro avoided want bus, got %s", got)
 	}
@@ -95,12 +95,12 @@ func TestSelectRoutePinsChoice(t *testing.T) {
 	day := time.Date(2026, 11, 23, 0, 0, 0, 0, time.Local)
 	ctx := context.Background()
 
-	sched, _ := svc.GetDaySchedule(ctx, "default_user", day, nil)
+	sched, _ := svc.GetDaySchedule(ctx, "default_user", day)
 	alt := sched.Commutes[0].Alternatives[0]
 	if err := svc.SelectRoute(ctx, alt.ID); err != nil {
 		t.Fatal(err)
 	}
-	sched, _ = svc.GetDaySchedule(ctx, "default_user", day, nil)
+	sched, _ = svc.GetDaySchedule(ctx, "default_user", day)
 	if got := sched.Commutes[0].ID; got != alt.ID {
 		t.Errorf("selected alternative should now be the main route, got %s", got)
 	}
@@ -113,7 +113,7 @@ func TestMockFallbackWhenProviderFails(t *testing.T) {
 	svc, _ := newTestService(failingProvider{})
 	svc.fallback = transit.NewMockProvider(transit.NewAccessibilityRegistry())
 	day := time.Date(2026, 11, 23, 0, 0, 0, 0, time.Local)
-	sched, _ := svc.GetDaySchedule(context.Background(), "default_user", day, nil)
+	sched, _ := svc.GetDaySchedule(context.Background(), "default_user", day)
 	if len(sched.Commutes) != 1 || sched.Commutes[0].Source != "mock" {
 		t.Fatalf("want one commute labelled mock, got %+v", sched.Commutes)
 	}
@@ -163,7 +163,7 @@ func TestParkWalkHomeCommuteAndWeather(t *testing.T) {
 	prefs.HomeLocation = &domain.Location{Name: "Home", Latitude: 45.50, Longitude: -73.60}
 	repo.SaveUserPreferences(prefs)
 
-	sched, err := svc.GetDaySchedule(ctx, "default_user", day, nil)
+	sched, err := svc.GetDaySchedule(ctx, "default_user", day)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -200,7 +200,7 @@ func TestParkWalkHomeCommuteAndWeather(t *testing.T) {
 
 	// Rain: no park candidate, only indoor suggestions, no extra walk requests.
 	svc.SetForecaster(fixedWeather{domain.Weather{Summary: "Rain likely, 4°C", GoodForOutdoors: false}})
-	sched, _ = svc.GetDaySchedule(ctx, "default_user", day, nil)
+	sched, _ = svc.GetDaySchedule(ctx, "default_user", day)
 	c := sched.Commutes[1]
 	for _, r := range append([]domain.Route{c}, c.Alternatives...) {
 		if r.IsParkWalk {
@@ -229,7 +229,7 @@ func TestDayEndpointOverride(t *testing.T) {
 	ctx := context.Background()
 
 	// No home, nothing chosen: only the commute between the two events.
-	sched, _ := svc.GetDaySchedule(ctx, "default_user", day, nil)
+	sched, _ := svc.GetDaySchedule(ctx, "default_user", day)
 	if sched.Origin != nil || sched.Destination != nil || len(sched.Commutes) != 1 {
 		t.Fatalf("without a home there are no endpoints: %+v / %+v, %d commutes", sched.Origin, sched.Destination, len(sched.Commutes))
 	}
@@ -245,7 +245,7 @@ func TestDayEndpointOverride(t *testing.T) {
 		t.Error("a bad endpoint name or a location without coordinates should be refused")
 	}
 
-	sched, _ = svc.GetDaySchedule(ctx, "default_user", day, nil)
+	sched, _ = svc.GetDaySchedule(ctx, "default_user", day)
 	if sched.Origin == nil || !sched.Origin.IsHome {
 		t.Errorf("origin should still be home: %+v", sched.Origin)
 	}
@@ -272,14 +272,14 @@ func TestPlannedRoutesArePersisted(t *testing.T) {
 	svc, repo := newTestService(stub)
 	day := time.Date(2026, 11, 23, 0, 0, 0, 0, time.Local)
 	ctx := context.Background()
-	first, _ := svc.GetDaySchedule(ctx, "default_user", day, nil)
+	first, _ := svc.GetDaySchedule(ctx, "default_user", day)
 	alt := first.Commutes[0].Alternatives[0]
 	if err := svc.SelectRoute(ctx, alt.ID); err != nil {
 		t.Fatal(err)
 	}
 
 	restarted := NewRoutingService(stubDown{}, nil, repo, places.NewThirdPlaceCatalog(), places.NewGreenSpaceIndex(), transit.NewAccessibilityRegistry(), NewRanker(""))
-	again, _ := restarted.GetDaySchedule(ctx, "default_user", day, nil)
+	again, _ := restarted.GetDaySchedule(ctx, "default_user", day)
 	if stub.calls != 1 || len(again.Commutes) != 1 {
 		t.Fatalf("want the saved route without a provider call, got %d commutes after %d calls", len(again.Commutes), stub.calls)
 	}
@@ -317,7 +317,7 @@ func TestRankingCountsWaiting(t *testing.T) {
 	prefs := repo.GetUserPreferences("default_user")
 	prefs.HomeLocation = &domain.Location{Name: "Home", Latitude: 45.59, Longitude: -73.78}
 	repo.SaveUserPreferences(prefs)
-	sched, _ := svc.GetDaySchedule(context.Background(), "default_user", time.Date(2026, 11, 23, 0, 0, 0, 0, time.Local), nil)
+	sched, _ := svc.GetDaySchedule(context.Background(), "default_user", time.Date(2026, 11, 23, 0, 0, 0, 0, time.Local))
 	if len(sched.Commutes) != 3 {
 		t.Fatalf("want 3 commutes, got %d", len(sched.Commutes))
 	}

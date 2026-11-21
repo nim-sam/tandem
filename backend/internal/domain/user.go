@@ -13,9 +13,6 @@ type UserPreferences struct {
 	StepGoalDaily          int           `json:"step_goal_daily"`
 	// HomeLocation, when set, is where the first commute of the day starts.
 	HomeLocation *Location `json:"home_location,omitempty"`
-	// HealthProvider is where step counts come from: "phone" (the phone's
-	// pedometer, real data), or "fitbit" / "garmin" (simulated for now).
-	HealthProvider HealthProvider `json:"health_provider"`
 	// Appearance is the app theme: "light" (default), "dark", or "system".
 	Appearance string `json:"appearance"`
 }
@@ -32,7 +29,6 @@ func DefaultUserPreferences(userID string) UserPreferences {
 		DepartureBufferMinutes: 10,
 		AllowThirdPlaceDetours: true,
 		StepGoalDaily:          8000,
-		HealthProvider:         ProviderPhone,
 		Appearance:             "light",
 	}
 }

@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { View } from 'react-native';
-import { Button, Text } from 'react-native-paper';
+import { Button } from 'react-native-paper';
 import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
 import { API } from '../api/client';
-import { useAppTheme } from '../theme';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -57,36 +55,6 @@ const SignedSync: React.FC<Props> = ({ onSynced, onError }) => {
   );
 };
 
-// Google Calendar sync. With client IDs configured it signs in and syncs for
-// real (events added or edited afterwards are mirrored to Google). Without
-// them it can only load clearly-labelled demo events.
-export const GoogleSync: React.FC<Props> = (props) => {
-  const theme = useAppTheme();
-  const [busy, setBusy] = useState(false);
-  if (WEB_ID) return <SignedSync {...props} />;
-
-  const loadDemo = () => {
-    setBusy(true);
-    API.syncGoogleCalendar()
-      .then((r) =>
-        props.onSynced(
-          r.simulated
-            ? `Loaded ${r.events_synced} demo events for today. No Google account was contacted.`
-            : `Synced ${r.events_synced} events from Google Calendar.`
-        )
-      )
-      .catch((e) => props.onError(e instanceof Error ? e.message : String(e)))
-      .finally(() => setBusy(false));
-  };
-
-  return (
-    <View style={{ gap: 4 }}>
-      <Button mode="outlined" icon="google" loading={busy} disabled={busy} onPress={loadDemo}>
-        Load demo Google events
-      </Button>
-      <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
-        Google sign-in is not set up (no client ID in .env), so this loads sample events only.
-      </Text>
-    </View>
-  );
-};
+// Google Calendar sync: signs in and syncs (events added or edited afterwards
+// are mirrored to Google). Shown only when client IDs are configured.
+export const GoogleSync: React.FC<Props> = (props) => (WEB_ID ? <SignedSync {...props} /> : null);

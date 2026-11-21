@@ -36,7 +36,6 @@ type CalendarImportRequest struct {
 // CalendarSyncResult reports the outcome of a calendar sync.
 type CalendarSyncResult struct {
 	Source       string    `json:"source"`
-	Simulated    bool      `json:"simulated"` // true: demo events, no real account was contacted
 	EventsAdded  int       `json:"events_added"`
 	EventsSynced int       `json:"events_synced"`
 	LastSyncAt   time.Time `json:"last_sync_at"`

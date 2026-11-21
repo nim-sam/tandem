@@ -15,12 +15,3 @@ var TransitModeCO2GramsPerKm = map[TransitMode]float64{
 }
 
 const BaselineCarCO2GramsPerKm = 171.0
-
-// EcoMetric contains calculations for carbon emissions and savings.
-type EcoMetric struct {
-	BaselineCarCO2Grams    float64 `json:"baseline_car_co2_grams"`
-	ActualRouteCO2Grams    float64 `json:"actual_route_co2_grams"`
-	CO2SavedGrams          float64 `json:"co2_saved_grams"`
-	CO2SavedPercentage     float64 `json:"co2_saved_percentage"`
-	EquivalentTreesPlanted float64 `json:"equivalent_trees_planted"` // 1 tree absorbs ~60g CO2/day
-}

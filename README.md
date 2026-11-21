@@ -1,6 +1,6 @@
 # EcoCommute (Codejam 16)
 
-> Multi-modal urban transit planner with external calendar synchronization, dynamic nature-focused rescheduling ("Touch Grass" prize), accessibility elevator tracking (STM Metro & CDPQ REM), carbon savings calculation, and wearable health integration.
+> Multi-modal urban transit planner with external calendar synchronization, dynamic nature-focused rescheduling ("Touch Grass" prize), accessibility elevator tracking (STM Metro & CDPQ REM), carbon savings calculation, and step counting with the phone's pedometer.
 
 ---
 
@@ -14,7 +14,7 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the reasoning and a per-fea
 
 **Laval (STL) buses:** the public routing server the app uses by default has no STL timetable, so trips involving Laval are routed on exo buses only. Run `make routing` once (a few minutes, about 2 GB) to build a local routing engine with every agency of the region; `make dev` then uses it automatically.
 
-**Not real yet:** Fitbit/Garmin step counts (simulated and labelled; the phone pedometer is real), and Google Calendar sync until you add OAuth client IDs to `frontend/.env`. The app starts empty: no sample events or places. Everything you add, and every route already planned, is saved to a SQLite database, `backend/data/app.db`; `make reset-data` wipes it.
+**Not available by default:** Google Calendar sync. Its button appears once you add OAuth client IDs to `frontend/.env`. The app starts empty: no sample events or places. Everything you add, and every route already planned, is saved to a SQLite database, `backend/data/app.db`; `make reset-data` wipes it.
 
 ---
 
@@ -26,13 +26,12 @@ This project is organized as a layered monorepo:
 ├── backend/                     # Go 1.22+ Clean Architecture REST API
 │   ├── cmd/api/main.go          # Server entrypoint (:8080)
 │   ├── internal/domain/         # Pure business entities (Event, Route, IntermodalNode)
-│   ├── internal/service/        # Application services (Routing, Calendar, Eco, Health)
-│   ├── internal/adapter/        # External integrations (transit API, ICS, parks; Google/wearables simulated)
+│   ├── internal/service/        # Application services (Routing, Calendar, Places, Health)
+│   ├── internal/adapter/        # External integrations (transit API, ICS, Google Calendar, parks, weather)
 │   └── internal/transport/http/ # REST HTTP Handlers
 │
 ├── frontend/                    # React Native (Expo) Mobile App
-│   ├── src/components/timeline/ # DayTimeline & IntermodalNode visualizer
-│   ├── src/components/routing/  # CO2Badge & NatureDetourCard
+│   ├── src/components/          # CommuteCard, RouteMap, calendar grids, dialogs
 │   ├── src/screens/             # DayView, Calendar, SavedPlaces, Health, Settings
 │   ├── src/store/AppContext.tsx # Global application state
 │   └── src/theme/               # Material 3 Design (Paper)

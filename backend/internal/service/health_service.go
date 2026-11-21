@@ -5,25 +5,18 @@ import (
 	"errors"
 	"time"
 
-	"github.com/nim-sam/codejam16/backend/internal/adapter/health"
 	"github.com/nim-sam/codejam16/backend/internal/adapter/repository"
 	"github.com/nim-sam/codejam16/backend/internal/domain"
 )
 
-// HealthService reports step counts.
-//
-//   - provider "phone": real numbers, pushed by the app from the phone's
-//     pedometer (ReportSteps).
-//   - provider "fitbit" / "garmin": SIMULATED placeholder numbers; real
-//     integrations need OAuth (Fitbit) or partner approval (Garmin). The
-//     summary carries simulated=true so the UI can say so.
+// HealthService reports step counts: real numbers, pushed by the app from the
+// phone's pedometer (ReportSteps).
 type HealthService struct {
-	wearable *health.WearableAdapter
-	repo     *repository.Repository
+	repo *repository.Repository
 }
 
-func NewHealthService(wearable *health.WearableAdapter, repo *repository.Repository) *HealthService {
-	return &HealthService{wearable: wearable, repo: repo}
+func NewHealthService(repo *repository.Repository) *HealthService {
+	return &HealthService{repo: repo}
 }
 
 func (s *HealthService) GetDailyHealth(ctx context.Context, userID, date string) (domain.DailyHealthSummary, error) {
@@ -33,25 +26,14 @@ func (s *HealthService) GetDailyHealth(ctx context.Context, userID, date string)
 		goal = 8000
 	}
 
-	if prefs.HealthProvider != domain.ProviderPhone {
-		summary, err := s.wearable.GetDailySummary(ctx, date)
-		summary.Provider = prefs.HealthProvider
-		summary.Simulated = true
-		summary.StepGoal = goal
-		summary.GoalAchievedRatio = float64(summary.TotalStepsToday) / float64(goal)
-		return summary, err
-	}
-
 	stats := s.repo.GetDayStats(date)
 	return domain.DailyHealthSummary{
 		Date:                date,
-		Provider:            domain.ProviderPhone,
 		Connected:           stats.ReportedSteps > 0,
 		TotalStepsToday:     stats.ReportedSteps,
 		CommuteWalkingSteps: stats.PlannedSteps, // planned walking in today's commutes
 		StepGoal:            goal,
 		GoalAchievedRatio:   float64(stats.ReportedSteps) / float64(goal),
-		CommuteStepRecords:  []domain.CommuteStepRecord{},
 	}, nil
 }
 

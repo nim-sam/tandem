@@ -1,28 +1,20 @@
 import React, { useMemo } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
-import { Icon, Text, TouchableRipple } from 'react-native-paper';
-import { Event, Route } from '../types';
-import { useAppTheme, useTokens } from '../theme';
+import { Text, TouchableRipple } from 'react-native-paper';
+import { Event } from '../types';
+import { useTokens } from '../theme';
 import { formatTime, fromDateKey, toDateKey, todayKey } from '../utils/format';
-import { lineSummary } from './CommuteCard';
 
 const HOUR = 52; // height of one hour
 const GUTTER = 44; // width of the hour labels
 const EARLIEST_SHOWN = 7; // the grid opens at 07:00 unless something is planned before
 
-export interface GridCommute {
-  route: Route;
-  icon: string;
-}
-
 interface Props {
-  days: string[]; // one column per day: 1 (day) or 7 (week)
+  days: string[]; // one column per day
   events: Event[];
-  commutes?: GridCommute[]; // drawn between the events; day mode only
   onPressEvent: (event: Event) => void;
   onPressSlot: (day: string, hour: number) => void; // an empty hour: add an event there
-  onPressDay?: (day: string) => void; // a day heading (week mode)
-  onPressCommute?: (route: Route) => void;
+  onPressDay?: (day: string) => void; // a day heading
 }
 
 interface Placed {
@@ -68,9 +60,7 @@ const place = (events: Event[], day: string): Placed[] => {
 };
 
 // A calendar's hour grid: one column per day, events as blocks at their time.
-// In day mode the commutes are drawn too, as dashed blocks between the events.
-export const TimeGrid: React.FC<Props> = ({ days, events, commutes = [], onPressEvent, onPressSlot, onPressDay, onPressCommute }) => {
-  const theme = useAppTheme();
+export const TimeGrid: React.FC<Props> = ({ days, events, onPressEvent, onPressSlot, onPressDay }) => {
   const tokens = useTokens();
   const today = todayKey();
   const week = days.length > 1;
@@ -87,12 +77,9 @@ export const TimeGrid: React.FC<Props> = ({ days, events, commutes = [], onPress
 
   // Empty early hours are left out so the first thing planned is on screen.
   const firstHour = useMemo(() => {
-    const starts = [
-      ...days.flatMap((d) => byDay.get(d)?.timed.map((p) => p.top) ?? []),
-      ...(week ? [] : commutes.map((c) => minutesInto(c.route.departure_time, days[0]))),
-    ];
+    const starts = days.flatMap((d) => byDay.get(d)?.timed.map((p) => p.top) ?? []);
     return Math.max(0, Math.min(EARLIEST_SHOWN, ...starts.map((m) => Math.floor(m / 60))));
-  }, [days, byDay, commutes, week]);
+  }, [days, byDay]);
   const hours = Array.from({ length: 24 - firstHour }, (_, i) => firstHour + i);
   const y = (minutes: number) => ((minutes - firstHour * 60) / 60) * HOUR;
 
@@ -181,33 +168,6 @@ export const TimeGrid: React.FC<Props> = ({ days, events, commutes = [], onPress
               />
             ))}
 
-            {!week &&
-              commutes.map(({ route, icon }) => {
-                const start = minutesInto(route.departure_time, day);
-                const end = minutesInto(route.arrival_time, day);
-                const height = Math.max(22, ((end - start) / 60) * HOUR);
-                if (end <= firstHour * 60) return null;
-                return (
-                  <TouchableRipple
-                    key={route.id}
-                    onPress={() => onPressCommute?.(route)}
-                    accessibilityRole="button"
-                    accessibilityLabel={`Travel: leave ${formatTime(route.departure_time)}, arrive ${formatTime(
-                      route.arrival_time
-                    )}, ${lineSummary(route)}. Open the route.`}
-                    style={[styles.commute, { top: y(start), height, borderColor: route.is_tight ? tokens.warn : tokens.soft }]}
-                  >
-                    <View style={styles.commuteRow}>
-                      <Icon source={icon} size={14} color={route.is_tight ? tokens.warn : tokens.muted} />
-                      <Text variant="bodySmall" numberOfLines={1} style={[styles.tabular, { flex: 1, color: tokens.muted }]}>
-                        {formatTime(route.departure_time)}–{formatTime(route.arrival_time)} · {lineSummary(route)}
-                        {route.is_tight ? ' · does not fit' : ''}
-                      </Text>
-                    </View>
-                  </TouchableRipple>
-                );
-              })}
-
             {byDay.get(day)?.timed.map(({ event, top: startMin, height: minutes, col, cols }) => {
               const top = y(startMin);
               const height = (minutes / 60) * HOUR;
@@ -271,8 +231,6 @@ const styles = StyleSheet.create({
   event: { position: 'absolute', borderWidth: 1, borderRadius: 10, overflow: 'hidden' },
   eventInner: { paddingHorizontal: 8, paddingVertical: 2 },
   eventInnerWeek: { paddingHorizontal: 3, paddingVertical: 2 },
-  commute: { position: 'absolute', left: 0, right: 0, borderWidth: 1.5, borderStyle: 'dashed', borderRadius: 10, justifyContent: 'center' },
-  commuteRow: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 8 },
   now: { position: 'absolute', left: 0, right: 0, height: 2 },
   nowDot: { position: 'absolute', left: -4, top: -3, width: 8, height: 8, borderRadius: 4 },
   tabular: { fontVariant: ['tabular-nums'] },

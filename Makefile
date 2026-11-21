@@ -1,5 +1,5 @@
 SHELL := /bin/bash
-.PHONY: help setup routing dev dev-web stop logs dev-backend dev-frontend dev-ml docker-up test data reset-data
+.PHONY: help setup routing dev dev-web dev-android stop logs dev-backend dev-frontend dev-ml docker-up test data reset-data
 
 LOGS := $(CURDIR)/.logs
 MOTIS_PORT ?= 8082
@@ -10,6 +10,7 @@ help:
 	@echo "Available commands:"
 	@echo "  make dev          - Run the whole stack: ML agent + backend in the background, Expo in this terminal"
 	@echo "  make dev-web      - Same, opening the app in the browser"
+	@echo "  make dev-android  - Same, opening the app in an Android emulator (needs Android Studio's SDK and a virtual device)"
 	@echo "  make stop         - Stop background servers left over from make dev"
 	@echo "  make logs         - Follow backend and ML agent logs"
 	@echo "  make routing      - Build the local routing engine with every Montreal-area agency, STL (Laval) included; rerun every few weeks"
@@ -85,6 +86,25 @@ dev: ml-agent/.venv frontend/node_modules
 
 dev-web:
 	@$(MAKE) --no-print-directory dev FRONTEND_CMD="npx expo start --web"
+
+# Android emulator. Inside it "localhost" is the virtual phone itself; 10.0.2.2
+# is the emulator's name for this computer, so the app is pointed there.
+# Expo starts a virtual device if none is running and installs Expo Go in it.
+ANDROID_SDK ?= $(or $(ANDROID_HOME),$(ANDROID_SDK_ROOT),$(HOME)/Android/Sdk)
+dev-android:
+	@if [ ! -x "$(ANDROID_SDK)/platform-tools/adb" ]; then \
+		echo "No Android SDK found at $(ANDROID_SDK)."; \
+		echo "Install Android Studio, create a virtual device (More Actions > Virtual Device Manager),"; \
+		echo "then run this again. If the SDK is elsewhere: make dev-android ANDROID_SDK=/path/to/Sdk"; \
+		exit 1; \
+	fi
+	@if [ -z "$$($(ANDROID_SDK)/emulator/emulator -list-avds 2>/dev/null)" ] && ! $(ANDROID_SDK)/platform-tools/adb devices | grep -q "device$$"; then \
+		echo "No virtual device yet. Create one in Android Studio: More Actions > Virtual Device Manager."; \
+		exit 1; \
+	fi
+	@ANDROID_HOME="$(ANDROID_SDK)" PATH="$(ANDROID_SDK)/platform-tools:$(ANDROID_SDK)/emulator:$$PATH" \
+		$(MAKE) --no-print-directory dev \
+		FRONTEND_CMD="EXPO_PUBLIC_API_URL=http://10.0.2.2:8080/api npx expo start --android"
 
 stop:
 	@for f in $(LOGS)/*.pid; do \

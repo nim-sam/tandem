@@ -5,21 +5,16 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/nim-sam/codejam16/backend/internal/adapter/places"
 	"github.com/nim-sam/codejam16/backend/internal/adapter/repository"
 	"github.com/nim-sam/codejam16/backend/internal/domain"
 )
 
 type PlaceService struct {
-	repo        *repository.Repository
-	thirdPlaces *places.ThirdPlaceCatalog
+	repo *repository.Repository
 }
 
-func NewPlaceService(repo *repository.Repository, thirdPlaces *places.ThirdPlaceCatalog) *PlaceService {
-	return &PlaceService{
-		repo:        repo,
-		thirdPlaces: thirdPlaces,
-	}
+func NewPlaceService(repo *repository.Repository) *PlaceService {
+	return &PlaceService{repo: repo}
 }
 
 func (s *PlaceService) GetCollections(ctx context.Context) []domain.Collection {
@@ -74,14 +69,4 @@ func (s *PlaceService) RemovePlace(ctx context.Context, colID, placeID string) b
 
 func (s *PlaceService) MovePlace(ctx context.Context, fromID, placeID, toID string) bool {
 	return s.repo.MovePlace(fromID, placeID, toID)
-}
-
-// GetThirdPlaces lists third places near a point (the catalog has ~1,500
-// entries, so it is never returned whole). Without coordinates it returns the
-// hand-picked highlights.
-func (s *PlaceService) GetThirdPlaces(ctx context.Context, near *domain.Location) []domain.ThirdPlace {
-	if near == nil {
-		return s.thirdPlaces.Highlights()
-	}
-	return s.thirdPlaces.FindNearbyThirdPlaces(*near, *near, 25, false, 20)
 }

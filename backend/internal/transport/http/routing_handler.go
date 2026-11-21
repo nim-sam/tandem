@@ -3,7 +3,6 @@ package http
 import (
 	"encoding/json"
 	"net/http"
-	"strconv"
 	"strings"
 	"time"
 
@@ -16,14 +15,6 @@ func (s *Server) handleGetDaySchedule(w http.ResponseWriter, r *http.Request) {
 		userID = "default_user"
 	}
 
-	var natureOverride *bool
-	if natureParam := r.URL.Query().Get("nature"); natureParam != "" {
-		val, err := strconv.ParseBool(natureParam)
-		if err == nil {
-			natureOverride = &val
-		}
-	}
-
 	date := time.Now()
 	if d := r.URL.Query().Get("date"); d != "" {
 		parsed, err := time.ParseInLocation("2006-01-02", d, time.Local)
@@ -34,44 +25,13 @@ func (s *Server) handleGetDaySchedule(w http.ResponseWriter, r *http.Request) {
 		date = parsed
 	}
 
-	schedule, err := s.routingService.GetDaySchedule(r.Context(), userID, date, natureOverride)
+	schedule, err := s.routingService.GetDaySchedule(r.Context(), userID, date)
 	if err != nil {
 		respondError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	respondJSON(w, http.StatusOK, schedule)
-}
-
-type PlanRouteRequest struct {
-	Origin        domain.Location `json:"origin"`
-	Destination   domain.Location `json:"destination"`
-	NatureFocused bool            `json:"nature_focused"`
-}
-
-func (s *Server) handlePlanRoute(w http.ResponseWriter, r *http.Request) {
-	userID := r.URL.Query().Get("user_id")
-	if userID == "" {
-		userID = "default_user"
-	}
-
-	var req PlanRouteRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		respondError(w, http.StatusBadRequest, "Invalid route plan request")
-		return
-	}
-
-	route, err := s.routingService.PlanCustomRoute(r.Context(), userID, req.Origin, req.Destination, req.NatureFocused)
-	if err != nil {
-		respondError(w, http.StatusBadGateway, "No route found: "+err.Error())
-		return
-	}
-	eco := s.ecoService.CalculateCO2Savings(r.Context(), route)
-
-	respondJSON(w, http.StatusOK, map[string]interface{}{
-		"route": route,
-		"eco":   eco,
-	})
 }
 
 // handleSelectRoute records that the user picked one of the alternatives.

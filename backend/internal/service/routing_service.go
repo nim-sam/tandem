@@ -134,7 +134,7 @@ func (s *RoutingService) ResetDayEndpoint(date, which string) {
 // GetDaySchedule builds the day view for one local date: the events, the
 // commutes between them, and the trips from where the day starts to the
 // first event and from the last event to where the day ends.
-func (s *RoutingService) GetDaySchedule(ctx context.Context, userID string, date time.Time, natureOverride *bool) (domain.DaySchedule, error) {
+func (s *RoutingService) GetDaySchedule(ctx context.Context, userID string, date time.Time) (domain.DaySchedule, error) {
 	y, m, d := date.Date()
 	dayStart := time.Date(y, m, d, 0, 0, 0, 0, date.Location())
 	events := s.repo.GetEventsBetween(dayStart, dayStart.AddDate(0, 0, 1))
@@ -142,9 +142,6 @@ func (s *RoutingService) GetDaySchedule(ctx context.Context, userID string, date
 
 	prefs := s.repo.GetUserPreferences(userID)
 	natureMode := prefs.PreferNatureRoutes
-	if natureOverride != nil {
-		natureMode = *natureOverride
-	}
 	origin, destination := s.DayEndpoints(prefs, dateKey)
 
 	// Only events with a resolved location can be routed between.
@@ -347,28 +344,6 @@ func (s *RoutingService) parkWalk(ctx context.Context, req transit.PlanRequest) 
 	s.enrich(&route)
 	route.IsNatureFocused = true
 	return route, true
-}
-
-// PlanCustomRoute plans a trip leaving now between two arbitrary points.
-func (s *RoutingService) PlanCustomRoute(ctx context.Context, userID string, origin, dest domain.Location, natureFocused bool) (domain.Route, error) {
-	prefs := s.repo.GetUserPreferences(userID)
-	candidates, err := s.candidates(ctx, transit.PlanRequest{Origin: origin, Dest: dest, Time: time.Now(), Prefs: prefs})
-	if err != nil {
-		return domain.Route{}, err
-	}
-	if natureFocused {
-		if park, ok := s.parkWalk(ctx, transit.PlanRequest{Origin: origin, Dest: dest, Time: time.Now()}); ok {
-			candidates = append(candidates, park)
-		}
-	}
-	if len(candidates) == 0 {
-		return domain.Route{}, errors.New("no itinerary found")
-	}
-	best := s.rank(ctx, userID, prefs, natureFocused, "", candidates)
-	if natureFocused {
-		best.SuggestedThirdPlaces = s.thirdPlaces.FindNearbyThirdPlaces(origin, dest, 20, false, 5)
-	}
-	return best, nil
 }
 
 // SelectRoute records that the user chose routeID over the alternatives it was

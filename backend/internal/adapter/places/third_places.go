@@ -174,11 +174,6 @@ func (c *ThirdPlaceCatalog) FindNearbyThirdPlaces(origin, dest domain.Location, 
 	return out
 }
 
-// Highlights returns the hand-picked places.
-func (c *ThirdPlaceCatalog) Highlights() []domain.ThirdPlace {
-	return newCuratedCatalog().places
-}
-
 // Len is the number of places in the catalog.
 func (c *ThirdPlaceCatalog) Len() int { return len(c.places) }
 

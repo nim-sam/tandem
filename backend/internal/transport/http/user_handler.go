@@ -48,32 +48,6 @@ func (s *Server) handleUpdateUserPreferences(w http.ResponseWriter, r *http.Requ
 	respondJSON(w, http.StatusOK, prefs)
 }
 
-func (s *Server) handleGetTimeToLeaveAlert(w http.ResponseWriter, r *http.Request) {
-	userID := r.URL.Query().Get("user_id")
-	if userID == "" {
-		userID = "default_user"
-	}
-
-	alert, err := s.notificationService.GetNextDepartureAlert(r.Context(), userID)
-	if err != nil {
-		respondError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	if alert == nil {
-		respondJSON(w, http.StatusOK, map[string]interface{}{
-			"has_alert": false,
-			"message":   "No upcoming departure events requiring transit today.",
-		})
-		return
-	}
-
-	respondJSON(w, http.StatusOK, map[string]interface{}{
-		"has_alert": true,
-		"alert":     alert,
-	})
-}
-
 // handleReportSteps stores the phone pedometer's step total for a day.
 // Body: {"date": "YYYY-MM-DD", "steps": 4321}
 func (s *Server) handleReportSteps(w http.ResponseWriter, r *http.Request) {

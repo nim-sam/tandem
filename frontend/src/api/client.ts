@@ -7,7 +7,6 @@ import {
   SavedPlace,
   UserPreferences,
   DailyHealthSummary,
-  ThirdPlace,
   Location,
   WeekStats,
   LearnedWeights,
@@ -40,8 +39,7 @@ async function request<T>(endpoint: string, method = 'GET', body?: unknown): Pro
 
 export const API = {
   // Day schedule & commutes
-  getDaySchedule: (date: string, nature?: boolean) =>
-    request<DaySchedule>(`/routes/day?date=${date}${nature === undefined ? '' : `&nature=${nature}`}`),
+  getDaySchedule: (date: string) => request<DaySchedule>(`/routes/day?date=${date}`),
   // Start or end one day somewhere other than home (coordinates 0,0: the server looks the address up).
   setDayEndpoint: (date: string, which: EndpointKind, endpoint: Pick<DayEndpoint, 'location' | 'category'>) =>
     request<DayEndpoint>(`/routes/day/${date}/${which}`, 'PUT', endpoint),
@@ -62,9 +60,9 @@ export const API = {
   deleteEvent: (id: string) => request<void>(`/calendar/events/${encodeURIComponent(id)}`, 'DELETE'),
   importICS: (icsContent: string) =>
     request<CalendarSyncResult>('/calendar/import-ics', 'POST', { ics_content: icsContent, source: 'ics' }),
-  // accessToken comes from Google sign-in; without one the server loads demo events.
-  syncGoogleCalendar: (accessToken?: string) =>
-    request<CalendarSyncResult>('/calendar/sync-google', 'POST', { access_token: accessToken ?? '' }),
+  // accessToken comes from Google sign-in.
+  syncGoogleCalendar: (accessToken: string) =>
+    request<CalendarSyncResult>('/calendar/sync-google', 'POST', { access_token: accessToken }),
 
   // Saved places
   getCollections: () => request<{ collections: Collection[] }>('/collections'),
@@ -80,8 +78,6 @@ export const API = {
     request<void>(`/collections/${collectionId}/places/${placeId}/move`, 'POST', {
       to_collection_id: toCollectionId,
     }),
-  getThirdPlaces: (lat: number, lon: number) =>
-    request<{ third_places: ThirdPlace[] }>(`/places/third-places?lat=${lat}&lon=${lon}`),
 
   // Health & stats
   getHealthSummary: (date: string) => request<DailyHealthSummary>(`/health/summary?date=${date}`),

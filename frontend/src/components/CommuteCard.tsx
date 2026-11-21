@@ -6,6 +6,7 @@ import { Font, Radius, cardShadow, inkOn, lineColor, useAppTheme, useTokens } fr
 import { formatCO2, formatDuration, formatTime } from '../utils/format';
 import { easeLayout } from '../utils/motion';
 import { RouteMap } from './RouteMap';
+import { useApp } from '../store/AppContext';
 
 const RAIL = 28; // width of the column the line runs down
 
@@ -31,11 +32,12 @@ export const LinePill: React.FC<{ node: IntermodalNode }> = ({ node }) => {
 };
 
 // The walking counterpart of a line pill: same size, a walker instead of a code.
-const WalkPill: React.FC = () => {
+// With green routes on, the walker is green on a walk through a park.
+const WalkPill: React.FC<{ green?: boolean }> = ({ green }) => {
   const tokens = useTokens();
   return (
     <View style={[styles.linePill, { backgroundColor: tokens.pale }]}>
-      <Icon source="walk" size={16} color={tokens.accent} />
+      <Icon source="walk" size={16} color={green ? tokens.green : tokens.accent} />
     </View>
   );
 };
@@ -54,8 +56,16 @@ const visibleLegs = (nodes: IntermodalNode[]): IntermodalNode[] =>
 // vehicle. Tapping a vehicle stretch lists the stops it passes, in order.
 // `header` and `footer` are drawn in the same row, above and below the
 // segment's own line of text, alongside the same stretch of line.
-const Segment: React.FC<{ node: IntermodalNode; header?: React.ReactNode; footer?: React.ReactNode }> = ({
+const Segment: React.FC<{
+  node: IntermodalNode;
+  green?: boolean; // green routes are on
+  parkWalk?: boolean; // the whole route is a walk through a park
+  header?: React.ReactNode;
+  footer?: React.ReactNode;
+}> = ({
   node,
+  green,
+  parkWalk,
   header,
   footer,
 }) => {
@@ -67,18 +77,15 @@ const Segment: React.FC<{ node: IntermodalNode; header?: React.ReactNode; footer
   const color = lineColor(node.mode, node.route_color, theme.dark);
   const passed = node.intermediate_stops ?? [];
   const showCodes = node.mode === 'bus'; // stop numbers are printed on bus stop signs
-  const label = walking
-    ? node.green_spaces?.length && node.nature_score >= 0.2
-      ? `Walk via ${node.green_spaces[0]}`
-      : 'Walk'
-    : node.transit_line;
+  const throughPark = walking && !!node.green_spaces?.length && node.nature_score >= 0.2;
+  const label = walking ? (throughPark ? `Walk via ${node.green_spaces![0]}` : 'Walk') : node.transit_line;
 
   // With a pill, the text beside it is only the line's name ("Des Pins").
   const text = !walking && node.line_code ? node.line_name ?? '' : label;
 
   const summary = (
     <View style={styles.segment}>
-      {walking ? <WalkPill /> : <LinePill node={node} />}
+      {walking ? <WalkPill green={green && (throughPark || parkWalk)} /> : <LinePill node={node} />}
       {!!text && (
         <Text variant="bodyMedium" numberOfLines={1} style={{ flexShrink: 1, color: walking ? tokens.muted : theme.colors.onSurface }}>
           {text}
@@ -207,6 +214,9 @@ export const CommuteCard: React.FC<Props> = ({ route, onSelect }) => {
   const theme = useAppTheme();
   const tokens = useTokens();
   const [open, setOpen] = useState(false);
+  const { preferences } = useApp();
+  // Green routes are switched off by the server in rain, snow or deep cold.
+  const greenOn = !!preferences?.prefer_nature_routes && route.weather?.good_for_outdoors !== false;
   const alternatives = route.alternatives ?? [];
   const places = route.suggested_third_places ?? [];
   const legs = visibleLegs(route.nodes);
@@ -299,12 +309,12 @@ export const CommuteCard: React.FC<Props> = ({ route, onSelect }) => {
                 .join('  ·  ')}
             </Text>
 
-            {places.length > 0 && route.slack_minutes >= 10 && (
+            {places.length > 1 && route.slack_minutes >= 10 && (
               <View style={styles.list}>
                 <Text variant="labelLarge" style={{ color: tokens.offer }}>
-                  Places that fit in your {formatDuration(route.slack_minutes)} free
+                  Other places that fit in your {formatDuration(route.slack_minutes)} free
                 </Text>
-                {places.map((place) => (
+                {places.slice(1).map((place) => (
                   <View key={place.id} style={styles.place}>
                     <Text variant="bodyMedium" style={{ flex: 1 }} numberOfLines={1}>
                       {place.name}
@@ -419,6 +429,8 @@ export const CommuteCard: React.FC<Props> = ({ route, onSelect }) => {
           )}
           <Segment
             node={leg}
+            green={greenOn}
+            parkWalk={route.is_park_walk}
             header={i === 0 && joinStart ? timesBlock : undefined}
             footer={i === legs.length - 1 && joinEnd ? detailsBlock : undefined}
           />

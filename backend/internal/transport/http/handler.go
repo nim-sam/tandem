@@ -9,15 +9,13 @@ import (
 )
 
 type Server struct {
-	calendarService     *service.CalendarService
-	routingService      *service.RoutingService
-	placeService        *service.PlaceService
-	healthService       *service.HealthService
-	notificationService *service.NotificationService
-	ecoService          *service.EcoService
-	ranker              *service.Ranker
-	repo                *repository.Repository
-	mux                 *http.ServeMux
+	calendarService *service.CalendarService
+	routingService  *service.RoutingService
+	placeService    *service.PlaceService
+	healthService   *service.HealthService
+	ranker          *service.Ranker
+	repo            *repository.Repository
+	mux             *http.ServeMux
 }
 
 func NewServer(
@@ -25,21 +23,17 @@ func NewServer(
 	routingService *service.RoutingService,
 	placeService *service.PlaceService,
 	healthService *service.HealthService,
-	notificationService *service.NotificationService,
-	ecoService *service.EcoService,
 	ranker *service.Ranker,
 	repo *repository.Repository,
 ) *Server {
 	s := &Server{
-		calendarService:     calendarService,
-		routingService:      routingService,
-		placeService:        placeService,
-		healthService:       healthService,
-		notificationService: notificationService,
-		ecoService:          ecoService,
-		ranker:              ranker,
-		repo:                repo,
-		mux:                 http.NewServeMux(),
+		calendarService: calendarService,
+		routingService:  routingService,
+		placeService:    placeService,
+		healthService:   healthService,
+		ranker:          ranker,
+		repo:            repo,
+		mux:             http.NewServeMux(),
 	}
 	s.registerRoutes()
 	return s
@@ -70,7 +64,6 @@ func (s *Server) registerRoutes() {
 	// Where a day starts and ends, when that is not home: which = origin | destination
 	s.mux.HandleFunc("PUT /api/routes/day/{date}/{which}", s.handleSetDayEndpoint)
 	s.mux.HandleFunc("DELETE /api/routes/day/{date}/{which}", s.handleResetDayEndpoint)
-	s.mux.HandleFunc("POST /api/routes/plan", s.handlePlanRoute)
 	s.mux.HandleFunc("POST /api/routes/select", s.handleSelectRoute)
 	s.mux.HandleFunc("GET /api/geocode", s.handleGeocode)
 	s.mux.HandleFunc("GET /api/geocode/suggest", s.handleSuggestPlaces) // ?q=partly typed address
@@ -83,17 +76,15 @@ func (s *Server) registerRoutes() {
 	s.mux.HandleFunc("POST /api/collections/{id}/places", s.handleAddPlaceToCollection)
 	s.mux.HandleFunc("DELETE /api/collections/{id}/places/{placeId}", s.handleRemovePlace)
 	s.mux.HandleFunc("POST /api/collections/{id}/places/{placeId}/move", s.handleMovePlace)
-	s.mux.HandleFunc("GET /api/places/third-places", s.handleGetThirdPlaces) // ?lat=&lon=
 
-	// Health: step counts (phone pedometer or simulated wearable) and weekly totals
+	// Health: step counts (phone pedometer) and weekly totals
 	s.mux.HandleFunc("GET /api/health/summary", s.handleGetHealthSummary)
 	s.mux.HandleFunc("POST /api/health/steps", s.handleReportSteps)
 	s.mux.HandleFunc("GET /api/stats/week", s.handleGetWeekStats)
 
-	// User Preferences & Time-to-Leave
+	// User Preferences
 	s.mux.HandleFunc("GET /api/user/preferences", s.handleGetUserPreferences)
 	s.mux.HandleFunc("PUT /api/user/preferences", s.handleUpdateUserPreferences)
-	s.mux.HandleFunc("GET /api/notifications/time-to-leave", s.handleGetTimeToLeaveAlert)
 
 	// What the ranking agent has learned ("why this route")
 	s.mux.HandleFunc("GET /api/ml/weights", s.handleGetLearnedWeights)

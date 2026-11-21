@@ -160,13 +160,10 @@ export interface UserPreferences {
   allow_third_place_detours: boolean;
   step_goal_daily: number;
   home_location?: Location | null; // where every day starts and ends, unless changed for a day
-  health_provider: HealthProvider;
   appearance: Appearance;
 }
 
 export type Appearance = 'dark' | 'light' | 'system';
-
-export type HealthProvider = 'phone' | 'fitbit' | 'garmin';
 
 export interface Weather {
   temperature_c: number;
@@ -203,40 +200,15 @@ export interface LearnedWeights {
 
 export interface CalendarSyncResult {
   source: string;
-  simulated: boolean; // true: demo events, no real account was contacted
   events_added: number;
   events_synced: number;
 }
 
-export interface CommuteStepRecord {
-  commute_id: string;
-  date: string;
-  step_count: number;
-  distance_km: number;
-  calories_burned: number;
-  duration_mins: number;
-}
-
 export interface DailyHealthSummary {
   date: string;
-  provider: string;
   connected: boolean;
-  simulated: boolean; // true: placeholder numbers, not from a device
   total_steps_today: number;
   commute_walking_steps: number;
   step_goal: number;
   goal_achieved_ratio: number;
-  commute_step_records: CommuteStepRecord[];
-}
-
-export interface TimeToLeaveAlert {
-  event_id: string;
-  event_title: string;
-  event_location: string;
-  event_start_time: string;
-  recommended_leave_time: string;
-  minutes_until_leave: number;
-  first_step_summary: string;
-  is_nature_route: boolean;
-  third_place_suggestion?: string;
 }

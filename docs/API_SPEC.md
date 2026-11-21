@@ -65,11 +65,11 @@ Triggers synchronization with Google Calendar.
 
 ## 2. Routing & Commutes
 
-### `GET /routes/day?date=YYYY-MM-DD&nature=true`
+### `GET /routes/day?date=YYYY-MM-DD`
 Events for one local date (default today, any past or future date works) and
 the commutes of that day: from where the day starts to the first located event,
 between each pair of consecutive located events, and from the last one to where
-the day ends. `nature=true` weights green walking more heavily.
+the day ends.
 
 The day starts and ends at home (`home_location` in the preferences) unless
 another place was set for that date. `origin` and `destination` describe those
@@ -155,9 +155,6 @@ Up to 6 places in the Montreal region matching what has been typed so far
 the city, and the coordinates are filled in, so a picked suggestion needs no
 further lookup.
 
-### `POST /routes/plan`
-`{ "origin": Location, "destination": Location, "nature_focused": bool }` → `{ "route": Route, "eco": EcoMetric }`, leaving now.
-
 ### `POST /routes/select`
 `{ "route_id": "…" }`. The user prefers this alternative: it becomes the route
 for that commute and is sent to the ML agent as a training example. `404` if the
@@ -183,7 +180,6 @@ are geocoded automatically from `location.address` / `location.name`.
 | `POST /collections/{id}/places` | Add a place (`name`, `address`, `notes`); the address is geocoded |
 | `DELETE /collections/{id}/places/{placeId}` | Remove a place |
 | `POST /collections/{id}/places/{placeId}/move` | `{ "to_collection_id": "…" }` |
-| `GET /places/third-places?lat=&lon=` | Cafés, libraries, parks near a point (hand-picked highlights without coordinates) |
 
 ## 4. Calendar additions
 
@@ -192,21 +188,20 @@ are geocoded automatically from `location.address` / `location.name`.
 | `GET /calendar/events?from=YYYY-MM-DD&to=YYYY-MM-DD` | Events starting in the range (inclusive) |
 | `PUT /calendar/events/{id}` | Edit title, times, location. Send `latitude: 0, longitude: 0` when the location text changed |
 | `DELETE /calendar/events/{id}` | `404` if unknown |
-| `POST /calendar/sync-google` | Body `{ "access_token": "…" }` from Google sign-in. Without a token: demo events, `simulated: true` |
+| `POST /calendar/sync-google` | Body `{ "access_token": "…" }` from Google sign-in. `401` without a token |
 
 ## 5. Health and stats
 
 | Method and path | Purpose |
 |---|---|
-| `GET /health/summary?date=` | Steps for the day. `simulated: true` for Fitbit/Garmin |
+| `GET /health/summary?date=` | Steps for the day, as reported by the phone |
 | `POST /health/steps` | `{ "date": "YYYY-MM-DD", "steps": 5321 }` from the phone pedometer (running total for the day) |
 | `GET /stats/week` | Last 7 days: planned steps, measured steps, CO2 saved, green-walk streak |
 
-## 6. Preferences, notifications, ranking
+## 6. Preferences and ranking
 
 | Method and path | Purpose |
 |---|---|
-| `GET` / `PUT /user/preferences` | Includes `home_location` and `health_provider` (`phone`, `fitbit`, `garmin`) |
-| `GET /notifications/time-to-leave` | Next commute that has not departed |
+| `GET` / `PUT /user/preferences` | Includes `home_location` |
 | `GET /ml/weights` | Settings-based weights, the learned correction, and how many choices it learned from |
 | `DELETE /ml/weights` | Forget what was learned |

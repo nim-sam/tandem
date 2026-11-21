@@ -168,6 +168,7 @@ export const useTokens = () => {
     accent: theme.colors.primary, // the solid blue: active tab, today, primary action
     onAccent: theme.colors.onPrimary,
     offer: theme.colors.secondary, // offers and good news, as text and icons
+    green: dark ? '#7BC88A' : '#2E7D32', // the one non-blue: the walker on a walk through a park
     warn: theme.colors.error,
     deep: dark ? '#223F70' : Blue.deep, // the emphasis card
     onDeep: dark ? Blue.pale : Blue.white,

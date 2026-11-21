@@ -3,7 +3,6 @@ package http
 import (
 	"encoding/json"
 	"net/http"
-	"strconv"
 
 	"github.com/nim-sam/codejam16/backend/internal/domain"
 )
@@ -95,17 +94,4 @@ func (s *Server) handleMovePlace(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	respondJSON(w, http.StatusOK, map[string]string{"status": "moved", "collection_id": req.ToCollectionID})
-}
-
-// handleGetThirdPlaces lists third places near ?lat=&lon= (or the hand-picked
-// highlights when no position is given).
-func (s *Server) handleGetThirdPlaces(w http.ResponseWriter, r *http.Request) {
-	var near *domain.Location
-	lat, err1 := strconv.ParseFloat(r.URL.Query().Get("lat"), 64)
-	lon, err2 := strconv.ParseFloat(r.URL.Query().Get("lon"), 64)
-	if err1 == nil && err2 == nil {
-		near = &domain.Location{Latitude: lat, Longitude: lon}
-	}
-	places := s.placeService.GetThirdPlaces(r.Context(), near)
-	respondJSON(w, http.StatusOK, map[string]interface{}{"third_places": places})
 }

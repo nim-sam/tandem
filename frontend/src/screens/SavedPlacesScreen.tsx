@@ -7,7 +7,7 @@ import { Screen } from '../components/Screen';
 import { PromptDialog, PromptField } from '../components/PromptDialog';
 import { Card } from '../components/Card';
 import { NAV_CLEARANCE, useAppTheme, useTokens } from '../theme';
-import { Collection, SavedPlace } from '../types';
+import { Collection } from '../types';
 
 interface Prompt {
   title: string;
@@ -19,7 +19,7 @@ interface Prompt {
 export const SavedPlacesScreen: React.FC = () => {
   const theme = useAppTheme();
   const tokens = useTokens();
-  const { collections, refreshCollections, preferences, updatePreferences } = useApp();
+  const { collections, refreshCollections } = useApp();
   const [prompt, setPrompt] = useState<Prompt | null>(null);
   const [menu, setMenu] = useState<string | null>(null); // id of the place or collection whose menu is open
   const [notice, setNotice] = useState('');
@@ -80,23 +80,6 @@ export const SavedPlacesScreen: React.FC = () => {
       },
     });
 
-  const setHome = (place: SavedPlace) =>
-    run(async () => {
-      if (!preferences) return;
-      if (!place.location.latitude && !place.location.longitude) {
-        throw new Error(`"${place.name}" has no map position, so it cannot be used as home.`);
-      }
-      await updatePreferences({
-        ...preferences,
-        home_location: { ...place.location, name: place.name, address: place.address },
-      });
-    }, `${place.name} is now home: every day starts and ends there.`);
-
-  const isHome = (place: SavedPlace) =>
-    !!preferences?.home_location &&
-    preferences.home_location.latitude === place.location.latitude &&
-    preferences.home_location.longitude === place.location.longitude;
-
   return (
     <View style={styles.root}>
       <Screen title="Saved places" error={error} onRetry={() => run(async () => undefined)}>
@@ -150,11 +133,6 @@ export const SavedPlacesScreen: React.FC = () => {
                 <View style={styles.place}>
                   <View style={{ flex: 1 }}>
                     <Text variant="bodyLarge">{place.name}</Text>
-                    {isHome(place) && (
-                      <Text variant="labelMedium" style={{ color: tokens.accent }}>
-                        Home
-                      </Text>
-                    )}
                     <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
                       {place.address}
                       {place.notes ? `\n${place.notes}` : ''}
@@ -171,7 +149,6 @@ export const SavedPlacesScreen: React.FC = () => {
                       />
                     }
                   >
-                    <Menu.Item leadingIcon="home-outline" title="Set as home" onPress={() => setHome(place)} />
                     {collections
                       .filter((c) => c.id !== col.id)
                       .map((target) => (

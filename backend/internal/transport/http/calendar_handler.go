@@ -90,15 +90,14 @@ func (s *Server) handleImportICS(w http.ResponseWriter, r *http.Request) {
 	respondJSON(w, http.StatusOK, result)
 }
 
-// handleSyncGoogle syncs with Google Calendar. Body (optional):
+// handleSyncGoogle syncs with Google Calendar. Body:
 // {"access_token": "..."} from the app's Google sign-in. Without a token, and
-// with none provided earlier, demo events are loaded and the result says
-// simulated=true.
+// with none provided earlier, it answers 401.
 func (s *Server) handleSyncGoogle(w http.ResponseWriter, r *http.Request) {
 	var req struct {
 		AccessToken string `json:"access_token"`
 	}
-	_ = json.NewDecoder(r.Body).Decode(&req) // empty body is fine
+	_ = json.NewDecoder(r.Body).Decode(&req) // empty body: reuse the token given earlier
 
 	result, err := s.calendarService.SyncGoogleCalendar(r.Context(), req.AccessToken)
 	if errors.Is(err, calendar.ErrGoogleAuth) {

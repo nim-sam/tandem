@@ -206,7 +206,7 @@ func (s *CalendarService) geocodeAll(ctx context.Context, events []domain.Event)
 // SyncGoogleCalendar pulls the next 30 days (and the past 7) from Google.
 // Pass the access token the app obtained from Google sign-in; it is kept in
 // memory so later adds/edits/deletes are mirrored. With no token, ever, it
-// loads clearly-marked demo events instead.
+// fails with ErrGoogleAuth.
 func (s *CalendarService) SyncGoogleCalendar(ctx context.Context, accessToken string) (domain.CalendarSyncResult, error) {
 	if accessToken != "" {
 		s.mu.Lock()
@@ -215,9 +215,7 @@ func (s *CalendarService) SyncGoogleCalendar(ctx context.Context, accessToken st
 	}
 	token := s.token()
 	if token == "" || s.googleClient == nil {
-		events := calendar.DemoEvents()
-		s.repo.SaveEvents(events)
-		return domain.CalendarSyncResult{Source: "google-demo", Simulated: true, EventsAdded: len(events), EventsSynced: len(events), LastSyncAt: time.Now()}, nil
+		return domain.CalendarSyncResult{}, calendar.ErrGoogleAuth
 	}
 
 	now := time.Now()
