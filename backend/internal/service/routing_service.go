@@ -212,6 +212,19 @@ func (s *RoutingService) GetDaySchedule(ctx context.Context, userID string, date
 		Origin: origin, Destination: destination}, nil
 }
 
+// commuteKey names one commute by the events (or day ends) it joins.
+func commuteKey(origID, destID string) string { return origID + ">" + destID }
+
+// SetCommuteGreen switches green routes on or off for one commute only,
+// whatever the user's setting says.
+func (s *RoutingService) SetCommuteGreen(origID, destID string, green bool) error {
+	if origID == "" || destID == "" {
+		return errors.New("origin_event_id and destination_event_id are required")
+	}
+	s.repo.SaveCommuteGreen(commuteKey(origID, destID), green)
+	return nil
+}
+
 // trip is one commute to plan.
 type trip struct {
 	origID, destID string // event IDs, or domain.DayStartID / domain.DayEndID
@@ -223,6 +236,12 @@ type trip struct {
 }
 
 func (s *RoutingService) planCommute(ctx context.Context, userID string, prefs domain.UserPreferences, natureMode bool, t trip) (domain.Route, error) {
+	pairKey := commuteKey(t.origID, t.destID)
+	// Green routes can be switched for this commute alone.
+	if green, ok := s.repo.GetCommuteGreen(pairKey); ok {
+		natureMode = green
+	}
+	greenRoutes := natureMode // as chosen, before the weather has its say
 	req := transit.PlanRequest{Origin: t.origin, Dest: t.dest, Time: t.when, ArriveBy: t.arriveBy, Prefs: prefs}
 	candidates, err := s.candidates(ctx, req)
 	if err != nil {
@@ -272,8 +291,8 @@ func (s *RoutingService) planCommute(ctx context.Context, userID string, prefs d
 		}
 	}
 
-	pairKey := t.origID + ">" + t.destID
 	best := s.rank(ctx, userID, prefs, natureMode, pairKey, candidates)
+	best.GreenRoutes = greenRoutes
 
 	// Free time before having to leave: suggest places whose detour fits in
 	// it. In bad weather only indoor places are suggested.

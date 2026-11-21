@@ -13,12 +13,14 @@ interface Props {
   refreshing?: boolean;
   onRefresh?: () => void;
   flush?: boolean; // content manages its own horizontal padding (the trail)
+  pinned?: ReactNode; // stays put under the title while the content scrolls
+  scrollRef?: React.RefObject<React.ComponentRef<typeof ScrollView> | null>; // to scroll the content from outside
   children: ReactNode;
 }
 
 // Shared page frame: a large title on the ice ground with its actions, an
 // error card when something failed, then the scrolling content.
-export const Screen: React.FC<Props> = ({ title, subtitle, actions, error, onRetry, refreshing, onRefresh, flush, children }) => {
+export const Screen: React.FC<Props> = ({ title, subtitle, actions, error, onRetry, refreshing, onRefresh, flush, pinned, scrollRef, children }) => {
   const theme = useAppTheme();
   const tokens = useTokens();
   const insets = useSafeAreaInsets();
@@ -50,7 +52,10 @@ export const Screen: React.FC<Props> = ({ title, subtitle, actions, error, onRet
         </View>
       )}
 
+      {pinned}
+
       <ScrollView
+        ref={scrollRef}
         // the last row clears the floating navigation bar and the add button above it
         contentContainerStyle={[styles.content, flush && styles.flush, { paddingBottom: 96 + NAV_CLEARANCE + insets.bottom }]}
         keyboardShouldPersistTaps="handled"

@@ -37,10 +37,12 @@ Routes are planned from the calendar, not from a search box: the app already kno
 - **Routes between events.** Each day starts and ends at home (or a place you choose for that day). Every trip is planned to arrive before the event, so its departure time is your time to leave.
 - **Time-to-leave reminders.** Local notifications 10 minutes before and at the moment to leave (phone only).
 - **Ranked for you.** Routes are ordered by your settings (preferred and avoided modes, longest walk, step-free only) and by what you actually pick: choosing an alternative teaches a small ranking agent.
-- **Green routes.** One switch favours walks through parks, marks them with a pine tree, and on short trips in dry weather offers a walk routed through a park.
+- **The trip that matters now.** The Day tab opens on the trip under way or next to leave, marked with a pointer; the rest of the day is folded to one line per trip.
+- **Map.** The open trip drawn section by section (walk, bus, metro, REM, train) with your live position and the steps listed underneath.
+- **Green routes.** A switch, per trip or for every trip, favours walks through parks, marks them with a pine tree, and on short trips in dry weather offers a walk routed through a park.
 - **Free-time suggestions.** When there is slack before you need to leave, the app suggests a café, library or park that fits.
 - **Impact at a glance.** Time travelling, steps on foot, and CO₂ saved against driving, with a plain comparison such as "≈ 49 km by car".
-- **Calendar.** Week and month views, add and edit events, import an `.ics` file, optional Google Calendar sync.
+- **Your events.** Add and edit events on the Day tab, jump to any date, import an `.ics` calendar file from Settings, and optionally sync Google Calendar.
 - **Saved places.** Keep the places you go to often and pick them as an event's location or a day's start or end.
 - **Step counting.** From the phone's own pedometer, with a seven-day chart and a green-walk streak.
 - **Light and dark themes.**
@@ -182,8 +184,8 @@ All settings are optional environment variables.
 │   └── internal/transport/http/ # handlers
 ├── frontend/                    # React Native app (Expo): Android, iOS, web
 │   └── src/
-│       ├── screens/             # Day, Calendar, Places, Activity, Settings
-│       ├── components/          # CommuteCard, RouteMap, calendar grids, dialogs
+│       ├── screens/             # Day, Map, Places, Activity, Settings
+│       ├── components/          # CommuteCard, TripMap, dialogs
 │       ├── store/               # app state
 │       └── theme/               # colours and type
 ├── ml-agent/                    # route-ranking agent (FastAPI, :8000)

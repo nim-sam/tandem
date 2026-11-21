@@ -34,6 +34,12 @@
             "backgroundColor": "#0D1626"
           }
         }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Tandem shows where you are on the map of your trip."
+        }
       ]
     ]
   }

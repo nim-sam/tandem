@@ -5,8 +5,6 @@ import { DAY_END, DAY_START, IntermodalNode, Route } from '../types';
 import { Font, Radius, cardShadow, inkOn, lineColor, useAppTheme, useTokens } from '../theme';
 import { formatCO2, formatDuration, formatTime } from '../utils/format';
 import { easeLayout } from '../utils/motion';
-import { RouteMap } from './RouteMap';
-import { useApp } from '../store/AppContext';
 
 const RAIL = 28; // width of the column the line runs down
 
@@ -207,19 +205,22 @@ const Pass: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 interface Props {
   route: Route;
   onSelect: (routeId: string) => void;
+  expanded: boolean; // false: one line with the times and the lines taken
+  onToggle: () => void;
+  onOpenMap: () => void;
 }
 
 // The trip between two events, drawn as one vertical line coming out of the
-// event above: when to leave, then a dot at every change of mode with the
-// stretch between dots in the line's colour. Everything else (why this route,
-// CO2, steps, map, other options) is behind "Details".
-export const CommuteCard: React.FC<Props> = ({ route, onSelect }) => {
+// event above. Closed, it is a single line: when to leave, how long, and the
+// lines taken. Open, it shows a dot at every change of mode with the stretch
+// between dots in the line's colour; why this route, CO2, steps and the other
+// options are behind "Details".
+export const CommuteCard: React.FC<Props> = ({ route, onSelect, expanded, onToggle, onOpenMap }) => {
   const theme = useAppTheme();
   const tokens = useTokens();
   const [open, setOpen] = useState(false);
-  const { preferences } = useApp();
   // Green routes are switched off by the server in rain, snow or deep cold.
-  const greenOn = !!preferences?.prefer_nature_routes && route.weather?.good_for_outdoors !== false;
+  const greenOn = route.green_routes && route.weather?.good_for_outdoors !== false;
   const alternatives = route.alternatives ?? [];
   const places = route.suggested_third_places ?? [];
   const legs = visibleLegs(route.nodes);
@@ -242,15 +243,22 @@ export const CommuteCard: React.FC<Props> = ({ route, onSelect }) => {
 
   const timesBlock = (
     <>
+      <TouchableRipple
+        onPress={() => {
+          easeLayout();
+          onToggle();
+        }}
+        accessibilityRole="button"
+        accessibilityState={{ expanded }}
+        accessibilityLabel={`Leave at ${formatTime(route.departure_time)}. ${formatDuration(
+          route.total_duration_minutes
+        )}, arrive ${formatTime(route.arrival_time)}. ${expanded ? 'Hide' : 'Show'} the route.`}
+        style={styles.toggle}
+      >
+        <View style={styles.toggleRow}>
         {/* The day's start and end markers already say when to leave home and
             when the trip back arrives, so those times are not repeated here. */}
-        <Text
-          variant="bodyMedium"
-          style={[styles.tabular, styles.times, { color: tokens.muted }]}
-          accessibilityLabel={`Leave at ${formatTime(route.departure_time)}. ${formatDuration(
-            route.total_duration_minutes
-          )}, arrive ${formatTime(route.arrival_time)}.`}
-        >
+        <Text variant="bodyMedium" style={[styles.tabular, styles.times, { color: tokens.muted, flex: 1 }]}>
           {!fromStart && (
             <>
               leave <Text variant="titleSmall" style={{ color: theme.colors.onSurface }}>{formatTime(route.departure_time)}</Text>
@@ -264,6 +272,9 @@ export const CommuteCard: React.FC<Props> = ({ route, onSelect }) => {
             </>
           )}
         </Text>
+        <Icon source={expanded ? 'chevron-up' : 'chevron-down'} size={20} color={tokens.muted} />
+        </View>
+      </TouchableRipple>
         {warning && (
           <View style={styles.warning}>
             <Icon source="alert-outline" size={16} color={tokens.warn} />
@@ -330,7 +341,9 @@ export const CommuteCard: React.FC<Props> = ({ route, onSelect }) => {
               </View>
             )}
 
-            <RouteMap route={route} height={220} />
+            <Button mode="contained-tonal" icon="map-outline" onPress={onOpenMap} style={{ alignSelf: 'flex-start' }}>
+              Show on the map
+            </Button>
 
             {alternatives.length > 0 && (
               <View>
@@ -386,6 +399,32 @@ export const CommuteCard: React.FC<Props> = ({ route, onSelect }) => {
         )}
     </>
   );
+
+  if (!expanded) {
+    const lines = route.nodes.filter((n) => n.mode !== 'walk');
+    return (
+      <View style={styles.commute}>
+        <Pass>
+          {timesBlock}
+          <View style={styles.closedPills}>
+            {lines.length === 0 ? (
+              <WalkPill green={greenOn && (route.is_park_walk || route.nature_score >= 0.2)} />
+            ) : (
+              lines.map((n, i) =>
+                n.line_code ? (
+                  <LinePill key={i} node={n} />
+                ) : (
+                  <Text key={i} variant="labelLarge" style={{ color: tokens.muted }}>
+                    {n.transit_line}
+                  </Text>
+                )
+              )
+            )}
+          </View>
+        </Pass>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.commute}>
@@ -477,8 +516,11 @@ const styles = StyleSheet.create({
   pass: { flex: 1, paddingLeft: 8, paddingVertical: 6, minWidth: 0 },
   joined: { paddingLeft: 8, paddingVertical: 6 },
   times: { minHeight: 24 },
+  toggle: { borderRadius: Radius.tag, marginRight: 4 },
+  toggleRow: { flexDirection: 'row', alignItems: 'center', gap: 6, minHeight: 36 },
   linePill: { minWidth: 32, height: 24, borderRadius: Radius.tag, paddingHorizontal: 7, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
   lineCode: { lineHeight: 24, fontSize: 14, fontFamily: Font.bold },
+  closedPills: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 6, paddingBottom: 2 },
   pills: { flex: 1, flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 6 },
   warning: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 6 },
   actions: { flexDirection: 'row', marginLeft: -12 },

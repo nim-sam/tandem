@@ -207,6 +207,14 @@ export const cardShadow = (dark: boolean): ViewStyle =>
 export const NAV_BAR = { height: 68, margin: 14 };
 export const NAV_CLEARANCE = NAV_BAR.height + NAV_BAR.margin * 2;
 
+// Colours riders already know, as the agencies publish them: used to tell the
+// day's three figures apart.
+export const LineColor = {
+  blueLine: '#0095E6', // STM metro line 5, the blue line
+  rem: '#73A400', // REM
+  rtl: '#D90B3E', // RTL buses
+};
+
 // Fallback colours per mode, used when the agency does not publish a line colour.
 export const TransitModeColors: Record<TransitMode, string> = {
   walk: '#8A8A8A',

@@ -95,6 +95,9 @@ type Route struct {
 	IsParkWalk   bool     `json:"is_park_walk"`      // walking route deliberately routed through a park
 	Weather      *Weather `json:"weather,omitempty"` // forecast at departure time
 	IsTight      bool     `json:"is_tight"`          // does not fit between the two events
+	// GreenRoutes says whether green routes are on for this commute: the
+	// user's setting, unless it was switched for this commute alone.
+	GreenRoutes bool `json:"green_routes"`
 	// WaitMinutes is the idle time this option costs on top of the ride:
 	// arriving earlier than needed, or leaving later than the user is free.
 	WaitMinutes int `json:"wait_minutes"`

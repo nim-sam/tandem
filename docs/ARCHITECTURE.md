@@ -76,7 +76,9 @@ unavailable during the demo, the same client works against a self-hosted MOTIS
 |---------|-------|--------|
 | Routes between events | `service/routing_service.go` | Live. Planned as *arrive by (event start − buffer)*, so the route's departure time **is** the time to leave. A day starts and ends at home (or at the place chosen for that date): one more commute to the first event, and one back from the last, leaving when it ends. Home is a place, not an event. Fetched itineraries and the option the user picked are saved in the database, so a planned day reopens without calling the provider (refreshed every 15 min for trips in the next 24 h, daily beyond that, never for past trips); if the provider is down the saved itinerary is used before the mock. |
 | Time-to-leave | `frontend/src/hooks/useLeaveNotifications.ts` | The app schedules **local** notifications (10 min before, and at leave time) with `expo-notifications`. No push server. Not available in a browser. |
-| Route map | `frontend/src/components/RouteMap.tsx` | Leaflet in a web view, legs drawn from the API's geometry in each line's colour. OpenStreetMap public tiles: fine for a prototype, not for a released app (see below). |
+| Map tab | `frontend/src/screens/MapScreen.tsx`, `components/TripMap.tsx` | Leaflet in a web view. The open trip is drawn section by section from the API's geometry (walking as dots, vehicles in their line's colour with the line number), with the user's live position (`hooks/useLiveLocation.ts`, expo-location) and the steps listed under the map. OpenStreetMap public tiles: fine for a prototype, not for a released app (see below). |
+| Current trip on the Day tab | `frontend/src/screens/DayViewScreen.tsx` | The trip under way or next to leave is opened, marked with a pointer and scrolled to; the others are closed to one line. |
+| Green routes per trip | `routing_service.go` `SetCommuteGreen`, `PUT /api/routes/green` | The Day tab's pinned switch turns green routes on or off for the open trip only; the Settings switch is the default for every trip. |
 | Mode preferences | `domain/ranking.go` `PriorWeights` | Live. Preferred modes get a bonus, avoided modes a strong penalty. |
 | CO2 saved | `routing_service.go` `enrich`, `domain/eco.go` | Live, per-leg distance × per-mode factor vs. a car. Factors are rough estimates. |
 | Accessibility | `enrich` + `transit/accessibility.go` | Vehicle accessibility from the API. Station list generated from the official STM feed (`scripts/fetch_station_access.py`): 25 of 68 stations step-free. Static: not live elevator outages. |
@@ -85,9 +87,9 @@ unavailable during the demo, the same client works against a self-hosted MOTIS
 | Weather | `adapter/weather/openmeteo.go` | Live (Open-Meteo, no key, non-commercial terms). Rain, snow or below −10 °C turns off park walks and limits suggestions to indoor places. |
 | Third-place suggestions | `places/third_places.go` | 5 hand-picked places + ~1,500 cafés, libraries and community centres from OpenStreetMap. Suggested when free time before leaving covers the detour. Detour time is a straight-line estimate. |
 | Live delays | `transit/motis.go` | Each leg carries `real_time` and `delay_minutes` when the feed provides them. Provider responses are cached 15 minutes, so this is not second-by-second. |
-| .ics import | `adapter/calendar/ics_parser.go` | Live. Locations geocoded. Recurring events (DAILY/WEEKLY/MONTHLY/YEARLY with INTERVAL, COUNT, UNTIL, BYDAY) expanded; EXDATE is not handled. |
+| .ics import | `adapter/calendar/ics_parser.go`, Settings screen | Live, from the Calendar card in Settings. Importing the same file again updates the events it brought in. Locations geocoded. Recurring events (DAILY/WEEKLY/MONTHLY/YEARLY with INTERVAL, COUNT, UNTIL, BYDAY) expanded; EXDATE is not handled. |
 | Google Calendar | `adapter/calendar/google_calendar.go` | Real client for Calendar API v3 (fetch, create, update, delete) using an access token from the app's Google sign-in. **Tested only against a fake server**: needs OAuth client IDs in `frontend/.env` to use for real. Without them the sync button is not shown. |
-| Event editing | `service/calendar_service.go` | Add, edit, delete; `GET /calendar/events?from=&to=` for week views. |
+| Event editing | `service/calendar_service.go` | Add, edit, delete, from the Day tab. There is no calendar view; `GET /calendar/events?from=&to=` remains for listing a range. |
 | Step counts | `frontend/src/hooks/usePhoneSteps.ts`, `service/health_service.go` | Phone pedometer is real (exact on iOS; Android counts only while the app is open). |
 | Weekly totals, streak | `service/health_service.go` `GetWeekStats` | From the day's planned routes (not measured), plus measured phone steps. |
 | "Why this route" | `GET /api/ml/weights`, Settings screen | Shows what the ranking agent has learned; can be reset. |
@@ -100,7 +102,7 @@ Not built: user accounts (one hardcoded user), smartwatch integrations.
 
 The map uses OpenStreetMap's public tile server, which is free with attribution
 but forbids heavy use and has no uptime guarantee. For a released app, change
-the tile URL in `RouteMap.tsx` to a hosted provider (most have a free tier and
+the tile URL in `TripMap.tsx` to a hosted provider (most have a free tier and
 need a key), or switch to `react-native-maps` (Google Maps on Android, Apple
 Maps on iOS; needs a Google Maps API key and a development build, and does not
 run on web).

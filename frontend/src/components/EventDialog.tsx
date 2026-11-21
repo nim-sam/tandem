@@ -13,7 +13,6 @@ interface Props {
   visible: boolean;
   date: string; // day for a new event
   event?: Event | null; // set to show an existing event
-  initialStart?: string; // "HH:MM" for a new event (tapping an hour in the calendar)
   onDismiss: () => void;
   onSaved: () => void; // also called after a delete
 }
@@ -66,7 +65,7 @@ const Detail: React.FC<{ icon: string; children: React.ReactNode }> = ({ icon, c
 // the same dialog to editable fields. A new event opens straight in the fields.
 // The location is typed as an address (the server finds the coordinates) or
 // picked from saved places.
-export const EventDialog: React.FC<Props> = ({ visible, date, event, initialStart, onDismiss, onSaved }) => {
+export const EventDialog: React.FC<Props> = ({ visible, date, event, onDismiss, onSaved }) => {
   const theme = useAppTheme();
   const tokens = useTokens();
   const { collections } = useApp();
@@ -96,7 +95,7 @@ export const EventDialog: React.FC<Props> = ({ visible, date, event, initialStar
       setPicked(event.location.latitude || event.location.longitude ? event.location : null);
       setDescription(event.description ?? '');
     } else {
-      const from = initialStart ?? '09:00';
+      const from = '09:00';
       setTitle('');
       setDay(date);
       setStart(from);
@@ -113,7 +112,7 @@ export const EventDialog: React.FC<Props> = ({ visible, date, event, initialStar
     setEditing(!event);
     // reset only when the dialog opens or shows another event
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [visible, event, date, initialStart]);
+  }, [visible, event, date]);
 
   const savedPlaces = collections.flatMap((c) => c.places).filter((p) => p.location.latitude || p.location.longitude);
 

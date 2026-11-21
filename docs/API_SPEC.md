@@ -155,6 +155,11 @@ Up to 6 places in the Montreal region matching what has been typed so far
 the city, and the coordinates are filled in, so a picked suggestion needs no
 further lookup.
 
+### `PUT /routes/green`
+`{ "origin_event_id": "…", "destination_event_id": "…", "green": true }`. Switches green routes on or
+off for that one commute, whatever the user's setting says. Each `Route` reports the result as
+`green_routes`.
+
 ### `POST /routes/select`
 `{ "route_id": "…" }`. The user prefers this alternative: it becomes the route
 for that commute and is sent to the ML agent as a training example. `404` if the

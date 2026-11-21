@@ -92,3 +92,13 @@ export const co2Equivalent = (grams: number, short = false): string =>
 
 export const formatDuration = (minutes: number): string =>
   minutes >= 60 ? `${Math.floor(minutes / 60)} h ${minutes % 60} min` : `${minutes} min`;
+
+// A commute's identity within a day: the events (or day ends) it joins. Unlike
+// its id, it stays the same when the day is planned again.
+export const commuteKey = (route: { origin_event_id?: string; destination_event_id?: string }): string =>
+  `${route.origin_event_id ?? ''}>${route.destination_event_id ?? ''}`;
+
+// The commute that matters now: the one under way, or else the next to leave.
+// Null when every trip of the day has already arrived (or there are none).
+export const currentCommute = <T extends { arrival_time: string }>(commutes: T[], now = Date.now()): T | null =>
+  commutes.find((c) => new Date(c.arrival_time).getTime() >= now) ?? null;

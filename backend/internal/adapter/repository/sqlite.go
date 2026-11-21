@@ -67,6 +67,11 @@ CREATE TABLE IF NOT EXISTS routes (
 CREATE TABLE IF NOT EXISTS route_choices (
 	pair_key  TEXT PRIMARY KEY,
 	signature TEXT NOT NULL
+);
+-- Green routes switched on or off for one commute, overriding the setting.
+CREATE TABLE IF NOT EXISTS commute_green (
+	pair_key TEXT PRIMARY KEY,
+	green    INTEGER NOT NULL
 );`
 
 // NewMemoryRepository returns an empty repository that is not saved anywhere.
@@ -396,4 +401,21 @@ func (r *Repository) GetRouteChoice(pairKey string) (string, bool) {
 func (r *Repository) SaveRouteChoice(pairKey, signature string) {
 	r.exec(`INSERT INTO route_choices (pair_key, signature) VALUES (?, ?)
 		ON CONFLICT(pair_key) DO UPDATE SET signature = excluded.signature`, pairKey, signature)
+}
+
+// GetCommuteGreen returns whether green routes were switched on or off for
+// one commute; ok is false when it follows the user's setting.
+func (r *Repository) GetCommuteGreen(pairKey string) (green, ok bool) {
+	var v int
+	err := r.db.QueryRow(`SELECT green FROM commute_green WHERE pair_key = ?`, pairKey).Scan(&v)
+	return v != 0, err == nil
+}
+
+func (r *Repository) SaveCommuteGreen(pairKey string, green bool) {
+	v := 0
+	if green {
+		v = 1
+	}
+	r.exec(`INSERT INTO commute_green (pair_key, green) VALUES (?, ?)
+		ON CONFLICT(pair_key) DO UPDATE SET green = excluded.green`, pairKey, v)
 }

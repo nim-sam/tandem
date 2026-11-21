@@ -65,6 +65,7 @@ func (s *Server) registerRoutes() {
 	s.mux.HandleFunc("PUT /api/routes/day/{date}/{which}", s.handleSetDayEndpoint)
 	s.mux.HandleFunc("DELETE /api/routes/day/{date}/{which}", s.handleResetDayEndpoint)
 	s.mux.HandleFunc("POST /api/routes/select", s.handleSelectRoute)
+	s.mux.HandleFunc("PUT /api/routes/green", s.handleSetCommuteGreen) // green routes for one commute
 	s.mux.HandleFunc("GET /api/geocode", s.handleGeocode)
 	s.mux.HandleFunc("GET /api/geocode/suggest", s.handleSuggestPlaces) // ?q=partly typed address
 

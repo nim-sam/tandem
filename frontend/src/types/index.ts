@@ -91,6 +91,7 @@ export interface Route {
   slack_minutes: number; // free time before having to leave
   is_tight: boolean;
   is_park_walk: boolean; // walk deliberately routed through a park
+  green_routes: boolean; // green routes are on for this commute (the setting, unless switched for it alone)
   weather?: Weather; // forecast at departure time
   score: number;
   reason?: string; // why this option ranked where it did

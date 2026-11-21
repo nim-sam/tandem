@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Linking, StyleSheet, View } from 'react-native';
+import { Linking, Platform, StyleSheet, View } from 'react-native';
+import * as DocumentPicker from 'expo-document-picker';
 import { Button, HelperText, SegmentedButtons, Snackbar, Switch, Text, TextInput } from 'react-native-paper';
 import { useFocusEffect } from '@react-navigation/native';
 import { useApp } from '../store/AppContext';
@@ -7,6 +8,7 @@ import { API } from '../api/client';
 import { Screen } from '../components/Screen';
 import { NAV_CLEARANCE, useAppTheme, useTokens } from '../theme';
 import { AddressInput } from '../components/AddressInput';
+import { GoogleSync } from '../components/GoogleSync';
 import { Card } from '../components/Card';
 import { Appearance, LearnedWeights, Location, TransitMode, UserPreferences } from '../types';
 
@@ -54,7 +56,9 @@ const Row: React.FC<{ title: string; hint?: string; children: React.ReactNode }>
 export const PreferencesScreen: React.FC = () => {
   const theme = useAppTheme();
   const tokens = useTokens();
-  const { preferences, updatePreferences } = useApp();
+  const { preferences, updatePreferences, refresh } = useApp();
+  const [importing, setImporting] = useState(false);
+  const [importError, setImportError] = useState('');
   const [numbers, setNumbers] = useState({ walk: '', buffer: '', goal: '' });
   const [home, setHome] = useState('');
   const [homePicked, setHomePicked] = useState<Location | null>(null); // chosen from the suggestions
@@ -123,6 +127,37 @@ export const PreferencesScreen: React.FC = () => {
     }
   };
 
+  // Bring events in from a calendar (.ics) file. Importing the same calendar
+  // again updates the events it already brought in.
+  const importCalendar = async () => {
+    setImportError('');
+    try {
+      const picked = await DocumentPicker.getDocumentAsync({
+        type: Platform.OS === 'web' ? '.ics,text/calendar' : ['text/calendar', '*/*'],
+        copyToCacheDirectory: true,
+      });
+      if (picked.canceled || !picked.assets?.length) return;
+      const asset = picked.assets[0];
+      const text = asset.file ? await asset.file.text() : await (await fetch(asset.uri)).text();
+      if (!text.includes('BEGIN:VCALENDAR') && !text.includes('BEGIN:VEVENT')) {
+        setImportError('That does not look like a calendar (.ics) file.');
+        return;
+      }
+      setImporting(true);
+      const result = await API.importICS(text);
+      await refresh();
+      setNotice(
+        result.events_added === 0
+          ? 'That file contained no events.'
+          : `Imported ${result.events_added} event${result.events_added > 1 ? 's' : ''}. They are on the Day tab.`
+      );
+    } catch (e) {
+      setImportError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setImporting(false);
+    }
+  };
+
   const insights = learned
     ? Object.entries(learned.learned_delta)
         .filter(([key, value]) => FEATURES[key] && Math.abs(value) >= 0.05)
@@ -155,6 +190,9 @@ export const PreferencesScreen: React.FC = () => {
           ))}
           <Row title="Step-free routes only" hint="Strongly favours stations with elevators and accessible vehicles.">
             <Switch value={preferences.require_elevator} onValueChange={(v) => save({ require_elevator: v })} />
+          </Row>
+          <Row title="Prefer green routes" hint="Favours walks through parks on every trip. The switch on the Day tab changes one trip at a time.">
+            <Switch value={preferences.prefer_nature_routes} onValueChange={(v) => save({ prefer_nature_routes: v })} />
           </Row>
           <Row title="Suggest places for free time" hint="Cafés, libraries and parks that fit before you need to leave.">
             <Switch value={preferences.allow_third_place_detours} onValueChange={(v) => save({ allow_third_place_detours: v })} />
@@ -191,6 +229,26 @@ export const PreferencesScreen: React.FC = () => {
             onChangeText={(t) => setNumbers((n) => ({ ...n, goal: t }))}
             onBlur={() => saveNumber('goal')}
           />
+        </Card>
+
+        <Card style={styles.card}>
+          <Text variant="titleLarge">Calendar</Text>
+          <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
+            Bring your events in from a calendar (.ics) file, such as a class schedule or an export from another calendar. Import the file again after it changes to update the events it brought in.
+          </Text>
+          <Button mode="contained-tonal" icon="file-upload-outline" onPress={importCalendar} loading={importing} disabled={importing}>
+            Import an .ics file
+          </Button>
+          <GoogleSync
+            onSynced={(message) => {
+              setNotice(message);
+              refresh();
+            }}
+            onError={setImportError}
+          />
+          <HelperText type="error" visible={!!importError}>
+            {importError}
+          </HelperText>
         </Card>
 
         <Card style={styles.card}>

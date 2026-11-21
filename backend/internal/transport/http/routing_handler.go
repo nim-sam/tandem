@@ -51,6 +51,25 @@ func (s *Server) handleSelectRoute(w http.ResponseWriter, r *http.Request) {
 	respondJSON(w, http.StatusOK, map[string]string{"status": "selected", "route_id": req.RouteID})
 }
 
+// handleSetCommuteGreen switches green routes on or off for one commute.
+// Body: {"origin_event_id": "...", "destination_event_id": "...", "green": true}
+func (s *Server) handleSetCommuteGreen(w http.ResponseWriter, r *http.Request) {
+	var req struct {
+		OriginEventID      string `json:"origin_event_id"`
+		DestinationEventID string `json:"destination_event_id"`
+		Green              bool   `json:"green"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		respondError(w, http.StatusBadRequest, "Invalid payload")
+		return
+	}
+	if err := s.routingService.SetCommuteGreen(req.OriginEventID, req.DestinationEventID, req.Green); err != nil {
+		respondError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	respondJSON(w, http.StatusOK, map[string]any{"status": "saved", "green": req.Green})
+}
+
 // handleGeocode resolves ?q=address to coordinates (for the add-event form).
 func (s *Server) handleGeocode(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query().Get("q")

@@ -328,3 +328,32 @@ func TestRankingCountsWaiting(t *testing.T) {
 		}
 	}
 }
+
+// Green routes can be switched for one commute without touching the setting.
+func TestGreenRoutesPerCommute(t *testing.T) {
+	svc, repo := newTestService(&stubProvider{})
+	ctx := context.Background()
+	day := time.Date(2026, 11, 23, 0, 0, 0, 0, time.Local)
+
+	prefs := repo.GetUserPreferences("default_user")
+	prefs.PreferNatureRoutes = false
+	repo.SaveUserPreferences(prefs)
+
+	sched, _ := svc.GetDaySchedule(ctx, "default_user", day)
+	if len(sched.Commutes) != 1 || sched.Commutes[0].GreenRoutes {
+		t.Fatalf("with the setting off the commute should not be green: %+v", sched.Commutes)
+	}
+	if err := svc.SetCommuteGreen("a", "b", true); err != nil {
+		t.Fatal(err)
+	}
+	sched, _ = svc.GetDaySchedule(ctx, "default_user", day)
+	if !sched.Commutes[0].GreenRoutes {
+		t.Error("the commute switched to green should report green_routes")
+	}
+	if repo.GetUserPreferences("default_user").PreferNatureRoutes {
+		t.Error("switching one commute must not change the user's setting")
+	}
+	if err := svc.SetCommuteGreen("", "b", true); err == nil {
+		t.Error("a commute needs both ends")
+	}
+}

@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState, ReactNode } from 'react';
-import { DaySchedule, Collection, UserPreferences, DailyHealthSummary, WeekStats } from '../types';
+import { DaySchedule, Collection, Route, UserPreferences, DailyHealthSummary, WeekStats } from '../types';
 import { API } from '../api/client';
 import { todayKey } from '../utils/format';
 
@@ -17,6 +17,10 @@ interface AppContextValue {
   refreshCollections: () => Promise<void>;
   selectRoute: (routeId: string) => Promise<void>;
   updatePreferences: (prefs: UserPreferences) => Promise<void>;
+  // The commute that is open on the Day tab and drawn on the Map tab (see commuteKey), or null.
+  openCommute: string | null;
+  setOpenCommute: (key: string | null) => void;
+  setCommuteGreen: (route: Route, green: boolean) => Promise<void>; // green routes for that commute only
 }
 
 const AppContext = createContext<AppContextValue | undefined>(undefined);
@@ -30,6 +34,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [collections, setCollections] = useState<Collection[]>([]);
   const [health, setHealth] = useState<DailyHealthSummary | null>(null);
   const [week, setWeek] = useState<WeekStats | null>(null);
+  const [openCommute, setOpenCommute] = useState<string | null>(null);
   const latest = useRef(0); // ignore responses for a day the user has already left
 
   const refresh = useCallback(async () => {
@@ -74,6 +79,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     await refresh();
   };
 
+  const setCommuteGreen = async (route: Route, green: boolean) => {
+    await API.setCommuteGreen(route.origin_event_id ?? '', route.destination_event_id ?? '', green);
+    await refresh();
+  };
+
   const updatePreferences = async (prefs: UserPreferences) => {
     setPreferences(await API.updatePreferences(prefs));
     await refresh();
@@ -95,6 +105,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         refreshCollections,
         selectRoute,
         updatePreferences,
+        openCommute,
+        setOpenCommute,
+        setCommuteGreen,
       }}
     >
       {children}

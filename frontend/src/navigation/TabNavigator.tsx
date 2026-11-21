@@ -4,7 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Icon, Text } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DayViewScreen } from '../screens/DayViewScreen';
-import { CalendarScreen } from '../screens/CalendarScreen';
+import { MapScreen } from '../screens/MapScreen';
 import { SavedPlacesScreen } from '../screens/SavedPlacesScreen';
 import { HealthScreen } from '../screens/HealthScreen';
 import { PreferencesScreen } from '../screens/PreferencesScreen';
@@ -16,7 +16,7 @@ const Tab = createBottomTabNavigator();
 // blue pill when selected.
 const TABS = [
   { name: 'Day', component: DayViewScreen, icon: 'map-marker-path' },
-  { name: 'Calendar', component: CalendarScreen, icon: 'calendar-blank-outline' },
+  { name: 'Map', component: MapScreen, icon: 'map-outline' },
   { name: 'Places', component: SavedPlacesScreen, icon: 'bookmark-outline' },
   { name: 'Activity', component: HealthScreen, icon: 'heart-pulse' },
   { name: 'Settings', component: PreferencesScreen, icon: 'cog-outline' },
