@@ -75,6 +75,30 @@ while IFS='|' read -r tag url; do
 done <<< "$FEEDS"
 grep -q "^    stl:" <<< "$DATASETS" || { echo "The STL timetable is missing; not building." >&2; exit 1; }
 
+HELPER="$(dirname "$DIR")/scripts/gtfs_feed.py"
+
+# The RTL's "latest feed" is next season's timetable for weeks before it
+# starts, and then has no trips today. Load the one in force alongside it.
+rm -f feeds/rtlnow.zip
+if [ -s feeds/rtl.zip ] && ! python3 "$HELPER" active feeds/rtl.zip; then
+  echo "The RTL's latest timetable has not started yet ($(python3 "$HELPER" range feeds/rtl.zip)); fetching the current one..."
+  if python3 "$HELPER" rtl-current feeds/rtlnow.zip; then
+    DATASETS+="    rtlnow:"$'\n'"      path: feeds/rtlnow.zip"$'\n'
+  else
+    rm -f feeds/rtlnow.zip
+    SKIPPED+=" rtl(current-season)"
+  fi
+fi
+
+# Any other timetable with no trips in the coming week: built anyway, but said out loud.
+INACTIVE=""
+for f in feeds/*.zip; do
+  tag="$(basename "$f" .zip)"
+  grep -q "^    $tag:" <<< "$DATASETS" || continue
+  [ "$tag" = rtl ] && [ -s feeds/rtlnow.zip ] && continue
+  python3 "$HELPER" active "$f" || INACTIVE+=" $tag($(python3 "$HELPER" range "$f"))"
+done
+
 cat > config.yml <<YAML
 # Written by scripts/setup_routing.sh; edits are overwritten.
 server:
@@ -97,6 +121,9 @@ echo "Building routing data (a few minutes)..."
 ./motis import
 date +%F > .built
 echo "Done. 'make dev' now routes with the local engine (port $PORT)."
+if [ -n "$INACTIVE" ]; then
+  echo "WARNING: no trips in the coming week, so these agencies are not routed today:$INACTIVE" >&2
+fi
 if [ -n "$SKIPPED" ]; then
   echo "WARNING: left out, so their lines are not routed:$SKIPPED" >&2
   echo "Check the links in scripts/setup_routing.sh." >&2
