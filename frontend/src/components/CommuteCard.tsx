@@ -32,12 +32,12 @@ export const LinePill: React.FC<{ node: IntermodalNode }> = ({ node }) => {
 };
 
 // The walking counterpart of a line pill: same size, a walker instead of a code.
-// With green routes on, the walker is green on a walk through a park.
+// With green routes on, a walk through a park shows a green pine tree instead of the walker.
 const WalkPill: React.FC<{ green?: boolean }> = ({ green }) => {
   const tokens = useTokens();
   return (
     <View style={[styles.linePill, { backgroundColor: tokens.pale }]}>
-      <Icon source="walk" size={16} color={green ? tokens.green : tokens.accent} />
+      <Icon source={green ? 'pine-tree' : 'walk'} size={16} color={green ? tokens.green : tokens.accent} />
     </View>
   );
 };
