@@ -201,6 +201,15 @@ export const cardShadow = (dark: boolean): ViewStyle =>
         default: { shadowColor: '#163866', shadowOpacity: 0.09, shadowRadius: 18, shadowOffset: { width: 0, height: 6 } },
       }) ?? {};
 
+// Frosted glass, for the cards that float over the patterned ground: the
+// surface colour at part strength, with whatever is behind it blurred. The
+// blur is a browser feature; on a phone the card is simply translucent.
+export const glass = (dark: boolean): ViewStyle => ({
+  backgroundColor: dark ? 'rgba(23, 36, 61, 0.72)' : 'rgba(255, 255, 255, 0.7)',
+  ...(Platform.OS === 'web' ? ({ backdropFilter: 'blur(14px)' } as ViewStyle) : null),
+  ...(Platform.OS === 'android' ? { elevation: 0 } : null), // a shadow would show through
+});
+
 // The navigation bar floats over the content. Anything pinned to the bottom of
 // a screen (the add button, snackbars, the last row of a list) keeps this much
 // clear, plus the system's bottom inset.
@@ -213,6 +222,7 @@ export const LineColor = {
   blueLine: '#0095E6', // STM metro line 5, the blue line
   rem: '#73A400', // REM
   rtl: '#D90B3E', // RTL buses
+  orangeLine: '#D95700', // STM metro line 2, the orange line
 };
 
 // Fallback colours per mode, used when the agency does not publish a line colour.

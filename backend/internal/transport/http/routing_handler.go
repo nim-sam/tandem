@@ -3,6 +3,7 @@ package http
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -68,6 +69,97 @@ func (s *Server) handleSetCommuteGreen(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	respondJSON(w, http.StatusOK, map[string]any{"status": "saved", "green": req.Green})
+}
+
+// handlePreviewCommuteGreen returns the route one commute would get with green
+// routes on (or off), changing nothing.
+// Body: {"date": "YYYY-MM-DD", "origin_event_id": "...", "destination_event_id": "...", "green": true}
+func (s *Server) handlePreviewCommuteGreen(w http.ResponseWriter, r *http.Request) {
+	var req struct {
+		Date               string `json:"date"`
+		OriginEventID      string `json:"origin_event_id"`
+		DestinationEventID string `json:"destination_event_id"`
+		Green              bool   `json:"green"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		respondError(w, http.StatusBadRequest, "Invalid payload")
+		return
+	}
+	date, err := time.ParseInLocation("2006-01-02", req.Date, time.Local)
+	if err != nil {
+		respondError(w, http.StatusBadRequest, "date must be YYYY-MM-DD")
+		return
+	}
+	route, err := s.routingService.PreviewCommuteGreen(r.Context(), userID(r), date, req.OriginEventID, req.DestinationEventID, req.Green)
+	if err != nil {
+		respondError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	respondJSON(w, http.StatusOK, route)
+}
+
+// handleSetCommuteGoal optimises one commute for steps or CO2 saved.
+// Body: {"origin_event_id": "...", "destination_event_id": "...", "goal": "steps" | "co2" | ""}
+func (s *Server) handleSetCommuteGoal(w http.ResponseWriter, r *http.Request) {
+	var req struct {
+		OriginEventID      string `json:"origin_event_id"`
+		DestinationEventID string `json:"destination_event_id"`
+		Goal               string `json:"goal"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		respondError(w, http.StatusBadRequest, "Invalid payload")
+		return
+	}
+	if err := s.routingService.SetCommuteGoal(req.OriginEventID, req.DestinationEventID, req.Goal); err != nil {
+		respondError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	respondJSON(w, http.StatusOK, map[string]any{"status": "saved", "goal": req.Goal})
+}
+
+// handleAddStop is "I finished early": it adds a stop at a place right after
+// the event. Body: a NearbyPlace (name and location are enough).
+func (s *Server) handleAddStop(w http.ResponseWriter, r *http.Request) {
+	var place domain.NearbyPlace
+	if err := json.NewDecoder(r.Body).Decode(&place); err != nil {
+		respondError(w, http.StatusBadRequest, "Invalid place")
+		return
+	}
+	stop, err := s.routingService.AddStop(r.Context(), userID(r), r.PathValue("id"), place)
+	if err != nil {
+		respondError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	respondJSON(w, http.StatusOK, stop)
+}
+
+// handleNearbyPlaces lists cafés, restaurants or parks around ?lat=&lon=,
+// nearest first. ?category=cafe|restaurant|nature, ?refine=study,terrace
+func (s *Server) handleNearbyPlaces(w http.ResponseWriter, r *http.Request) {
+	q := r.URL.Query()
+	lat, err1 := strconv.ParseFloat(q.Get("lat"), 64)
+	lon, err2 := strconv.ParseFloat(q.Get("lon"), 64)
+	if err1 != nil || err2 != nil {
+		respondError(w, http.StatusBadRequest, "lat and lon are required")
+		return
+	}
+	var refine []string
+	for _, word := range strings.Split(q.Get("refine"), ",") {
+		if word = strings.TrimSpace(word); word != "" {
+			refine = append(refine, word)
+		}
+	}
+	places, err := s.routingService.NearbyPlaces(lat, lon, q.Get("category"), refine)
+	if err != nil {
+		respondError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	respondJSON(w, http.StatusOK, map[string]any{"places": places})
+}
+
+// handlePlacePicks lists the places the user stopped at most often.
+func (s *Server) handlePlacePicks(w http.ResponseWriter, r *http.Request) {
+	respondJSON(w, http.StatusOK, map[string]any{"places": s.routingService.TopPlacePicks()})
 }
 
 // handleGeocode resolves ?q=address to coordinates (for the add-event form).

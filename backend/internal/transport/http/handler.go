@@ -58,6 +58,7 @@ func (s *Server) registerRoutes() {
 	s.mux.HandleFunc("DELETE /api/calendar/events/{id}", s.handleDeleteEvent)
 	s.mux.HandleFunc("POST /api/calendar/import-ics", s.handleImportICS)
 	s.mux.HandleFunc("POST /api/calendar/sync-google", s.handleSyncGoogle)
+	s.mux.HandleFunc("POST /api/calendar/events/{id}/stop", s.handleAddStop) // finished early: stop somewhere next
 
 	// Routing & Commutes
 	s.mux.HandleFunc("GET /api/routes/day", s.handleGetDaySchedule)
@@ -66,6 +67,8 @@ func (s *Server) registerRoutes() {
 	s.mux.HandleFunc("DELETE /api/routes/day/{date}/{which}", s.handleResetDayEndpoint)
 	s.mux.HandleFunc("POST /api/routes/select", s.handleSelectRoute)
 	s.mux.HandleFunc("PUT /api/routes/green", s.handleSetCommuteGreen) // green routes for one commute
+	s.mux.HandleFunc("POST /api/routes/green/preview", s.handlePreviewCommuteGreen)
+	s.mux.HandleFunc("PUT /api/routes/goal", s.handleSetCommuteGoal) // one commute: most steps / most CO2 saved
 	s.mux.HandleFunc("GET /api/geocode", s.handleGeocode)
 	s.mux.HandleFunc("GET /api/geocode/suggest", s.handleSuggestPlaces) // ?q=partly typed address
 
@@ -77,6 +80,8 @@ func (s *Server) registerRoutes() {
 	s.mux.HandleFunc("POST /api/collections/{id}/places", s.handleAddPlaceToCollection)
 	s.mux.HandleFunc("DELETE /api/collections/{id}/places/{placeId}", s.handleRemovePlace)
 	s.mux.HandleFunc("POST /api/collections/{id}/places/{placeId}/move", s.handleMovePlace)
+	s.mux.HandleFunc("GET /api/places/nearby", s.handleNearbyPlaces) // ?lat=&lon=&category=&refine=a,b
+	s.mux.HandleFunc("GET /api/places/picks", s.handlePlacePicks)
 
 	// Health: step counts (phone pedometer) and weekly totals
 	s.mux.HandleFunc("GET /api/health/summary", s.handleGetHealthSummary)

@@ -400,27 +400,46 @@ export const CommuteCard: React.FC<Props> = ({ route, onSelect, expanded, onTogg
     </>
   );
 
+  // Closed: only the lines taken and how long it takes. The times and the
+  // stops appear when it is opened.
   if (!expanded) {
     const lines = route.nodes.filter((n) => n.mode !== 'walk');
     return (
       <View style={styles.commute}>
         <Pass>
-          {timesBlock}
-          <View style={styles.closedPills}>
-            {lines.length === 0 ? (
-              <WalkPill green={greenOn && (route.is_park_walk || route.nature_score >= 0.2)} />
-            ) : (
-              lines.map((n, i) =>
-                n.line_code ? (
-                  <LinePill key={i} node={n} />
+          <TouchableRipple
+            onPress={() => {
+              easeLayout();
+              onToggle();
+            }}
+            accessibilityRole="button"
+            accessibilityState={{ expanded: false }}
+            accessibilityLabel={`${lineSummary(route)}, ${formatDuration(route.total_duration_minutes)}. Show the route and its times.`}
+            style={styles.toggle}
+          >
+            <View style={styles.toggleRow}>
+              <View style={styles.closedPills}>
+                {lines.length === 0 ? (
+                  <WalkPill green={greenOn && (route.is_park_walk || route.nature_score >= 0.2)} />
                 ) : (
-                  <Text key={i} variant="labelLarge" style={{ color: tokens.muted }}>
-                    {n.transit_line}
-                  </Text>
-                )
-              )
-            )}
-          </View>
+                  lines.map((n, i) =>
+                    n.line_code ? (
+                      <LinePill key={i} node={n} />
+                    ) : (
+                      <Text key={i} variant="labelLarge" style={{ color: tokens.muted }}>
+                        {n.transit_line}
+                      </Text>
+                    )
+                  )
+                )}
+                <Text variant="bodySmall" style={[styles.tabular, { color: route.is_tight ? tokens.warn : tokens.muted }]}>
+                  {formatDuration(route.total_duration_minutes)}
+                  {route.is_tight ? ' · does not fit' : ''}
+                </Text>
+              </View>
+              <Icon source="chevron-down" size={20} color={tokens.muted} />
+            </View>
+          </TouchableRipple>
         </Pass>
       </View>
     );
@@ -520,7 +539,7 @@ const styles = StyleSheet.create({
   toggleRow: { flexDirection: 'row', alignItems: 'center', gap: 6, minHeight: 36 },
   linePill: { minWidth: 32, height: 24, borderRadius: Radius.tag, paddingHorizontal: 7, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
   lineCode: { lineHeight: 24, fontSize: 14, fontFamily: Font.bold },
-  closedPills: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 6, paddingBottom: 2 },
+  closedPills: { flex: 1, flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 6 },
   pills: { flex: 1, flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 6 },
   warning: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 6 },
   actions: { flexDirection: 'row', marginLeft: -12 },

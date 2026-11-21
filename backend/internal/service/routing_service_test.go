@@ -356,4 +356,113 @@ func TestGreenRoutesPerCommute(t *testing.T) {
 	if err := svc.SetCommuteGreen("", "b", true); err == nil {
 		t.Error("a commute needs both ends")
 	}
+
+	// A preview shows the other setting without saving it.
+	preview, err := svc.PreviewCommuteGreen(ctx, "default_user", day, "a", "b", false)
+	if err != nil || preview.GreenRoutes {
+		t.Errorf("preview with green off should report green_routes=false, got %v (%v)", preview.GreenRoutes, err)
+	}
+	sched, _ = svc.GetDaySchedule(ctx, "default_user", day)
+	if !sched.Commutes[0].GreenRoutes {
+		t.Error("a preview must not change the commute's saved setting")
+	}
+	if _, err := svc.PreviewCommuteGreen(ctx, "default_user", day, "a", "nowhere", true); err == nil {
+		t.Error("previewing a commute that is not on the day should fail")
+	}
+}
+
+// A commute can be optimised for steps or CO2 saved; picking by hand ends that.
+func TestCommuteGoal(t *testing.T) {
+	svc, _ := newTestService(&stubProvider{})
+	ctx := context.Background()
+	day := time.Date(2026, 11, 23, 0, 0, 0, 0, time.Local)
+
+	if err := svc.SetCommuteGoal("a", "b", "fastest"); err == nil {
+		t.Error("an unknown goal should be refused")
+	}
+	for _, goal := range []string{GoalSteps, GoalCO2} {
+		if err := svc.SetCommuteGoal("a", "b", goal); err != nil {
+			t.Fatal(err)
+		}
+		sched, _ := svc.GetDaySchedule(ctx, "default_user", day)
+		c := sched.Commutes[0]
+		if c.Goal != goal {
+			t.Fatalf("commute should report goal %q, got %q", goal, c.Goal)
+		}
+		for _, alt := range c.Alternatives {
+			if goal == GoalSteps && alt.TotalSteps > c.TotalSteps && !alt.IsTight {
+				t.Errorf("steps goal: an alternative has more steps (%d > %d)", alt.TotalSteps, c.TotalSteps)
+			}
+			if goal == GoalCO2 && alt.CO2SavedGrams > c.CO2SavedGrams && !alt.IsTight {
+				t.Errorf("co2 goal: an alternative saves more (%v > %v)", alt.CO2SavedGrams, c.CO2SavedGrams)
+			}
+		}
+	}
+	sched, _ := svc.GetDaySchedule(ctx, "default_user", day)
+	if len(sched.Commutes[0].Alternatives) > 0 {
+		if err := svc.SelectRoute(ctx, sched.Commutes[0].Alternatives[0].ID); err != nil {
+			t.Fatal(err)
+		}
+		sched, _ = svc.GetDaySchedule(ctx, "default_user", day)
+		if sched.Commutes[0].Goal != "" {
+			t.Error("choosing an option by hand should clear the goal")
+		}
+	}
+}
+
+// "Finished early": a stop is added between an event and the next one.
+func TestAddStop(t *testing.T) {
+	svc, repo := newTestService(&stubProvider{})
+	ctx := context.Background()
+	day := time.Date(2026, 11, 23, 0, 0, 0, 0, time.Local)
+	a, _ := repo.GetEvent("a")
+	b, _ := repo.GetEvent("b")
+
+	place := domain.NearbyPlace{Name: "Café Test", Kind: "Café", Category: "cafe",
+		Location: domain.Location{Name: "Café Test", Latitude: 45.51, Longitude: -73.58}}
+	stop, err := svc.AddStop(ctx, "default_user", "a", place)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if stop.Title != "Café Test" || !stop.StartTime.After(a.EndTime) || stop.EndTime.After(b.StartTime) || !stop.EndTime.After(stop.StartTime) {
+		t.Errorf("stop should sit between the two events: %v–%v (A ends %v, B starts %v)", stop.StartTime, stop.EndTime, a.EndTime, b.StartTime)
+	}
+	sched, _ := svc.GetDaySchedule(ctx, "default_user", day)
+	if len(sched.Events) != 3 {
+		t.Errorf("the day should now have 3 events, got %d", len(sched.Events))
+	}
+	for _, c := range sched.Commutes {
+		if c.IsTight {
+			t.Errorf("the trips around the stop should fit: %s -> %s is tight", c.OriginEventID, c.DestinationEventID)
+		}
+	}
+	if picks := svc.TopPlacePicks(); len(picks) != 1 || picks[0].Picks != 1 || picks[0].Name != "Café Test" {
+		t.Errorf("the stop should be remembered as a pick, got %+v", picks)
+	}
+	if _, err := svc.AddStop(ctx, "default_user", "nope", place); err == nil {
+		t.Error("an unknown event should be refused")
+	}
+}
+
+func TestNearbyPlaces(t *testing.T) {
+	svc, _ := newTestService(&stubProvider{})
+	for _, category := range []string{"cafe", "restaurant", "nature"} {
+		places, err := svc.NearbyPlaces(45.5048, -73.5772, category, nil)
+		if err != nil || len(places) == 0 {
+			t.Fatalf("%s: expected places near downtown, got %d (%v)", category, len(places), err)
+		}
+		for i := 1; i < len(places); i++ {
+			if places[i].DistanceMeters < places[i-1].DistanceMeters {
+				t.Errorf("%s: not nearest first", category)
+			}
+		}
+	}
+	pizza, _ := svc.NearbyPlaces(45.5048, -73.5772, "restaurant", []string{"pizza"})
+	all, _ := svc.NearbyPlaces(45.5048, -73.5772, "restaurant", nil)
+	if len(pizza) == 0 || pizza[0].DistanceMeters < all[0].DistanceMeters {
+		t.Errorf("narrowing down should give a subset: pizza %d, all %d", len(pizza), len(all))
+	}
+	if _, err := svc.NearbyPlaces(45.5, -73.57, "museum", nil); err == nil {
+		t.Error("an unknown category should be refused")
+	}
 }

@@ -36,4 +36,21 @@ type ThirdPlace struct {
 	Description   string   `json:"description"`
 	HasWifi       bool     `json:"has_wifi"`
 	HasSeating    bool     `json:"has_seating"`
+	// From OpenStreetMap, for narrowing a search down. Empty when unknown.
+	Cuisine        string `json:"cuisine,omitempty"` // "pizza", "sushi;japanese"
+	Vegetarian     bool   `json:"vegetarian,omitempty"`
+	OutdoorSeating bool   `json:"outdoor_seating,omitempty"`
+}
+
+// NearbyPlace is a place to go to, found around a point: a café, a restaurant
+// or a park, with how far it is on foot.
+type NearbyPlace struct {
+	ID             string   `json:"id"`
+	Name           string   `json:"name"`
+	Category       string   `json:"category"` // "cafe", "restaurant", "nature", or "" for a searched address
+	Kind           string   `json:"kind"`     // what it is, in words: "Café", "Pizza restaurant", "Park"
+	Location       Location `json:"location"`
+	DistanceMeters int      `json:"distance_meters"` // straight line
+	WalkMinutes    int      `json:"walk_minutes"`    // estimate from the straight line, 12 min per km
+	Picks          int      `json:"picks,omitempty"` // how many times the user chose it
 }

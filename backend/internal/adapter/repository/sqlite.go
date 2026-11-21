@@ -72,6 +72,18 @@ CREATE TABLE IF NOT EXISTS route_choices (
 CREATE TABLE IF NOT EXISTS commute_green (
 	pair_key TEXT PRIMARY KEY,
 	green    INTEGER NOT NULL
+);
+-- What one commute is optimised for instead of the usual ranking ("steps", "co2").
+CREATE TABLE IF NOT EXISTS commute_goal (
+	pair_key TEXT PRIMARY KEY,
+	goal     TEXT NOT NULL
+);
+-- Places the user chose to stop at, to offer the favourites first.
+CREATE TABLE IF NOT EXISTS place_picks (
+	key    TEXT PRIMARY KEY,
+	picks  INTEGER NOT NULL,
+	last   INTEGER NOT NULL,
+	data   TEXT NOT NULL
 );`
 
 // NewMemoryRepository returns an empty repository that is not saved anywhere.
@@ -418,4 +430,54 @@ func (r *Repository) SaveCommuteGreen(pairKey string, green bool) {
 	}
 	r.exec(`INSERT INTO commute_green (pair_key, green) VALUES (?, ?)
 		ON CONFLICT(pair_key) DO UPDATE SET green = excluded.green`, pairKey, v)
+}
+
+// GetCommuteGoal returns what one commute is optimised for ("steps", "co2"),
+// or "" when it follows the usual ranking.
+func (r *Repository) GetCommuteGoal(pairKey string) string {
+	var goal string
+	_ = r.db.QueryRow(`SELECT goal FROM commute_goal WHERE pair_key = ?`, pairKey).Scan(&goal)
+	return goal
+}
+
+func (r *Repository) SaveCommuteGoal(pairKey, goal string) {
+	if goal == "" {
+		r.exec(`DELETE FROM commute_goal WHERE pair_key = ?`, pairKey)
+		return
+	}
+	r.exec(`INSERT INTO commute_goal (pair_key, goal) VALUES (?, ?)
+		ON CONFLICT(pair_key) DO UPDATE SET goal = excluded.goal`, pairKey, goal)
+}
+
+// RecordPlacePick counts one more visit to a place the user chose to stop at.
+func (r *Repository) RecordPlacePick(p domain.NearbyPlace) {
+	key := fmt.Sprintf("%s|%.4f|%.4f", p.Name, p.Location.Latitude, p.Location.Longitude)
+	p.Picks = 0
+	data, err := json.Marshal(p)
+	if err != nil {
+		return
+	}
+	r.exec(`INSERT INTO place_picks (key, picks, last, data) VALUES (?, 1, ?, ?)
+		ON CONFLICT(key) DO UPDATE SET picks = picks + 1, last = excluded.last, data = excluded.data`,
+		key, time.Now().Unix(), string(data))
+}
+
+// TopPlacePicks lists the places chosen most often, most picked first.
+func (r *Repository) TopPlacePicks(limit int) []domain.NearbyPlace {
+	rows, err := r.db.Query(`SELECT picks, data FROM place_picks ORDER BY picks DESC, last DESC LIMIT ?`, limit)
+	if err != nil {
+		return []domain.NearbyPlace{}
+	}
+	defer rows.Close()
+	out := []domain.NearbyPlace{}
+	for rows.Next() {
+		var picks int
+		var data string
+		var p domain.NearbyPlace
+		if rows.Scan(&picks, &data) == nil && json.Unmarshal([]byte(data), &p) == nil {
+			p.Picks = picks
+			out = append(out, p)
+		}
+	}
+	return out
 }

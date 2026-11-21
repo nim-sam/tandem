@@ -135,6 +135,31 @@ func (s *RoutingService) ResetDayEndpoint(date, which string) {
 // commutes between them, and the trips from where the day starts to the
 // first event and from the last event to where the day ends.
 func (s *RoutingService) GetDaySchedule(ctx context.Context, userID string, date time.Time) (domain.DaySchedule, error) {
+	return s.daySchedule(ctx, userID, date, nil)
+}
+
+// PreviewCommuteGreen plans one commute of a day as it would be with green
+// routes switched on (or off) for it, without changing anything: the app
+// shows the result and lets the user decide.
+func (s *RoutingService) PreviewCommuteGreen(ctx context.Context, userID string, date time.Time, origID, destID string, green bool) (domain.Route, error) {
+	if origID == "" || destID == "" {
+		return domain.Route{}, errors.New("origin_event_id and destination_event_id are required")
+	}
+	sched, err := s.daySchedule(ctx, userID, date, map[string]bool{commuteKey(origID, destID): green})
+	if err != nil {
+		return domain.Route{}, err
+	}
+	for _, c := range sched.Commutes {
+		if c.OriginEventID == origID && c.DestinationEventID == destID {
+			return c, nil
+		}
+	}
+	return domain.Route{}, errors.New("no such commute on that day")
+}
+
+// daySchedule plans a day. `trial` switches green routes for the commutes it
+// names, for this call only; a day planned with a trial is not recorded.
+func (s *RoutingService) daySchedule(ctx context.Context, userID string, date time.Time, trial map[string]bool) (domain.DaySchedule, error) {
 	y, m, d := date.Date()
 	dayStart := time.Date(y, m, d, 0, 0, 0, 0, date.Location())
 	events := s.repo.GetEventsBetween(dayStart, dayStart.AddDate(0, 0, 1))
@@ -159,7 +184,7 @@ func (s *RoutingService) GetDaySchedule(ctx context.Context, userID string, date
 		if !isDifferentLocation(t.origin, t.dest) {
 			return
 		}
-		route, err := s.planCommute(ctx, userID, prefs, natureMode, t)
+		route, err := s.planCommute(ctx, userID, prefs, natureMode, trial, t)
 		if err != nil {
 			log.Printf("routing %s -> %s failed: %v", t.origin.Name, to, err)
 			return
@@ -201,12 +226,14 @@ func (s *RoutingService) GetDaySchedule(ctx context.Context, userID string, date
 	summary.TotalCO2SavedGrams = round2(summary.TotalCO2SavedGrams)
 
 	// Remember what the day adds up to, for the weekly totals and the streak.
-	s.repo.UpdateDayStats(dateKey, func(st *domain.DayStats) {
-		st.CommuteMinutes = summary.TotalCommuteMinutes
-		st.PlannedSteps = summary.TotalSteps
-		st.CO2SavedGrams = summary.TotalCO2SavedGrams
-		st.TouchedGrass = touchedGrass
-	})
+	if trial == nil {
+		s.repo.UpdateDayStats(dateKey, func(st *domain.DayStats) {
+			st.CommuteMinutes = summary.TotalCommuteMinutes
+			st.PlannedSteps = summary.TotalSteps
+			st.CO2SavedGrams = summary.TotalCO2SavedGrams
+			st.TouchedGrass = touchedGrass
+		})
+	}
 
 	return domain.DaySchedule{Date: dateKey, Events: events, Commutes: commutes, Summary: summary,
 		Origin: origin, Destination: destination}, nil
@@ -225,6 +252,130 @@ func (s *RoutingService) SetCommuteGreen(origID, destID string, green bool) erro
 	return nil
 }
 
+// What one commute can be optimised for, instead of the usual ranking.
+const (
+	GoalSteps = "steps" // the most walking
+	GoalCO2   = "co2"   // the most CO2 saved
+)
+
+// SetCommuteGoal makes one commute prefer the option with the most steps or
+// the most CO2 saved. An empty goal goes back to the usual ranking.
+func (s *RoutingService) SetCommuteGoal(origID, destID, goal string) error {
+	if origID == "" || destID == "" {
+		return errors.New("origin_event_id and destination_event_id are required")
+	}
+	if goal != "" && goal != GoalSteps && goal != GoalCO2 {
+		return errors.New(`goal must be "steps", "co2" or empty`)
+	}
+	s.repo.SaveCommuteGoal(commuteKey(origID, destID), goal)
+	return nil
+}
+
+// NearbyPlaces lists cafés, restaurants or parks around a point, nearest
+// first. category is "cafe", "restaurant" or "nature".
+func (s *RoutingService) NearbyPlaces(lat, lon float64, category string, refine []string) ([]domain.NearbyPlace, error) {
+	switch category {
+	case "cafe", "restaurant":
+		return s.thirdPlaces.Near(lat, lon, category, refine, 12), nil
+	case "nature":
+		return s.green.Near(lat, lon, refine, 12), nil
+	}
+	return nil, errors.New(`category must be "cafe", "restaurant" or "nature"`)
+}
+
+// TopPlacePicks lists the places the user stopped at most often.
+func (s *RoutingService) TopPlacePicks() []domain.NearbyPlace { return s.repo.TopPlacePicks(6) }
+
+// AddStop is "I finished early": it puts a stop at `place` into the day,
+// right after the event. An event still going on ends now. The stop starts
+// when the trip there arrives and ends when the trip to the next event has to
+// leave; with nothing after it, it lasts an hour.
+func (s *RoutingService) AddStop(ctx context.Context, userID, eventID string, place domain.NearbyPlace) (domain.Event, error) {
+	event, ok := s.repo.GetEvent(eventID)
+	if !ok {
+		return domain.Event{}, errors.New("event not found")
+	}
+	if place.Name == "" || !hasCoordinates(place.Location) {
+		return domain.Event{}, errors.New("the place needs a name and a position")
+	}
+	now := time.Now().Truncate(time.Minute)
+	endedNow := event.StartTime.Before(now) && now.Before(event.EndTime)
+	if endedNow {
+		event.EndTime = now
+	}
+	leave := event.EndTime
+	if now.After(leave) && now.Format("2006-01-02") == leave.Format("2006-01-02") {
+		leave = now // the event is over: the trip starts from now
+	}
+	prefs := s.repo.GetUserPreferences(userID)
+	buffer := time.Duration(prefs.DepartureBufferMinutes) * time.Minute
+	// Without a route, the straight line at walking pace.
+	walk := func(a, b domain.Location) time.Duration {
+		return time.Duration(transit.HaversineMeters(a.Latitude, a.Longitude, b.Latitude, b.Longitude)*12/1000) * time.Minute
+	}
+
+	// When the trip to the stop arrives.
+	arrive := leave
+	if hasCoordinates(event.Location) && isDifferentLocation(event.Location, place.Location) {
+		route, err := s.planCommute(ctx, userID, prefs, prefs.PreferNatureRoutes, nil,
+			trip{origID: event.ID, destID: "stop", origin: event.Location, dest: place.Location, when: leave})
+		if err == nil {
+			arrive = route.ArrivalTime
+		} else {
+			arrive = leave.Add(walk(event.Location, place.Location))
+		}
+	}
+	// The day plans every trip to arrive `buffer` early, so the stop starts that much after arriving.
+	start := arrive.Truncate(time.Minute).Add(time.Minute).Add(buffer)
+	end := start.Add(time.Hour)
+
+	// What comes next that day, if anything: the stop ends when the trip there has to leave.
+	y, m, d := event.StartTime.Date()
+	dayStart := time.Date(y, m, d, 0, 0, 0, 0, event.StartTime.Location())
+	for _, next := range s.repo.GetEventsBetween(dayStart, dayStart.AddDate(0, 0, 1)) {
+		if next.ID == event.ID || !hasCoordinates(next.Location) || !next.StartTime.After(event.StartTime) {
+			continue
+		}
+		deadline := next.StartTime.Add(-buffer)
+		end = deadline
+		if isDifferentLocation(place.Location, next.Location) {
+			route, err := s.planCommute(ctx, userID, prefs, prefs.PreferNatureRoutes, nil,
+				trip{origID: "stop", destID: next.ID, origin: place.Location, dest: next.Location, when: deadline, arriveBy: true})
+			if err == nil {
+				end = route.DepartureTime
+			} else {
+				end = deadline.Add(-walk(place.Location, next.Location))
+			}
+		}
+		end = end.Truncate(time.Minute)
+		if stay := int(end.Sub(start).Minutes()); stay < 10 {
+			if stay < 0 {
+				stay = 0
+			}
+			return domain.Event{}, fmt.Errorf("there is not enough time to stop at %s before %s: you would have %d minutes there", place.Name, next.Title, stay)
+		}
+		break
+	}
+
+	if endedNow {
+		event.UpdatedAt = time.Now()
+		s.repo.SaveEvent(event)
+	}
+	stop := domain.Event{
+		ID:          fmt.Sprintf("evt-stop-%d", time.Now().UnixNano()),
+		Title:       place.Name,
+		Description: place.Kind,
+		Location:    domain.Location{Name: place.Name, Address: place.Location.Address, Latitude: place.Location.Latitude, Longitude: place.Location.Longitude},
+		StartTime:   start,
+		EndTime:     end,
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+	}
+	s.repo.SaveEvent(stop)
+	s.repo.RecordPlacePick(place)
+	return stop, nil
+}
+
 // trip is one commute to plan.
 type trip struct {
 	origID, destID string // event IDs, or domain.DayStartID / domain.DayEndID
@@ -235,10 +386,13 @@ type trip struct {
 	due            *time.Time // when the user is expected at the destination (nil: no deadline)
 }
 
-func (s *RoutingService) planCommute(ctx context.Context, userID string, prefs domain.UserPreferences, natureMode bool, t trip) (domain.Route, error) {
+func (s *RoutingService) planCommute(ctx context.Context, userID string, prefs domain.UserPreferences, natureMode bool, trial map[string]bool, t trip) (domain.Route, error) {
 	pairKey := commuteKey(t.origID, t.destID)
 	// Green routes can be switched for this commute alone.
 	if green, ok := s.repo.GetCommuteGreen(pairKey); ok {
+		natureMode = green
+	}
+	if green, ok := trial[pairKey]; ok {
 		natureMode = green
 	}
 	greenRoutes := natureMode // as chosen, before the weather has its say
@@ -291,8 +445,10 @@ func (s *RoutingService) planCommute(ctx context.Context, userID string, prefs d
 		}
 	}
 
-	best := s.rank(ctx, userID, prefs, natureMode, pairKey, candidates)
+	goal := s.repo.GetCommuteGoal(pairKey)
+	best := s.rank(ctx, userID, prefs, natureMode, pairKey, goal, candidates)
 	best.GreenRoutes = greenRoutes
+	best.Goal = goal
 
 	// Free time before having to leave: suggest places whose detour fits in
 	// it. In bad weather only indoor places are suggested.
@@ -376,6 +532,7 @@ func (s *RoutingService) SelectRoute(ctx context.Context, routeID string) error 
 		for _, r := range set.routes {
 			if r.ID == routeID {
 				s.repo.SaveRouteChoice(set.pairKey, routeSignature(r))
+				s.repo.SaveCommuteGoal(set.pairKey, "") // picking by hand ends "optimise for…"
 			}
 		}
 	}
@@ -535,7 +692,7 @@ func features(r domain.Route, prefs domain.UserPreferences) domain.FeatureVector
 }
 
 // rank orders candidates and returns the best with the rest as Alternatives.
-func (s *RoutingService) rank(ctx context.Context, userID string, prefs domain.UserPreferences, natureMode bool, pairKey string, candidates []domain.Route) domain.Route {
+func (s *RoutingService) rank(ctx context.Context, userID string, prefs domain.UserPreferences, natureMode bool, pairKey, goal string, candidates []domain.Route) domain.Route {
 	prior := domain.PriorWeights(prefs, natureMode)
 	vectors := make([]domain.FeatureVector, len(candidates))
 	for i := range candidates {
@@ -560,6 +717,35 @@ func (s *RoutingService) rank(ctx context.Context, userID string, prefs domain.U
 				candidates = append(append([]domain.Route{picked}, candidates[:i]...), candidates[i+1:]...)
 				break
 			}
+		}
+	}
+	// A goal set for this commute wins over both: the option with the most
+	// steps or the most CO2 saved comes first, among those that fit between
+	// the events (or among all of them when none fits).
+	if goal == GoalSteps || goal == GoalCO2 {
+		value := func(r domain.Route) float64 {
+			if goal == GoalSteps {
+				return float64(r.TotalSteps)
+			}
+			return r.CO2SavedGrams
+		}
+		anyFits := false
+		for _, c := range candidates {
+			anyFits = anyFits || !c.IsTight
+		}
+		top := -1
+		for i, c := range candidates {
+			if anyFits && c.IsTight {
+				continue
+			}
+			if top < 0 || value(c) > value(candidates[top]) {
+				top = i
+			}
+		}
+		if top >= 0 {
+			picked := candidates[top]
+			picked.Reason = map[string]string{GoalSteps: "Most steps on foot", GoalCO2: "Most CO₂ saved"}[goal]
+			candidates = append(append([]domain.Route{picked}, candidates[:top]...), candidates[top+1:]...)
 		}
 	}
 	s.mu.Lock()

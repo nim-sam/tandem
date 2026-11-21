@@ -1,5 +1,8 @@
 import {
   DaySchedule,
+  Route,
+  CommuteGoal,
+  NearbyPlace,
   DayEndpoint,
   EndpointKind,
   Event,
@@ -53,6 +56,25 @@ export const API = {
       destination_event_id: destinationEventId,
       green,
     }),
+  // The route that commute would get with green routes on (or off). Changes nothing.
+  previewCommuteGreen: (date: string, originEventId: string, destinationEventId: string, green: boolean) =>
+    request<Route>('/routes/green/preview', 'POST', {
+      date,
+      origin_event_id: originEventId,
+      destination_event_id: destinationEventId,
+      green,
+    }),
+  // One commute: prefer the option with the most steps or the most CO2 saved ('' = the usual ranking).
+  setCommuteGoal: (originEventId: string, destinationEventId: string, goal: CommuteGoal) =>
+    request<void>('/routes/goal', 'PUT', { origin_event_id: originEventId, destination_event_id: destinationEventId, goal }),
+  // Cafés, restaurants or parks around a point, nearest first; `refine` narrows it down.
+  nearbyPlaces: (lat: number, lon: number, category: string, refine: string[]) =>
+    request<{ places: NearbyPlace[] }>(`/places/nearby?lat=${lat}&lon=${lon}&category=${category}&refine=${refine.join(',')}`),
+  // The places the user stopped at most often, most picked first.
+  placePicks: () => request<{ places: NearbyPlace[] }>('/places/picks'),
+  // "Finished early": add a stop at that place right after the event.
+  addStop: (eventId: string, place: NearbyPlace) =>
+    request<Event>(`/calendar/events/${encodeURIComponent(eventId)}/stop`, 'POST', place),
   // Places matching a partly typed address, best first, each with coordinates.
   suggestPlaces: (query: string) =>
     request<{ suggestions: Location[] }>(`/geocode/suggest?q=${encodeURIComponent(query)}`),

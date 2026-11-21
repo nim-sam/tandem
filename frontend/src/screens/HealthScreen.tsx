@@ -1,5 +1,5 @@
 import React from 'react';
-import { Platform, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Icon, Text } from 'react-native-paper';
 import { useApp } from '../store/AppContext';
 import { Screen } from '../components/Screen';
@@ -7,19 +7,6 @@ import { Card } from '../components/Card';
 import { usePhoneSteps } from '../hooks/usePhoneSteps';
 import { useTokens } from '../theme';
 import { co2Equivalent, formatCO2, fromDateKey, todayKey } from '../utils/format';
-
-const PHONE_STATUS = {
-  checking: 'Checking the step sensor…',
-  counting:
-    Platform.OS === 'android'
-      ? 'Counting with this phone. On Android, steps are only counted while the app is open.'
-      : 'Counting with this phone.',
-  unavailable:
-    Platform.OS === 'web'
-      ? 'A browser has no step sensor. Open the app on a phone to count steps.'
-      : 'This device has no step sensor.',
-  denied: 'Motion access was refused. Allow it in the phone settings to count steps.',
-} as const;
 
 export const HealthScreen: React.FC = () => {
   const tokens = useTokens();
@@ -43,6 +30,7 @@ export const HealthScreen: React.FC = () => {
       {/* Today's steps: the one deep card on the screen. */}
       <Card tone="deep" style={styles.section}>
         <View style={styles.stepsRow}>
+          <Icon source="shoe-print" size={30} color={tokens.onDeep} />
           <Text variant="displaySmall" style={[styles.figure, { color: tokens.onDeep }]}>
             {steps.toLocaleString()}
           </Text>
@@ -66,9 +54,6 @@ export const HealthScreen: React.FC = () => {
         </View>
         <Text variant="bodyMedium" style={{ color: tokens.onDeepMuted }}>
           Today's planned commutes include {(health?.commute_walking_steps ?? 0).toLocaleString()} steps of walking.
-        </Text>
-        <Text variant="bodySmall" style={{ color: tokens.onDeepMuted }}>
-          {PHONE_STATUS[phone.status]}
         </Text>
       </Card>
 

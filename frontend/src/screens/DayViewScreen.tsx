@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Platform, ScrollView, StyleSheet, View } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import { ActivityIndicator, FAB, Icon, IconButton, Switch, Text, TouchableRipple } from 'react-native-paper';
+import { ActivityIndicator, FAB, Icon, IconButton, Snackbar, Text, TouchableRipple } from 'react-native-paper';
 import { DatePickerModal } from 'react-native-paper-dates';
 import { useApp } from '../store/AppContext';
 import { Screen } from '../components/Screen';
@@ -9,18 +9,19 @@ import { CommuteCard } from '../components/CommuteCard';
 import { EventDialog } from '../components/EventDialog';
 import { EndpointDialog } from '../components/EndpointDialog';
 import { useLeaveNotifications } from '../hooks/useLeaveNotifications';
-import { Blue, Font, LineColor, NAV_CLEARANCE, Radius, Space, cardShadow, endpointIcon, useAppTheme, useTokens } from '../theme';
+import { Blue, Font, LineColor, NAV_CLEARANCE, Radius, Space, cardShadow, endpointIcon, glass, useAppTheme, useTokens } from '../theme';
+import { GreenRouteDialog } from '../components/GreenRouteDialog';
+import { Anchor, WidgetOptions } from '../components/WidgetOptions';
+import { API } from '../api/client';
 import { Card } from '../components/Card';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DAY_END, DAY_START, DayEndpoint, EndpointKind, Event, Route } from '../types';
 import {
   addDays,
   commuteKey,
-  co2Equivalent,
   currentCommute,
   formatCO2,
   formatDay,
-  formatDuration,
   formatTime,
   fromDateKey,
   isNearDay,
@@ -28,9 +29,23 @@ import {
   todayKey,
 } from '../utils/format';
 
-// Where a view sits on screen, top edge. (On web a view's ref is its DOM node.)
+// "2h 5m": a duration short enough for a third of the summary card.
+const shortDuration = (minutes: number): string => (minutes >= 60 ? `${Math.floor(minutes / 60)}h ${minutes % 60}m` : `${minutes} min`);
+
 type ViewRef = React.ComponentRef<typeof View>;
 
+// Where a view sits on screen. (On web a view's ref is its DOM node.)
+const rectOf = (view: ViewRef | null): Promise<Anchor | null> =>
+  new Promise((resolve) => {
+    if (!view) return resolve(null);
+    if (Platform.OS === 'web') {
+      const r = (view as unknown as HTMLElement).getBoundingClientRect();
+      return resolve({ x: r.left, y: r.top, width: r.width, height: r.height });
+    }
+    view.measureInWindow((x: number, y: number, width: number, height: number) => resolve({ x, y, width, height }));
+  });
+
+// Its top edge only.
 const topOf = (view: ViewRef | null): Promise<number | null> =>
   new Promise((resolve) => {
     if (!view) return resolve(null);
@@ -45,23 +60,33 @@ const HereDot: React.FC = () => {
   return <View style={[styles.hereDot, { backgroundColor: theme.dark ? '#FFFFFF' : Blue.deep }]} />;
 };
 
-// An event is a white card; the line to the next event leaves from under it.
+// An event is a frosted card; the line to the next event leaves from under it.
 // Tapping it opens the event's details. `here` marks it as where the user is
-// now: its name in bold, with the dot beside it.
-const EventBlock: React.FC<{ event: Event; here?: boolean; onPress: () => void }> = ({ event, here, onPress }) => {
+// now: its name in bold, with the dot beside it. Its place is shown only while
+// a trip to or from it is open (`open`).
+const EventBlock: React.FC<{ event: Event; here?: boolean; open?: boolean; onPress?: () => void; onLongPress?: () => void }> = ({
+  event,
+  here,
+  open,
+  onPress,
+  onLongPress,
+}) => {
   const theme = useAppTheme();
   const tokens = useTokens();
   const located = !!(event.location.latitude || event.location.longitude);
   return (
-    <View style={[styles.event, { backgroundColor: tokens.card }, cardShadow(theme.dark)]}>
+    <View style={[styles.event, cardShadow(theme.dark), glass(theme.dark)]}>
       {here && <HereDot />}
       <TouchableRipple
         onPress={onPress}
+        onLongPress={onLongPress}
+        delayLongPress={320}
         borderless
         accessibilityRole="button"
         accessibilityLabel={`${event.title}, ${formatTime(event.start_time)} to ${formatTime(event.end_time)}${
           here ? ', where you are now' : ''
         }. Show details.`}
+        accessibilityHint="Hold for options: optimise the trip from here, or say you finished early"
         style={styles.eventTouch}
       >
         <View style={styles.eventBody}>
@@ -75,6 +100,7 @@ const EventBlock: React.FC<{ event: Event; here?: boolean; onPress: () => void }
               </Text>
             </View>
           </View>
+          {(open || (!located && !!event.location.name)) && (
           <View style={styles.eventPlace}>
             <Icon source={located ? 'map-marker-outline' : 'map-marker-alert-outline'} size={16} color={located ? tokens.muted : tokens.warn} />
             <Text variant="bodyMedium" style={{ flex: 1, color: located ? tokens.muted : tokens.warn }} numberOfLines={2}>
@@ -85,6 +111,7 @@ const EventBlock: React.FC<{ event: Event; here?: boolean; onPress: () => void }
                 : 'No location'}
             </Text>
           </View>
+          )}
         </View>
       </TouchableRipple>
     </View>
@@ -112,8 +139,10 @@ const EndpointMarker: React.FC<{
   endpoint: DayEndpoint | null;
   time?: string;
   here?: boolean; // the user is there now
-  onPress: () => void;
-}> = ({ which, endpoint, time, here, onPress }) => {
+  open?: boolean; // the trip from or to it is open: show the address and the time
+  onPress?: () => void;
+  onLongPress?: () => void;
+}> = ({ which, endpoint, time, here, open, onPress, onLongPress }) => {
   const theme = useAppTheme();
   const tokens = useTokens();
   const starts = which === 'origin';
@@ -132,6 +161,8 @@ const EndpointMarker: React.FC<{
     {here && <HereDot />}
     <TouchableRipple
       onPress={onPress}
+      onLongPress={onLongPress}
+      delayLongPress={320}
       accessibilityRole="button"
       accessibilityLabel={
         endpoint
@@ -146,7 +177,7 @@ const EndpointMarker: React.FC<{
           style={[
             styles.marker,
             endpoint
-              ? [{ backgroundColor: tokens.card }, cardShadow(theme.dark)]
+              ? [cardShadow(theme.dark), glass(theme.dark)]
               : { borderWidth: 1.5, borderStyle: 'dashed', borderColor: tokens.border },
           ]}
         >
@@ -160,13 +191,13 @@ const EndpointMarker: React.FC<{
           >
             {name}
           </Text>
-          {!!detail && (
+          {!!detail && (open || !endpoint) && (
             <Text variant="bodySmall" style={{ color: tokens.muted }} numberOfLines={1}>
               {detail}
             </Text>
           )}
         </View>
-        {!!time && (
+        {!!time && open && (
           <Text variant="bodyMedium" style={[styles.tabular, { color: tokens.muted }]}>
             {starts ? 'leave' : 'arrive'}{' '}
             <Text variant="titleSmall" style={{ color: tokens.post }}>
@@ -184,12 +215,16 @@ export const DayViewScreen: React.FC = () => {
   const tokens = useTokens();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
-  const { date, setDate, schedule, loading, error, refresh, selectRoute, openCommute, setOpenCommute, setCommuteGreen } = useApp();
+  const { date, setDate, schedule, loading, error, refresh, selectRoute, openCommute, setOpenCommute, setCommuteGreen, setCommuteGoal } = useApp();
   const [editing, setEditing] = useState<Event | null>(null);
   const [dialog, setDialog] = useState(false);
   const [selectError, setSelectError] = useState<string | null>(null);
   const [endpointDialog, setEndpointDialog] = useState<EndpointKind | null>(null);
   const [pickingDay, setPickingDay] = useState(false);
+  const [offer, setOffer] = useState<{ current: Route; to: string; proposed: Route | null; error?: string } | null>(null);
+  const [applying, setApplying] = useState(false);
+  const [held, setHeld] = useState<{ anchor: Anchor; event: Event | null; widget: React.ReactNode; route?: Route } | null>(null);
+  const [notice, setNotice] = useState('');
 
   // Reminders are only scheduled for the real "today".
   useLeaveNotifications(date === todayKey() ? schedule : null, true);
@@ -218,6 +253,7 @@ export const DayViewScreen: React.FC = () => {
   const scrollRef = useRef<React.ComponentRef<typeof ScrollView> | null>(null);
   const contentRef = useRef<ViewRef | null>(null);
   const rows = useRef(new Map<string, ViewRef | null>());
+  const blocks = useRef(new Map<string, ViewRef | null>()); // the widgets that can be held, by event id
   const [visit, setVisit] = useState(0); // counts each time the tab is opened
   useFocusEffect(useCallback(() => setVisit((v) => v + 1), []));
 
@@ -270,14 +306,45 @@ export const DayViewScreen: React.FC = () => {
     else here = showing.commutes[showing.commutes.length - 1]?.destination_event_id;
   }
 
-  // The green-routes switch stays in view and acts on one trip: the open one,
-  // or the current one when none is open.
-  const active = showing?.commutes.find((c) => commuteKey(c) === openCommute) ?? current;
-  const activeTo = active
-    ? showing?.events.find((e) => e.id === active.destination_event_id)?.title ??
-      (showing?.destination?.is_home ? 'home' : active.destination_location.name)
-    : '';
-  const green = !!active?.green_routes;
+  // The widgets at each end of the open trip show their place and time.
+  const openRoute = showing?.commutes.find((c) => commuteKey(c) === openCommute);
+  const openFrom = openRoute?.origin_event_id;
+  const openTo = openRoute?.destination_event_id;
+
+  // What a trip goes to, in words.
+  const nameOfDestination = (route: Route): string =>
+    showing?.events.find((e) => e.id === route.destination_event_id)?.title ??
+    (showing?.destination?.is_home ? 'home' : route.destination_location.name);
+
+  // "Optimize for Nature" on a trip asks first: the greener way is worked out
+  // and shown with what it changes. Switching it back off needs no question.
+  const askGreen = (route: Route) => {
+    setSelectError(null);
+    if (route.green_routes) {
+      setCommuteGreen(route, false)
+        .then(() => setNotice('Nature is off for that trip.'))
+        .catch((e) => setSelectError(e instanceof Error ? e.message : String(e)));
+      return;
+    }
+    setOffer({ current: route, to: nameOfDestination(route), proposed: null });
+    API.previewCommuteGreen(date, route.origin_event_id ?? '', route.destination_event_id ?? '', true)
+      .then((proposed) => setOffer((o) => (o && o.current.id === route.id ? { ...o, proposed } : o)))
+      .catch((e) => setOffer((o) => (o ? { ...o, error: e instanceof Error ? e.message : String(e) } : o)));
+  };
+
+  // Holding a widget lifts it out with its options (see WidgetOptions).
+  const hold = async (key: string, event: Event | null, widget: React.ReactNode) => {
+    const anchor = await rectOf(blocks.current.get(key) ?? null);
+    if (anchor) setHeld({ anchor, event, widget, route: commuteFrom(event ? event.id : DAY_START) });
+  };
+  const applyGreen = () => {
+    if (!offer) return;
+    setApplying(true);
+    setCommuteGreen(offer.current, true)
+      .then(() => setOffer(null))
+      .catch((e) => setOffer((o) => (o ? { ...o, error: e instanceof Error ? e.message : String(e) } : o)))
+      .finally(() => setApplying(false));
+  };
   const fromStart = commuteFrom(DAY_START);
   const toEnd = showing?.commutes.find((c) => c.destination_event_id === DAY_END);
 
@@ -292,36 +359,6 @@ export const DayViewScreen: React.FC = () => {
         onRefresh={refresh}
         flush
         scrollRef={scrollRef}
-        pinned={
-          showing && showing.commutes.length > 0 ? (
-            <View style={styles.pinned}>
-              <View style={[styles.green, { backgroundColor: tokens.deep }]}>
-                <Icon source="leaf" size={20} color={tokens.onDeep} />
-                <View style={{ flex: 1 }}>
-                  <Text variant="titleSmall" style={{ color: tokens.onDeep }}>
-                    Green routes
-                  </Text>
-                  <Text variant="bodySmall" style={{ color: tokens.onDeepMuted }} numberOfLines={1}>
-                    {active
-                      ? `${green ? 'On' : 'Off'} for the ${formatTime(active.departure_time)} trip to ${activeTo}`
-                      : 'Every trip of this day has arrived'}
-                  </Text>
-                </View>
-                <Switch
-                  value={green}
-                  disabled={!active}
-                  color={Blue.soft}
-                  onValueChange={() => {
-                    if (!active) return;
-                    setSelectError(null);
-                    setCommuteGreen(active, !green).catch((e) => setSelectError(e instanceof Error ? e.message : String(e)));
-                  }}
-                  accessibilityLabel={`Green routes for the trip to ${activeTo}: ${green ? 'on' : 'off'}`}
-                />
-              </View>
-            </View>
-          ) : undefined
-        }
         actions={
           <>
             <IconButton icon="chevron-left" accessibilityLabel="Previous day" onPress={() => setDate(addDays(date, -1))} />
@@ -344,44 +381,38 @@ export const DayViewScreen: React.FC = () => {
           ) : null
         ) : (
           <View ref={contentRef} collapsable={false} style={styles.content}>
-            {/* The day at a glance. */}
+            {/* The day at a glance: three figures, each under its icon. */}
             {showing.commutes.length > 0 && (
-            <View style={styles.pad}>
-              <Card style={styles.summary}>
-                {(
+              <View style={styles.pad}>
+                <Card frosted style={styles.summary}>
+                  <Text variant="labelMedium" style={{ color: tokens.muted }}>
+                    {date === todayKey()
+                      ? "Today's commute"
+                      : isNearDay(date)
+                        ? `${formatDay(date)}'s commute`
+                        : `Commute on ${formatDay(date)}`}
+                  </Text>
                   <View style={styles.stats}>
-                    {[
-                      [formatDuration(showing.summary.total_commute_minutes), 'travelling', '', 'clock-outline', LineColor.blueLine],
+                    {(
                       [
-                        formatCO2(showing.summary.total_co2_saved_grams),
-                        'CO₂ saved, est.',
-                        co2Equivalent(showing.summary.total_co2_saved_grams, true),
-                        'leaf',
-                        LineColor.rem,
-                      ],
-                      [showing.summary.total_steps.toLocaleString(), 'steps on foot', '', 'shoe-print', LineColor.rtl],
-                    ].map(([value, label, like, icon, color]) => (
-                      <View key={label} style={styles.stat}>
-                        <View style={styles.statValue}>
-                          <Icon source={icon} size={18} color={color} />
-                          <Text variant="titleLarge" style={[styles.tabular, { color: tokens.post, flexShrink: 1 }]} numberOfLines={1}>
-                            {value}
-                          </Text>
-                        </View>
-                        <Text variant="bodySmall" style={{ color: tokens.muted }} numberOfLines={1}>
+                        ['clock-outline', LineColor.blueLine, shortDuration(showing.summary.total_commute_minutes), 'Time Travelled'],
+                        ['leaf', LineColor.rem, formatCO2(showing.summary.total_co2_saved_grams), 'CO₂ Saved'],
+                        ['shoe-print', LineColor.rtl, showing.summary.total_steps.toLocaleString(), 'Steps Walked'],
+                      ] as const
+                    ).map(([icon, color, value, label]) => (
+                      <View key={label} style={styles.stat} accessible accessibilityLabel={`${label}: ${value}`}>
+                        <Icon source={icon} size={20} color={color} />
+                        <Text variant="titleMedium" style={[styles.tabular, styles.statValue, { color: tokens.post }]} numberOfLines={1}>
+                          {value}
+                        </Text>
+                        <Text variant="labelSmall" style={{ color: tokens.muted, textAlign: 'center' }} numberOfLines={2}>
                           {label}
                         </Text>
-                        {!!like && (
-                          <Text variant="bodySmall" style={{ color: tokens.accent, textAlign: 'center' }} numberOfLines={2}>
-                            ≈ {like}
-                          </Text>
-                        )}
                       </View>
                     ))}
                   </View>
-                )}
-              </Card>
-            </View>
+                </Card>
+              </View>
             )}
 
             {showing.events.length === 0 ? (
@@ -396,24 +427,36 @@ export const DayViewScreen: React.FC = () => {
               </View>
             ) : (
               <View style={styles.day}>
-                <EndpointMarker
-                  which="origin"
-                  endpoint={showing.origin}
-                  time={fromStart && formatTime(fromStart.departure_time)}
-                  here={here === DAY_START}
-                  onPress={() => setEndpointDialog('origin')}
-                />
+                <View ref={(view) => void blocks.current.set(DAY_START, view)} collapsable={false}>
+                  <EndpointMarker
+                    which="origin"
+                    endpoint={showing.origin}
+                    time={fromStart && formatTime(fromStart.departure_time)}
+                    here={here === DAY_START}
+                    open={openFrom === DAY_START}
+                    onPress={() => setEndpointDialog('origin')}
+                    onLongPress={
+                      showing.origin
+                        ? () => hold(DAY_START, null, <EndpointMarker which="origin" endpoint={showing.origin} here={here === DAY_START} open />)
+                        : undefined
+                    }
+                  />
+                </View>
                 {renderCommute(fromStart)}
                 {showing.events.map((event, i) => (
                   <View key={event.id}>
-                    <EventBlock
-                      event={event}
-                      here={here === event.id}
-                      onPress={() => {
-                        setEditing(event);
-                        setDialog(true);
-                      }}
-                    />
+                    <View ref={(view) => void blocks.current.set(event.id, view)} collapsable={false}>
+                      <EventBlock
+                        event={event}
+                        here={here === event.id}
+                        open={openFrom === event.id || openTo === event.id}
+                        onPress={() => {
+                          setEditing(event);
+                          setDialog(true);
+                        }}
+                        onLongPress={() => hold(event.id, event, <EventBlock event={event} here={here === event.id} open />)}
+                      />
+                    </View>
                     {renderCommute(commuteFrom(event.id))}
                     {/* Staying put: the next event is at the same place, so a short
                         plain line joins the two blocks with nothing to say. */}
@@ -429,6 +472,7 @@ export const DayViewScreen: React.FC = () => {
                   endpoint={showing.destination}
                   time={toEnd && formatTime(toEnd.arrival_time)}
                   here={here === DAY_END}
+                  open={openTo === DAY_END}
                   onPress={() => setEndpointDialog('destination')}
                 />
               </View>
@@ -437,8 +481,45 @@ export const DayViewScreen: React.FC = () => {
         )}
       </Screen>
 
+      {held && (
+        <WidgetOptions
+          anchor={held.anchor}
+          widget={held.widget}
+          event={held.event}
+          route={held.route}
+          onNature={(route) => {
+            setHeld(null);
+            askGreen(route);
+          }}
+          onGoal={async (route, goal) => {
+            await setCommuteGoal(route, goal);
+            setNotice(goal === 'steps' ? 'That trip now takes the way with the most steps.' : goal === 'co2' ? 'That trip now takes the way that saves the most CO₂.' : 'That trip is back to your usual ranking.');
+          }}
+          onStopAdded={(message) => {
+            setHeld(null);
+            setNotice(message);
+            refresh();
+          }}
+          onClose={() => setHeld(null)}
+        />
+      )}
+      {/* above the add button, so neither covers the other */}
+      <Snackbar visible={!!notice} onDismiss={() => setNotice('')} duration={4000} wrapperStyle={{ bottom: NAV_CLEARANCE + insets.bottom + 54 }}>
+        {notice}
+      </Snackbar>
+      <GreenRouteDialog
+        visible={!!offer}
+        to={offer?.to ?? ''}
+        current={offer?.current ?? null}
+        proposed={offer?.proposed ?? null}
+        error={offer?.error}
+        applying={applying}
+        onApply={applyGreen}
+        onDismiss={() => setOffer(null)}
+      />
       <FAB
         icon="plus"
+        customSize={48}
         accessibilityLabel="Add event"
         style={[styles.fab, { backgroundColor: tokens.accent, bottom: NAV_CLEARANCE + insets.bottom + 2 }]}
         color={tokens.onAccent}
@@ -474,15 +555,13 @@ export const DayViewScreen: React.FC = () => {
 const styles = StyleSheet.create({
   root: { flex: 1 },
   pad: { paddingHorizontal: Space.gutter },
-  summary: { gap: 16 },
-  stats: { flexDirection: 'row', gap: 12 },
-  stat: { flex: 1, gap: 2, alignItems: 'center' }, // three equal columns, each centred
+  summary: { gap: 12, paddingVertical: 14 },
+  stats: { flexDirection: 'row', gap: 6 },
+  stat: { flex: 1, gap: 3, alignItems: 'center' }, // three equal columns: icon, figure, caption
   content: { gap: Space.gap },
   // in the screen's gutter, level with the middle of the block it marks
   hereDot: { position: 'absolute', left: -14, top: '50%', marginTop: -4, width: 8, height: 8, borderRadius: 4 },
-  statValue: { flexDirection: 'row', alignItems: 'center', gap: 5 },
-  pinned: { paddingHorizontal: Space.gutter, paddingTop: 6, paddingBottom: 2, maxWidth: 720, width: '100%', alignSelf: 'center' },
-  green: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 56, borderRadius: Radius.card, paddingLeft: 16, paddingRight: 10, paddingVertical: 6 },
+  statValue: { fontFamily: Font.bold, marginTop: 2 },
   day: { paddingHorizontal: Space.gutter, paddingTop: 6 },
   event: { borderRadius: Radius.card },
   eventTouch: { borderRadius: Radius.card },
@@ -499,5 +578,5 @@ const styles = StyleSheet.create({
   tabular: { fontVariant: ['tabular-nums'] },
   center: { alignItems: 'center', gap: 10, paddingVertical: 56, paddingHorizontal: 32 },
   emptyIcon: { width: 64, height: 64, borderRadius: 32, alignItems: 'center', justifyContent: 'center' },
-  fab: { position: 'absolute', right: 18, borderRadius: 28 },
+  fab: { position: 'absolute', right: 18, borderRadius: 24 },
 });

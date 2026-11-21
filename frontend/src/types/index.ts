@@ -92,11 +92,27 @@ export interface Route {
   is_tight: boolean;
   is_park_walk: boolean; // walk deliberately routed through a park
   green_routes: boolean; // green routes are on for this commute (the setting, unless switched for it alone)
+  goal?: CommuteGoal; // what this commute is optimised for instead of the usual ranking
   weather?: Weather; // forecast at departure time
   score: number;
   reason?: string; // why this option ranked where it did
   ranked_by?: 'ml-agent' | 'preferences';
   alternatives?: Route[]; // other options, best first
+}
+
+// 'steps': the most walking. 'co2': the most CO2 saved. '': the usual ranking.
+export type CommuteGoal = 'steps' | 'co2' | '';
+
+// Somewhere to go, found around a point or by search.
+export interface NearbyPlace {
+  id?: string;
+  name: string;
+  category: 'cafe' | 'restaurant' | 'nature' | '';
+  kind: string; // what it is, in words
+  location: Location;
+  distance_meters?: number;
+  walk_minutes?: number;
+  picks?: number; // times the user chose it
 }
 
 export interface DaySummary {

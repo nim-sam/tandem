@@ -40,6 +40,7 @@ Routes are planned from the calendar, not from a search box: the app already kno
 - **The trip that matters now.** The Day tab opens on the trip under way or next to leave, marked with a pointer; the rest of the day is folded to one line per trip.
 - **Map.** The open trip drawn section by section (walk, bus, metro, REM, train) with your live position and the steps listed underneath.
 - **Green routes.** A switch, per trip or for every trip, favours walks through parks, marks them with a pine tree, and on short trips in dry weather offers a walk routed through a park.
+- **Hold for options.** Hold an event to optimise the trip from it for nature, steps or CO₂ saved, or to say you finished early and pick a café, restaurant or park to go to; the stop is fitted in before your next event.
 - **Free-time suggestions.** When there is slack before you need to leave, the app suggests a café, library or park that fits.
 - **Impact at a glance.** Time travelling, steps on foot, and CO₂ saved against driving, with a plain comparison such as "≈ 49 km by car".
 - **Your events.** Add and edit events on the Day tab, jump to any date, import an `.ics` calendar file from Settings, and optionally sync Google Calendar.

@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
+import { Image, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { Button, Icon, Text } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NAV_CLEARANCE, Radius, Space, useAppTheme, useTokens } from '../theme';
@@ -18,6 +18,20 @@ interface Props {
   children: ReactNode;
 }
 
+// A faint route map tiled across the ground, behind everything.
+export const TransitPattern: React.FC = () => {
+  const theme = useAppTheme();
+  return (
+    <Image
+      source={theme.dark ? require('../../assets/pattern-dark.png') : require('../../assets/pattern-light.png')}
+      resizeMode="repeat"
+      style={StyleSheet.absoluteFill}
+      accessibilityElementsHidden
+      importantForAccessibility="no-hide-descendants"
+    />
+  );
+};
+
 // Shared page frame: a large title on the ice ground with its actions, an
 // error card when something failed, then the scrolling content.
 export const Screen: React.FC<Props> = ({ title, subtitle, actions, error, onRetry, refreshing, onRefresh, flush, pinned, scrollRef, children }) => {
@@ -26,6 +40,7 @@ export const Screen: React.FC<Props> = ({ title, subtitle, actions, error, onRet
   const insets = useSafeAreaInsets();
   return (
     <View style={[styles.root, { backgroundColor: theme.colors.background }]}>
+      <TransitPattern />
       <View style={[styles.bar, { paddingTop: insets.top + 16 }]}>
         <View style={styles.titles} accessibilityRole="header">
           <Text variant="headlineMedium">{title}</Text>

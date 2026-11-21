@@ -160,6 +160,30 @@ further lookup.
 off for that one commute, whatever the user's setting says. Each `Route` reports the result as
 `green_routes`.
 
+### `POST /routes/green/preview`
+`{ "date": "YYYY-MM-DD", "origin_event_id": "…", "destination_event_id": "…", "green": true }` → the `Route` that
+commute would get with green routes on (or off). Changes nothing: the app shows the differences and asks first.
+
+### `PUT /routes/goal`
+`{ "origin_event_id": "…", "destination_event_id": "…", "goal": "steps" | "co2" | "" }`. Makes that one
+commute take the option with the most steps, or the most CO2 saved, among those that fit; `""` goes back to the
+usual ranking. Each `Route` reports it as `goal`. Choosing an alternative by hand clears it.
+
+### `POST /calendar/events/{id}/stop`
+"I finished early". Body: a place, `{ "name": "…", "kind": "…", "category": "cafe", "location": Location }`. Adds a
+stop there right after the event and returns it as an `Event`: an event still going on ends now, the stop starts
+when the trip there arrives and ends when the trip to the next event has to leave (one hour if nothing follows).
+`400` when fewer than 10 minutes would be left at the stop.
+
+### `GET /places/nearby?lat=&lon=&category=cafe|restaurant|nature&refine=a,b`
+Up to 12 places around a point, nearest first: `{ "places": [NearbyPlace] }` with `distance_meters` and
+`walk_minutes` (straight line). `refine` narrows it down: `study`, `coffee`, `bubble_tea`, `bakery`, `terrace`
+(cafés); `quick_bite`, `sit_down`, `vegetarian`, `terrace`, `pizza`, `burgers`, `sushi`, `asian`, `italian`,
+`mexican`, `middle_eastern` (restaurants); `large`, `small` (parks). There is no price data.
+
+### `GET /places/picks`
+The places the user stopped at most often, most picked first: `{ "places": [NearbyPlace] }` with `picks`.
+
 ### `POST /routes/select`
 `{ "route_id": "…" }`. The user prefers this alternative: it becomes the route
 for that commute and is sent to the ML agent as a training example. `404` if the

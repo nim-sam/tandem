@@ -10,7 +10,6 @@ import { useLiveLocation } from '../hooks/useLiveLocation';
 import { NAV_CLEARANCE, Radius, cardShadow, modeIcon, useAppTheme, useTokens } from '../theme';
 import { IntermodalNode } from '../types';
 import { commuteKey, currentCommute, formatDay, formatDuration, formatTime } from '../utils/format';
-import { easeLayout } from '../utils/motion';
 
 const LOCATION_NOTE = {
   asking: 'Still finding where you are…',
@@ -18,39 +17,28 @@ const LOCATION_NOTE = {
   unavailable: 'This device cannot report its location.',
 } as const;
 
-// One stretch of the trip in the list under the map.
+// One stretch of the trip in the strip under the map: its line (or a walker)
+// and how long it takes. Tapping it frames that stretch on the map.
 const Step: React.FC<{ leg: IntermodalNode; selected: boolean; onPress: () => void }> = ({ leg, selected, onPress }) => {
   const tokens = useTokens();
   const walking = leg.mode === 'walk';
-  const stops = (leg.intermediate_stops?.length ?? 0) + 1;
   return (
     <TouchableRipple
+      borderless
       onPress={onPress}
       accessibilityRole="button"
       accessibilityState={{ selected }}
       accessibilityLabel={`${walking ? 'Walk' : leg.transit_line ?? leg.mode}, ${leg.duration_minutes} minutes. Show this part on the map.`}
-      style={[styles.step, selected && { backgroundColor: tokens.pale }]}
+      style={[styles.step, { backgroundColor: selected ? tokens.pale : 'transparent', borderColor: selected ? tokens.accent : tokens.hairline }]}
     >
       <View style={styles.stepRow}>
-        <View style={styles.stepIcon}>
-          {!walking && leg.line_code ? (
-            <LinePill node={leg} />
-          ) : (
-            <Icon source={modeIcon(leg.mode)} size={22} color={walking ? tokens.accent : tokens.post} />
-          )}
-        </View>
-        <View style={{ flex: 1, minWidth: 0 }}>
-          <Text variant="titleSmall" numberOfLines={1}>
-            {walking ? `Walk ${leg.duration_minutes} min` : leg.line_name || leg.transit_line || leg.mode}
-          </Text>
-          <Text variant="bodySmall" style={{ color: tokens.muted }} numberOfLines={1}>
-            {walking
-              ? `to ${leg.to_stop_name || 'your destination'}`
-              : `${leg.station_or_stop_name ?? ''} → ${leg.to_stop_name ?? ''} · ${stops} stop${stops > 1 ? 's' : ''} · ${leg.duration_minutes} min`}
-          </Text>
-        </View>
-        <Text variant="bodyMedium" style={[styles.tabular, { color: tokens.muted }]}>
-          {formatTime(leg.departure_time)}
+        {!walking && leg.line_code ? (
+          <LinePill node={leg} />
+        ) : (
+          <Icon source={modeIcon(leg.mode)} size={18} color={walking ? tokens.accent : tokens.post} />
+        )}
+        <Text variant="labelLarge" style={[styles.tabular, { color: tokens.post }]}>
+          {leg.duration_minutes} min
         </Text>
       </View>
     </TouchableRipple>
@@ -67,7 +55,6 @@ export const MapScreen: React.FC = () => {
   const focused = useIsFocused();
   const { schedule, date, openCommute, setOpenCommute } = useApp();
   const { position, status } = useLiveLocation(focused);
-  const [steps, setSteps] = useState(true); // the list under the map is open
   const [focus, setFocus] = useState<{ leg: number | null; nonce: number }>({ leg: null, nonce: 0 });
   const [locate, setLocate] = useState(0);
   const [notice, setNotice] = useState('');
@@ -141,60 +128,38 @@ export const MapScreen: React.FC = () => {
         </View>
       </View>
 
-      {/* The steps, in the manner of a directions panel. */}
+      {/* The trip's stretches in one scrolling strip; the selected one is described in a line beneath. */}
       <View style={[styles.sheet, { backgroundColor: tokens.card, paddingBottom: NAV_CLEARANCE + insets.bottom }]}>
         {route ? (
           <>
-            <TouchableRipple
-              onPress={() => {
-                easeLayout();
-                setSteps((v) => !v);
-              }}
-              accessibilityRole="button"
-              accessibilityState={{ expanded: steps }}
-              accessibilityLabel={`${steps ? 'Hide' : 'Show'} the steps of this trip`}
-            >
-              <View style={styles.summary}>
-                <View style={styles.modes}>
-                  {legs.map((leg, i) => (
-                    <React.Fragment key={leg.id || i}>
-                      {i > 0 && <Icon source="chevron-right" size={16} color={tokens.muted} />}
-                      {leg.mode !== 'walk' && leg.line_code ? (
-                        <LinePill node={leg} />
-                      ) : (
-                        <Icon source={modeIcon(leg.mode)} size={20} color={leg.mode === 'walk' ? tokens.accent : tokens.post} />
-                      )}
-                    </React.Fragment>
-                  ))}
-                </View>
-                <Text variant="titleSmall" style={styles.tabular}>
-                  {formatDuration(route.total_duration_minutes)}
-                </Text>
-                <Icon source={steps ? 'chevron-down' : 'chevron-up'} size={22} color={tokens.muted} />
-              </View>
-            </TouchableRipple>
-            {steps && (
-              <ScrollView style={styles.steps}>
-                {legs.map((leg, i) => (
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.strip}>
+              {legs.map((leg, i) => (
+                <React.Fragment key={leg.id || i}>
+                  {i > 0 && <Icon source="chevron-right" size={16} color={tokens.muted} />}
                   <Step
-                    key={leg.id || i}
                     leg={leg}
                     selected={focus.leg === i}
                     onPress={() => setFocus((f) => ({ leg: f.leg === i ? null : i, nonce: f.nonce + 1 }))}
                   />
-                ))}
-                <View style={styles.stepRow}>
-                  <View style={styles.stepIcon}>
-                    <Icon source="map-marker" size={22} color="#EA4335" />
-                  </View>
-                  <Text variant="titleSmall" style={{ flex: 1 }} numberOfLines={1}>
-                    {to}
-                  </Text>
-                  <Text variant="bodyMedium" style={[styles.tabular, { color: tokens.muted }]}>
-                    {formatTime(route.arrival_time)}
-                  </Text>
-                </View>
-              </ScrollView>
+                </React.Fragment>
+              ))}
+              <Icon source="chevron-right" size={16} color={tokens.muted} />
+              <View style={styles.stepRow}>
+                <Icon source="map-marker" size={18} color="#EA4335" />
+                <Text variant="labelLarge" style={[styles.tabular, { color: tokens.post }]}>
+                  {formatTime(route.arrival_time)}
+                </Text>
+              </View>
+            </ScrollView>
+            {focus.leg !== null && legs[focus.leg] && (
+              <Text variant="bodySmall" style={[styles.caption, { color: tokens.muted }]} numberOfLines={1}>
+                {formatTime(legs[focus.leg].departure_time)} ·{' '}
+                {legs[focus.leg].mode === 'walk'
+                  ? `Walk to ${legs[focus.leg].to_stop_name || to}`
+                  : `${legs[focus.leg].line_name || legs[focus.leg].transit_line || ''}: ${legs[focus.leg].station_or_stop_name ?? ''} → ${
+                      legs[focus.leg].to_stop_name ?? ''
+                    } · ${(legs[focus.leg].intermediate_stops?.length ?? 0) + 1} stops`}
+              </Text>
             )}
           </>
         ) : (
@@ -228,12 +193,10 @@ const styles = StyleSheet.create({
   headerText: { flex: 1, minWidth: 0, alignItems: 'center' },
   buttons: { position: 'absolute', right: 8, bottom: 22, gap: 2 },
   sheet: { borderTopLeftRadius: Radius.card, borderTopRightRadius: Radius.card, paddingTop: 4 },
-  summary: { flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 52, paddingHorizontal: 18 },
-  modes: { flex: 1, flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 4 },
-  steps: { maxHeight: 236 },
-  step: { paddingHorizontal: 0 },
-  stepRow: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 52, paddingHorizontal: 18, paddingVertical: 6 },
-  stepIcon: { width: 44, alignItems: 'center' },
+  strip: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 14, paddingVertical: 8 },
+  step: { borderRadius: Radius.pill, borderWidth: StyleSheet.hairlineWidth },
+  stepRow: { flexDirection: 'row', alignItems: 'center', gap: 6, minHeight: 36, paddingHorizontal: 10 },
+  caption: { paddingHorizontal: 18, paddingBottom: 8 },
   empty: { paddingHorizontal: 18, paddingVertical: 16 },
   tabular: { fontVariant: ['tabular-nums'] },
 });

@@ -98,6 +98,9 @@ type Route struct {
 	// GreenRoutes says whether green routes are on for this commute: the
 	// user's setting, unless it was switched for this commute alone.
 	GreenRoutes bool `json:"green_routes"`
+	// Goal is what this commute was optimised for instead of the usual
+	// ranking: "steps" (most walking), "co2" (most CO2 saved), or "".
+	Goal string `json:"goal,omitempty"`
 	// WaitMinutes is the idle time this option costs on top of the ride:
 	// arriving earlier than needed, or leaving later than the user is free.
 	WaitMinutes int `json:"wait_minutes"`

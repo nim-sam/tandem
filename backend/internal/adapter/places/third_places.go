@@ -28,10 +28,16 @@ func NewThirdPlaceCatalog() *ThirdPlaceCatalog {
 	_ = json.Unmarshal(thirdPlacesJSON, &rows)
 	// How "restorative" a stop is, loosely: used only to order suggestions.
 	baseScore := map[string]float64{"library": 0.6, "community_centre": 0.45, "cafe": 0.4}
-	label := map[string]string{"library": "Public library", "community_centre": "Community centre", "cafe": "Café"}
+	label := map[string]string{"library": "Public library", "community_centre": "Community centre", "cafe": "Café",
+		"restaurant": "Restaurant", "fast_food": "Quick bite"}
 	for i, r := range rows {
-		if len(r) != 6 {
+		if len(r) < 6 {
 			continue
+		}
+		cuisine, vegetarian := "", 0.0
+		if len(r) >= 8 {
+			cuisine, _ = r[6].(string)
+			vegetarian, _ = r[7].(float64)
 		}
 		name, _ := r[0].(string)
 		kind, _ := r[1].(string)
@@ -54,6 +60,10 @@ func NewThirdPlaceCatalog() *ThirdPlaceCatalog {
 			Description: desc,
 			HasWifi:     wifi == 1 || kind == "library",
 			HasSeating:  true,
+
+			Cuisine:        cuisine,
+			Vegetarian:     vegetarian == 1,
+			OutdoorSeating: outdoor == 1,
 		})
 	}
 	return c
@@ -137,6 +147,9 @@ func (c *ThirdPlaceCatalog) FindNearbyThirdPlaces(origin, dest domain.Location, 
 	for _, p := range c.places {
 		if indoorOnly && p.Type == "park" {
 			continue
+		}
+		if p.Type == "restaurant" || p.Type == "fast_food" {
+			continue // somewhere to eat is asked for, not suggested for a spare half hour
 		}
 		// Extra walking: either on the way, or a round trip from one end (the
 		// realistic case when the commute itself is by transit).

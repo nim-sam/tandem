@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState, ReactNode } from 'react';
-import { DaySchedule, Collection, Route, UserPreferences, DailyHealthSummary, WeekStats } from '../types';
+import { CommuteGoal, DaySchedule, Collection, Route, UserPreferences, DailyHealthSummary, WeekStats } from '../types';
 import { API } from '../api/client';
 import { todayKey } from '../utils/format';
 
@@ -21,6 +21,7 @@ interface AppContextValue {
   openCommute: string | null;
   setOpenCommute: (key: string | null) => void;
   setCommuteGreen: (route: Route, green: boolean) => Promise<void>; // green routes for that commute only
+  setCommuteGoal: (route: Route, goal: CommuteGoal) => Promise<void>; // most steps / most CO2 saved, for that commute only
 }
 
 const AppContext = createContext<AppContextValue | undefined>(undefined);
@@ -84,6 +85,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     await refresh();
   };
 
+  const setCommuteGoal = async (route: Route, goal: CommuteGoal) => {
+    await API.setCommuteGoal(route.origin_event_id ?? '', route.destination_event_id ?? '', goal);
+    await refresh();
+  };
+
   const updatePreferences = async (prefs: UserPreferences) => {
     setPreferences(await API.updatePreferences(prefs));
     await refresh();
@@ -108,6 +114,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         openCommute,
         setOpenCommute,
         setCommuteGreen,
+        setCommuteGoal,
       }}
     >
       {children}

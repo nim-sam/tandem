@@ -1,194 +1,90 @@
 import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Button, IconButton, Menu, Snackbar, Text } from 'react-native-paper';
+import { Button, Icon, IconButton, Snackbar, Text } from 'react-native-paper';
 import { useApp } from '../store/AppContext';
 import { API } from '../api/client';
 import { Screen } from '../components/Screen';
-import { PromptDialog, PromptField } from '../components/PromptDialog';
+import { PromptDialog } from '../components/PromptDialog';
 import { Card } from '../components/Card';
-import { NAV_CLEARANCE, useAppTheme, useTokens } from '../theme';
-import { Collection } from '../types';
+import { NAV_CLEARANCE, placeIcon, useTokens } from '../theme';
 
-interface Prompt {
-  title: string;
-  confirm: string;
-  fields: PromptField[];
-  run: (values: Record<string, string>) => Promise<void>;
-}
-
+// The places you go to often, in one list. Each can be picked as the location
+// of an event, or as where a day starts or ends.
+//
+// (The server still files places in collections; the app keeps them all in
+// one, and shows any older collections together.)
 export const SavedPlacesScreen: React.FC = () => {
-  const theme = useAppTheme();
   const tokens = useTokens();
   const { collections, refreshCollections } = useApp();
-  const [prompt, setPrompt] = useState<Prompt | null>(null);
-  const [menu, setMenu] = useState<string | null>(null); // id of the place or collection whose menu is open
+  const [adding, setAdding] = useState(false);
   const [notice, setNotice] = useState('');
   const [error, setError] = useState<string | null>(null);
 
-  const run = async (action: () => Promise<unknown>, done?: string) => {
-    setMenu(null);
+  const places = collections.flatMap((c) => c.places.map((p) => ({ ...p, collection_id: c.id })));
+
+  const add = async (values: Record<string, string>) => {
+    const home = collections[0] ?? (await API.createCollection({ name: 'Saved places' }));
+    await API.addPlace(home.id, { name: values.name, address: values.address, notes: values.notes });
+    await refreshCollections();
+  };
+
+  const remove = async (collectionId: string, placeId: string, name: string) => {
     try {
-      await action();
+      await API.removePlace(collectionId, placeId);
       await refreshCollections();
       setError(null);
-      if (done) setNotice(done);
+      setNotice(`Removed ${name}.`);
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
     }
   };
 
-  const newCollection = () =>
-    setPrompt({
-      title: 'New collection',
-      confirm: 'Create',
-      fields: [
-        { key: 'name', label: 'Name', required: true },
-        { key: 'description', label: 'Description (optional)' },
-      ],
-      run: async (v) => {
-        await API.createCollection({ name: v.name, description: v.description });
-        await refreshCollections();
-      },
-    });
-
-  const renameCollection = (col: Collection) =>
-    setPrompt({
-      title: 'Rename collection',
-      confirm: 'Save',
-      fields: [
-        { key: 'name', label: 'Name', initial: col.name, required: true },
-        { key: 'description', label: 'Description (optional)', initial: col.description ?? '' },
-      ],
-      run: async (v) => {
-        await API.updateCollection(col.id, { name: v.name, description: v.description });
-        await refreshCollections();
-      },
-    });
-
-  const addPlace = (col: Collection) =>
-    setPrompt({
-      title: `Add a place to ${col.name}`,
-      confirm: 'Add place',
-      fields: [
-        { key: 'name', label: 'Name', required: true },
-        { key: 'address', label: 'Address', required: true, address: true },
-        { key: 'notes', label: 'Notes (optional)' },
-      ],
-      run: async (v) => {
-        await API.addPlace(col.id, { name: v.name, address: v.address, notes: v.notes });
-        await refreshCollections();
-      },
-    });
-
   return (
     <View style={styles.root}>
-      <Screen title="Saved places" error={error} onRetry={() => run(async () => undefined)}>
-        {collections.length === 0 && (
-          <Text variant="bodyLarge" style={{ color: theme.colors.onSurfaceVariant }}>
-            No collections yet. Create one to start saving places you go to often.
-          </Text>
-        )}
-
-        {collections.map((col) => (
-          <Card key={col.id} style={styles.card}>
-            <View style={styles.head}>
-              <View style={{ flex: 1 }}>
-                <Text variant="titleLarge">{col.name}</Text>
-                {!!col.description && (
-                  <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
-                    {col.description}
-                  </Text>
-                )}
+      <Screen title="Saved places" error={error} onRetry={() => refreshCollections().then(() => setError(null))}>
+        <Card frosted style={styles.card}>
+          {places.length === 0 && (
+            <Text variant="bodyMedium" style={[styles.empty, { color: tokens.muted }]}>
+              Nothing saved yet. Add the places you go to often, to pick them in a tap when you plan a day.
+            </Text>
+          )}
+          {places.map((place, i) => (
+            <View key={place.id} style={[styles.place, i > 0 && { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: tokens.hairline }]}>
+              <Icon source={placeIcon(place.category, place.name)} size={22} color={tokens.accent} />
+              <View style={{ flex: 1, minWidth: 0 }}>
+                <Text variant="bodyLarge" numberOfLines={1}>
+                  {place.name}
+                </Text>
+                <Text variant="bodySmall" style={{ color: tokens.muted }} numberOfLines={2}>
+                  {place.address}
+                  {place.notes ? `\n${place.notes}` : ''}
+                </Text>
               </View>
-              <Menu
-                visible={menu === col.id}
-                onDismiss={() => setMenu(null)}
-                anchor={
-                  <IconButton icon="dots-vertical" accessibilityLabel={`Options for ${col.name}`} onPress={() => setMenu(col.id)} />
-                }
-              >
-                <Menu.Item
-                  leadingIcon="pencil-outline"
-                  title="Rename"
-                  onPress={() => {
-                    setMenu(null);
-                    renameCollection(col);
-                  }}
-                />
-                <Menu.Item
-                  leadingIcon="trash-can-outline"
-                  title={col.places.length ? `Delete with ${col.places.length} places` : 'Delete'}
-                  onPress={() => run(() => API.deleteCollection(col.id), `Deleted ${col.name}.`)}
-                />
-              </Menu>
+              <IconButton
+                icon="trash-can-outline"
+                iconColor={tokens.muted}
+                accessibilityLabel={`Remove ${place.name}`}
+                onPress={() => remove(place.collection_id, place.id, place.name)}
+              />
             </View>
-
-            {col.places.length === 0 && (
-              <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
-                Nothing saved here yet.
-              </Text>
-            )}
-            {col.places.map((place, i) => (
-              <View key={place.id} style={[i > 0 && { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: tokens.hairline }]}>
-                <View style={styles.place}>
-                  <View style={{ flex: 1 }}>
-                    <Text variant="bodyLarge">{place.name}</Text>
-                    <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
-                      {place.address}
-                      {place.notes ? `\n${place.notes}` : ''}
-                    </Text>
-                  </View>
-                  <Menu
-                    visible={menu === place.id}
-                    onDismiss={() => setMenu(null)}
-                    anchor={
-                      <IconButton
-                        icon="dots-vertical"
-                        accessibilityLabel={`Options for ${place.name}`}
-                        onPress={() => setMenu(place.id)}
-                      />
-                    }
-                  >
-                    {collections
-                      .filter((c) => c.id !== col.id)
-                      .map((target) => (
-                        <Menu.Item
-                          key={target.id}
-                          leadingIcon="folder-move-outline"
-                          title={`Move to ${target.name}`}
-                          onPress={() => run(() => API.movePlace(col.id, place.id, target.id), `Moved to ${target.name}.`)}
-                        />
-                      ))}
-                    <Menu.Item
-                      leadingIcon="trash-can-outline"
-                      title="Delete"
-                      onPress={() => run(() => API.removePlace(col.id, place.id), `Deleted ${place.name}.`)}
-                    />
-                  </Menu>
-                </View>
-              </View>
-            ))}
-            <Button mode="text" icon="plus" style={styles.add} onPress={() => addPlace(col)}>
-              Add a place
-            </Button>
-          </Card>
-        ))}
-
-        <Button mode="contained" buttonColor={tokens.accent} textColor={tokens.onAccent} icon="folder-plus-outline" onPress={newCollection}>
-          New collection
-        </Button>
-        <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
-          Saved places can be picked as the location of an event, or as where a day starts or ends.
-        </Text>
+          ))}
+          <Button mode="text" icon="plus" style={styles.add} onPress={() => setAdding(true)}>
+            Add a place
+          </Button>
+        </Card>
       </Screen>
 
       <PromptDialog
-        visible={!!prompt}
-        title={prompt?.title ?? ''}
-        fields={prompt?.fields ?? []}
-        confirmLabel={prompt?.confirm ?? 'Save'}
-        onDismiss={() => setPrompt(null)}
-        onSubmit={(values) => prompt?.run(values) ?? Promise.resolve()}
+        visible={adding}
+        title="Add a place"
+        fields={[
+          { key: 'name', label: 'Name', required: true },
+          { key: 'address', label: 'Address', required: true, address: true },
+          { key: 'notes', label: 'Notes (optional)' },
+        ]}
+        confirmLabel="Add place"
+        onDismiss={() => setAdding(false)}
+        onSubmit={add}
       />
       <Snackbar visible={!!notice} onDismiss={() => setNotice('')} duration={4000} wrapperStyle={{ bottom: NAV_CLEARANCE }}>
         {notice}
@@ -199,8 +95,8 @@ export const SavedPlacesScreen: React.FC = () => {
 
 const styles = StyleSheet.create({
   root: { flex: 1 },
-  card: { gap: 4, paddingBottom: 10, paddingRight: 8 },
-  head: { flexDirection: 'row', alignItems: 'center' },
-  place: { flexDirection: 'row', alignItems: 'center', minHeight: 56, paddingVertical: 8 },
+  card: { gap: 2, paddingVertical: 8, paddingRight: 6 },
+  empty: { paddingVertical: 10 },
+  place: { flexDirection: 'row', alignItems: 'center', gap: 14, minHeight: 60, paddingVertical: 8 },
   add: { alignSelf: 'flex-start', marginLeft: -8 },
 });
