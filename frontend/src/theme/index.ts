@@ -3,7 +3,7 @@ import { TransitMode } from '../types';
 
 // "Sentier": the day is one trail on a neutral charcoal ground.
 // Colour jobs:
-//   gold      one flat field: when to leave, the selected tab, the primary action
+//   gold      one flat field: when to leave, the selected tab, today, the primary action
 //   teal      offers and good news (free time, green walks, on time)
 //   vermilion warnings only (stairs, late, does not fit)
 //   line colours   each transit line's own colour, on the trail blazes
@@ -27,49 +27,52 @@ const fonts = configureFonts({
   },
 });
 
+// Contrast is deliberately moderate: ink is a soft grey rather than near-white,
+// the ground a mid charcoal rather than near-black, and the accents are
+// slightly desaturated. Body text still clears WCAG AA (4.5:1) in both schemes.
 export const DarkTheme: MD3Theme = {
   ...MD3DarkTheme,
   fonts,
   roundness: 2,
   colors: {
     ...MD3DarkTheme.colors,
-    primary: '#F7B500',
-    onPrimary: '#111111',
-    primaryContainer: '#3A2D00',
-    onPrimaryContainer: '#FFE08A',
-    secondary: '#5CC5BC',
-    onSecondary: '#062B28',
-    secondaryContainer: '#163A37',
-    onSecondaryContainer: '#B4EBE5',
-    tertiary: '#F2907A',
-    onTertiary: '#3A0E05',
-    tertiaryContainer: '#55231A',
-    onTertiaryContainer: '#FFD3C8',
-    error: '#F2907A',
-    onError: '#3A0E05',
-    errorContainer: '#55231A',
-    onErrorContainer: '#FFD3C8',
-    background: '#111111',
-    onBackground: '#E8E8E8',
-    surface: '#1A1A1A',
-    onSurface: '#E8E8E8',
-    surfaceVariant: '#262626',
-    onSurfaceVariant: '#B3B3B3',
-    outline: '#6B6B6B',
-    outlineVariant: '#303030',
-    inverseSurface: '#E8E8E8',
-    inverseOnSurface: '#1A1A1A',
-    inversePrimary: '#7A5600',
-    surfaceDisabled: 'rgba(232,232,232,0.12)',
-    onSurfaceDisabled: 'rgba(232,232,232,0.38)',
-    backdrop: 'rgba(0,0,0,0.6)',
+    primary: '#E0AE3A',
+    onPrimary: '#1B1B1B',
+    primaryContainer: '#3D3214',
+    onPrimaryContainer: '#EBD597',
+    secondary: '#6FB8B0',
+    onSecondary: '#12302D',
+    secondaryContainer: '#203B39',
+    onSecondaryContainer: '#B5DCD8',
+    tertiary: '#DE9584',
+    onTertiary: '#3B1810',
+    tertiaryContainer: '#4E2A23',
+    onTertiaryContainer: '#EFCFC7',
+    error: '#DE9584',
+    onError: '#3B1810',
+    errorContainer: '#4E2A23',
+    onErrorContainer: '#EFCFC7',
+    background: '#1B1B1B',
+    onBackground: '#D2D2D2',
+    surface: '#222222',
+    onSurface: '#D2D2D2',
+    surfaceVariant: '#2C2C2C',
+    onSurfaceVariant: '#A0A0A0',
+    outline: '#666666',
+    outlineVariant: '#343434',
+    inverseSurface: '#D2D2D2',
+    inverseOnSurface: '#222222',
+    inversePrimary: '#7A5B14',
+    surfaceDisabled: 'rgba(210,210,210,0.12)',
+    onSurfaceDisabled: 'rgba(210,210,210,0.38)',
+    backdrop: 'rgba(0,0,0,0.5)',
     elevation: {
       level0: 'transparent',
-      level1: '#1A1A1A',
-      level2: '#1F1F1F',
-      level3: '#262626',
-      level4: '#2A2A2A',
-      level5: '#2E2E2E',
+      level1: '#222222',
+      level2: '#262626',
+      level3: '#2C2C2C',
+      level4: '#303030',
+      level5: '#343434',
     },
   },
 };
@@ -80,42 +83,42 @@ export const LightTheme: MD3Theme = {
   roundness: 2,
   colors: {
     ...MD3LightTheme.colors,
-    // Gold is too light to read as text on white, so text-coloured uses of
-    // "primary" get a deep gold; the flat gold field comes from useTokens().
-    primary: '#6E4E00',
-    onPrimary: '#FFFFFF',
-    primaryContainer: '#FFE7A3',
-    onPrimaryContainer: '#2B1E00',
-    secondary: '#00716A',
-    onSecondary: '#FFFFFF',
-    secondaryContainer: '#D2EFEC',
-    onSecondaryContainer: '#00302C',
-    tertiary: '#A8371C',
-    onTertiary: '#FFFFFF',
-    tertiaryContainer: '#FFDAD1',
-    onTertiaryContainer: '#3A0E05',
-    error: '#A8371C',
-    onError: '#FFFFFF',
-    errorContainer: '#FFDAD1',
-    onErrorContainer: '#3A0E05',
-    background: '#F7F7F7',
-    onBackground: '#1A1A1A',
-    surface: '#FFFFFF',
-    onSurface: '#1A1A1A',
-    surfaceVariant: '#EBEBEB',
-    onSurfaceVariant: '#565656',
-    outline: '#8A8A8A',
-    outlineVariant: '#D6D6D6',
-    inverseSurface: '#262626',
-    inverseOnSurface: '#F0F0F0',
-    inversePrimary: '#F7B500',
+    // Gold is too light to read as text on a light ground, so text-coloured
+    // uses of "primary" get a deep gold; the flat gold field comes from useTokens().
+    primary: '#7A5B14',
+    onPrimary: '#F8F8F8',
+    primaryContainer: '#F3E2AE',
+    onPrimaryContainer: '#3A2C08',
+    secondary: '#2A7770',
+    onSecondary: '#F8F8F8',
+    secondaryContainer: '#D3E8E5',
+    onSecondaryContainer: '#16403C',
+    tertiary: '#A9503B',
+    onTertiary: '#F8F8F8',
+    tertiaryContainer: '#F3DAD3',
+    onTertiaryContainer: '#4A1F15',
+    error: '#A9503B',
+    onError: '#F8F8F8',
+    errorContainer: '#F3DAD3',
+    onErrorContainer: '#4A1F15',
+    background: '#EFEFEF',
+    onBackground: '#2E2E2E',
+    surface: '#F8F8F8',
+    onSurface: '#2E2E2E',
+    surfaceVariant: '#E4E4E4',
+    onSurfaceVariant: '#626262',
+    outline: '#949494',
+    outlineVariant: '#D9D9D9',
+    inverseSurface: '#2C2C2C',
+    inverseOnSurface: '#E8E8E8',
+    inversePrimary: '#E0AE3A',
     elevation: {
       level0: 'transparent',
-      level1: '#FFFFFF',
-      level2: '#FAFAFA',
-      level3: '#F2F2F2',
-      level4: '#EEEEEE',
-      level5: '#EBEBEB',
+      level1: '#F8F8F8',
+      level2: '#F4F4F4',
+      level3: '#EDEDED',
+      level4: '#E9E9E9',
+      level5: '#E6E6E6',
     },
   },
 };
@@ -126,12 +129,13 @@ export const useAppTheme = () => useTheme<MD3Theme>();
 export const useTokens = () => {
   const theme = useAppTheme();
   return {
-    gold: '#F7B500', // the flat field, same in both schemes
-    onGold: '#111111',
+    gold: '#E0AE3A', // the flat field, same in both schemes
+    onGold: '#1B1B1B',
     teal: theme.colors.secondary,
     warn: theme.colors.error,
-    rail: theme.dark ? '#3A3A3A' : '#CFCFCF', // the trail line
+    rail: theme.dark ? '#3E3E3E' : '#CFCFCF', // the trail line
     post: theme.colors.onSurface, // event markers
+    border: theme.colors.outline, // event blocks, endpoint markers
     hairline: theme.colors.outlineVariant,
     muted: theme.colors.onSurfaceVariant,
   };
@@ -176,3 +180,31 @@ export const lineColor = (mode: TransitMode, routeColor: string | undefined, dar
 export const modeIcon = (mode: TransitMode): string =>
   ({ walk: 'walk', metro: 'subway-variant', rem: 'train', bus: 'bus', bike: 'bike', train: 'train-variant' })[mode] ??
   'navigation';
+
+// The icon for a place, guessed from its saved category and its name.
+const PLACE_ICONS: [RegExp, string][] = [
+  [/\bhome\b|maison/, 'home'],
+  [/work|office|bureau/, 'briefcase'],
+  [/librar|biblioth/, 'book-open-variant'],
+  [/school|[ée]cole|universit|college|campus|study|class/, 'school'],
+  [/caf[eé]|coffee|third_place/, 'coffee'],
+  [/park|parc|garden|jardin|trail/, 'pine-tree'],
+  [/gym|sport|fitness|pool|piscine|arena/, 'dumbbell'],
+  [/hotel|hôtel|hostel|airbnb/, 'bed'],
+  [/station|gare|airport|a[ée]roport|terminus/, 'train'],
+  [/restaurant|resto|\bbar\b|\bpub\b/, 'silverware-fork-knife'],
+  [/friend|\bami|parent|family|famille/, 'account-multiple'],
+];
+
+export const placeIcon = (category: string | undefined, name: string): string => {
+  const text = `${category ?? ''} ${name}`.toLowerCase();
+  return PLACE_ICONS.find(([pattern]) => pattern.test(text))?.[1] ?? 'map-marker';
+};
+
+// The marker for where a day starts or ends: a house for home, otherwise the
+// icon that suits the place (never a house, so "not home today" is visible).
+export const endpointIcon = (endpoint: { is_home: boolean; category?: string; location: { name: string } }): string => {
+  if (endpoint.is_home) return 'home';
+  const icon = placeIcon(endpoint.category, endpoint.location.name);
+  return icon === 'home' ? 'map-marker' : icon;
+};

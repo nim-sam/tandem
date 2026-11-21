@@ -32,6 +32,9 @@ export interface IntermodalNode {
   headsign?: string;
   route_color?: string; // hex without '#', from the agency
   stop_count?: number;
+  stop_code?: string; // number on the boarding stop's sign
+  to_stop_code?: string;
+  intermediate_stops?: { name: string; code?: string; time: string }[]; // stops passed on the way
   vehicle_accessible?: boolean;
   polyline?: string; // encoded leg geometry, for a map
   polyline_precision?: number;
@@ -101,11 +104,26 @@ export interface DaySummary {
   nature_detour_eligible: boolean;
 }
 
+// Where a day starts or ends: home unless the user chose another place for that date.
+export interface DayEndpoint {
+  location: Location;
+  category?: string; // from the saved place, when it is one
+  is_home: boolean;
+}
+
+export type EndpointKind = 'origin' | 'destination';
+
+// origin_event_id / destination_event_id of the commutes from and to the day's endpoints.
+export const DAY_START = 'day-start';
+export const DAY_END = 'day-end';
+
 export interface DaySchedule {
   date: string;
   events: Event[];
   commutes: Route[];
   summary: DaySummary;
+  origin: DayEndpoint | null; // null: no home set and nothing chosen
+  destination: DayEndpoint | null;
 }
 
 export interface SavedPlace {
@@ -139,7 +157,7 @@ export interface UserPreferences {
   departure_buffer_minutes: number;
   allow_third_place_detours: boolean;
   step_goal_daily: number;
-  home_location?: Location | null; // where the first commute of the day starts
+  home_location?: Location | null; // where every day starts and ends, unless changed for a day
   health_provider: HealthProvider;
   appearance: Appearance;
 }

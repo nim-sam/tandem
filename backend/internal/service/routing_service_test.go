@@ -19,24 +19,24 @@ func (p *stubProvider) Name() string { return "stub" }
 func (p *stubProvider) Plan(ctx context.Context, req transit.PlanRequest) ([]domain.Route, error) {
 	p.calls++
 	mk := func(id string, mode domain.TransitMode, line string, minutes int) domain.Route {
-		dep := req.Time.Add(-time.Duration(minutes) * time.Minute)
+		dep, arr := req.Time.Add(-time.Duration(minutes)*time.Minute), req.Time
+		if !req.ArriveBy {
+			dep, arr = req.Time, req.Time.Add(time.Duration(minutes)*time.Minute)
+		}
 		return domain.Route{
-			ID: id, DepartureTime: dep, ArrivalTime: req.Time, Source: "stub",
+			ID: id, DepartureTime: dep, ArrivalTime: arr, Source: "stub",
 			Nodes: []domain.IntermodalNode{{
 				Mode: mode, TransitLine: line, StationOrStopName: "McGill", ToStopName: "Berri-UQAM",
 				DurationMinutes: minutes, DistanceMeters: 4000, VehicleAccessible: true,
-				DepartureTime: dep, ArrivalTime: req.Time,
+				DepartureTime: dep, ArrivalTime: arr,
 			}},
 		}
 	}
 	return []domain.Route{mk("bus", domain.ModeBus, "Bus 24", 20), mk("metro", domain.ModeMetro, "Metro 1", 26)}, nil
 }
 
-func newTestService(p transit.Provider) (*RoutingService, *repository.MemoryRepository) {
+func newTestService(p transit.Provider) (*RoutingService, *repository.Repository) {
 	repo := repository.NewMemoryRepository()
-	for _, e := range repo.GetEvents() {
-		repo.DeleteEvent(e.ID)
-	}
 	day := time.Date(2026, 11, 23, 0, 0, 0, 0, time.Local)
 	repo.SaveEvent(domain.Event{ID: "a", Title: "A", Location: domain.Location{Name: "A", Latitude: 45.50, Longitude: -73.57},
 		StartTime: day.Add(9 * time.Hour), EndTime: day.Add(10 * time.Hour)})
@@ -167,8 +167,18 @@ func TestParkWalkHomeCommuteAndWeather(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(sched.Commutes) != 2 || sched.Commutes[0].OriginEventID != "home" || sched.Commutes[0].DestinationEventID != "a" {
-		t.Fatalf("want home->A then A->B, got %d commutes", len(sched.Commutes))
+	// Home is where the day starts and ends, but it is not an event.
+	if len(sched.Events) != 2 || len(sched.Commutes) != 3 ||
+		sched.Commutes[0].OriginEventID != domain.DayStartID || sched.Commutes[0].DestinationEventID != "a" ||
+		sched.Commutes[2].OriginEventID != "b" || sched.Commutes[2].DestinationEventID != domain.DayEndID {
+		t.Fatalf("want home->A, A->B, B->home, got %d commutes", len(sched.Commutes))
+	}
+	if sched.Origin == nil || !sched.Origin.IsHome || sched.Destination == nil || !sched.Destination.IsHome {
+		t.Fatalf("the day should start and end at home: %+v / %+v", sched.Origin, sched.Destination)
+	}
+	// The trip back leaves when the last event ends.
+	if back := sched.Commutes[2]; back.DepartureTime.Before(day.Add(13*time.Hour)) || back.IsTight || !back.ArrivalTime.After(back.DepartureTime) {
+		t.Errorf("trip home leaves %v, arrives %v, tight %v", back.DepartureTime, back.ArrivalTime, back.IsTight)
 	}
 	var park *domain.Route
 	for _, r := range append([]domain.Route{sched.Commutes[1]}, sched.Commutes[1].Alternatives...) {
@@ -212,3 +222,73 @@ func TestParkWalkHomeCommuteAndWeather(t *testing.T) {
 		t.Error("walk requests should be cached")
 	}
 }
+
+func TestDayEndpointOverride(t *testing.T) {
+	svc, repo := newTestService(&stubProvider{})
+	day := time.Date(2026, 11, 23, 0, 0, 0, 0, time.Local)
+	ctx := context.Background()
+
+	// No home, nothing chosen: only the commute between the two events.
+	sched, _ := svc.GetDaySchedule(ctx, "default_user", day, nil)
+	if sched.Origin != nil || sched.Destination != nil || len(sched.Commutes) != 1 {
+		t.Fatalf("without a home there are no endpoints: %+v / %+v, %d commutes", sched.Origin, sched.Destination, len(sched.Commutes))
+	}
+
+	prefs := repo.GetUserPreferences("default_user")
+	prefs.HomeLocation = &domain.Location{Name: "Home", Latitude: 45.47, Longitude: -73.60}
+	repo.SaveUserPreferences(prefs)
+	office := domain.DayEndpoint{Location: domain.Location{Name: "Office", Latitude: 45.51, Longitude: -73.55}, Category: "work", IsHome: true}
+	if err := svc.SetDayEndpoint("2026-11-23", "destination", office); err != nil {
+		t.Fatal(err)
+	}
+	if svc.SetDayEndpoint("2026-11-23", "sideways", office) == nil || svc.SetDayEndpoint("2026-11-23", "origin", domain.DayEndpoint{}) == nil {
+		t.Error("a bad endpoint name or a location without coordinates should be refused")
+	}
+
+	sched, _ = svc.GetDaySchedule(ctx, "default_user", day, nil)
+	if sched.Origin == nil || !sched.Origin.IsHome {
+		t.Errorf("origin should still be home: %+v", sched.Origin)
+	}
+	if d := sched.Destination; d == nil || d.IsHome || d.Category != "work" || d.Location.Name != "Office" {
+		t.Errorf("destination should be the office for this day: %+v", d)
+	}
+	if last := sched.Commutes[len(sched.Commutes)-1]; last.DestinationEventID != domain.DayEndID || last.DestinationLocation.Name != "" && last.DestinationLocation.Name != "Office" {
+		t.Errorf("last commute should go to the office: %+v", last.DestinationLocation)
+	}
+	// Other days are untouched, and resetting goes back to home.
+	if _, dest := svc.DayEndpoints(prefs, "2026-11-24"); dest == nil || !dest.IsHome {
+		t.Errorf("the next day should still end at home: %+v", dest)
+	}
+	svc.ResetDayEndpoint("2026-11-23", "destination")
+	if _, dest := svc.DayEndpoints(prefs, "2026-11-23"); dest == nil || !dest.IsHome {
+		t.Errorf("after a reset the day ends at home again: %+v", dest)
+	}
+}
+
+// Routes already planned are read back from the database, even by a new
+// service (a restart), and survive the provider going down.
+func TestPlannedRoutesArePersisted(t *testing.T) {
+	stub := &stubProvider{}
+	svc, repo := newTestService(stub)
+	day := time.Date(2026, 11, 23, 0, 0, 0, 0, time.Local)
+	ctx := context.Background()
+	first, _ := svc.GetDaySchedule(ctx, "default_user", day, nil)
+	alt := first.Commutes[0].Alternatives[0]
+	if err := svc.SelectRoute(ctx, alt.ID); err != nil {
+		t.Fatal(err)
+	}
+
+	restarted := NewRoutingService(stubDown{}, nil, repo, places.NewThirdPlaceCatalog(), places.NewGreenSpaceIndex(), transit.NewAccessibilityRegistry(), NewRanker(""))
+	again, _ := restarted.GetDaySchedule(ctx, "default_user", day, nil)
+	if stub.calls != 1 || len(again.Commutes) != 1 {
+		t.Fatalf("want the saved route without a provider call, got %d commutes after %d calls", len(again.Commutes), stub.calls)
+	}
+	if again.Commutes[0].ID != alt.ID {
+		t.Errorf("the chosen option should survive a restart, got %s", again.Commutes[0].ID)
+	}
+}
+
+// stubDown is the stub provider after it has gone offline.
+type stubDown struct{ failingProvider }
+
+func (stubDown) Name() string { return "stub" }

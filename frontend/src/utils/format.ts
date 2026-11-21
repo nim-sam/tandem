@@ -17,6 +17,17 @@ export const addDays = (key: string, days: number): string => {
   return toDateKey(d);
 };
 
+// Weeks run Monday to Sunday.
+export const mondayOf = (key: string): string => addDays(key, -((fromDateKey(key).getDay() + 6) % 7));
+
+export const startOfMonth = (key: string): string => `${key.slice(0, 8)}01`;
+
+export const addMonths = (key: string, months: number): string => {
+  const d = fromDateKey(startOfMonth(key));
+  d.setMonth(d.getMonth() + months);
+  return toDateKey(d);
+};
+
 export const todayKey = (): string => toDateKey(new Date());
 
 export const toHHMM = (iso: string): string => {
@@ -34,6 +45,9 @@ export const formatDay = (key: string): string => {
   return fromDateKey(key).toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
 };
 
+// Yesterday, today or tomorrow: formatDay() names these instead of giving the date.
+export const isNearDay = (key: string): boolean => Math.abs(fromDateKey(key).getTime() - fromDateKey(todayKey()).getTime()) < 36 * 3600 * 1000;
+
 // "HH:MM" on a given local date -> ISO string, or null if the text is not a time.
 export const timeOnDate = (dateKey: string, hhmm: string): string | null => {
   const match = /^(\d{1,2}):(\d{2})$/.exec(hhmm.trim());
@@ -45,7 +59,6 @@ export const timeOnDate = (dateKey: string, hhmm: string): string | null => {
   d.setHours(h, m, 0, 0);
   return d.toISOString();
 };
-
 
 export const formatCO2 = (grams: number): string =>
   grams >= 1000 ? `${(grams / 1000).toFixed(1)} kg` : `${Math.round(grams)} g`;

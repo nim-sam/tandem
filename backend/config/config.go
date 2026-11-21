@@ -15,7 +15,7 @@ type Config struct {
 	// TransitUserAgent is sent to the transit API. Transitous requires app
 	// name, version and a contact (e-mail or URL): set TRANSIT_USER_AGENT.
 	TransitUserAgent string
-	// DataPath is the JSON file everything is saved to ("" = memory only).
+	// DataPath is the SQLite database everything is saved to.
 	DataPath           string
 	WeatherAPIURL      string
 	GoogleClientID     string
@@ -39,7 +39,7 @@ func Load() *Config {
 	}
 
 	return &Config{
-		DataPath:           getenv("DATA_PATH", "data/store.json"),
+		DataPath:           getenv("DATA_PATH", "data/app.db"),
 		WeatherAPIURL:      getenv("WEATHER_API_URL", "https://api.open-meteo.com"),
 		TransitProvider:    getenv("TRANSIT_PROVIDER", "transitous"),
 		TransitAPIURL:      getenv("TRANSIT_API_URL", "https://api.transitous.org"),

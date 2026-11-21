@@ -1,5 +1,7 @@
 import {
   DaySchedule,
+  DayEndpoint,
+  EndpointKind,
   Event,
   Collection,
   SavedPlace,
@@ -40,6 +42,10 @@ export const API = {
   // Day schedule & commutes
   getDaySchedule: (date: string, nature?: boolean) =>
     request<DaySchedule>(`/routes/day?date=${date}${nature === undefined ? '' : `&nature=${nature}`}`),
+  // Start or end one day somewhere other than home (coordinates 0,0: the server looks the address up).
+  setDayEndpoint: (date: string, which: EndpointKind, endpoint: Pick<DayEndpoint, 'location' | 'category'>) =>
+    request<DayEndpoint>(`/routes/day/${date}/${which}`, 'PUT', endpoint),
+  resetDayEndpoint: (date: string, which: EndpointKind) => request<void>(`/routes/day/${date}/${which}`, 'DELETE'),
   // The user prefers this alternative: pins it and trains the ranking agent.
   selectRoute: (routeId: string) => request<void>('/routes/select', 'POST', { route_id: routeId }),
   geocode: (query: string) => request<Location>(`/geocode?q=${encodeURIComponent(query)}`),

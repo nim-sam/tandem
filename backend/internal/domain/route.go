@@ -28,17 +28,22 @@ const (
 // IntermodalNode represents a single segment or interchange in a commute.
 // Examples: Walk to Metro station, switch from Metro Orange line to REM, switch from REM to Bus.
 type IntermodalNode struct {
-	ID                 string      `json:"id"`
-	SequenceIndex      int         `json:"sequence_index"`
-	NodeType           NodeType    `json:"node_type"`
-	Mode               TransitMode `json:"mode"`
-	Location           Location    `json:"location"`
-	StationOrStopName  string      `json:"station_or_stop_name,omitempty"` // where this leg starts
-	ToStopName         string      `json:"to_stop_name,omitempty"`         // where this leg ends
-	ToLocation         Location    `json:"to_location"`
-	Headsign           string      `json:"headsign,omitempty"`
-	RouteColor         string      `json:"route_color,omitempty"` // hex without '#', from the agency's GTFS
-	StopCount          int         `json:"stop_count,omitempty"`
+	ID                string      `json:"id"`
+	SequenceIndex     int         `json:"sequence_index"`
+	NodeType          NodeType    `json:"node_type"`
+	Mode              TransitMode `json:"mode"`
+	Location          Location    `json:"location"`
+	StationOrStopName string      `json:"station_or_stop_name,omitempty"` // where this leg starts
+	ToStopName        string      `json:"to_stop_name,omitempty"`         // where this leg ends
+	ToLocation        Location    `json:"to_location"`
+	Headsign          string      `json:"headsign,omitempty"`
+	RouteColor        string      `json:"route_color,omitempty"` // hex without '#', from the agency's GTFS
+	StopCount         int         `json:"stop_count,omitempty"`
+	// Stop numbers as printed on the stop signs (transit legs only).
+	StopCode   string `json:"stop_code,omitempty"`
+	ToStopCode string `json:"to_stop_code,omitempty"`
+	// IntermediateStops are the stops passed between boarding and alighting.
+	IntermediateStops  []StopVisit `json:"intermediate_stops,omitempty"`
 	VehicleAccessible  bool        `json:"vehicle_accessible"`           // transit legs: vehicle/trip is wheelchair accessible
 	Polyline           string      `json:"polyline,omitempty"`           // encoded polyline of the leg, for drawing on a map
 	PolylinePrecision  int         `json:"polyline_precision,omitempty"` // 5 or 6
@@ -102,6 +107,27 @@ type DaySchedule struct {
 	Events   []Event    `json:"events"`
 	Commutes []Route    `json:"commutes"`
 	Summary  DaySummary `json:"summary"`
+	// Where the day starts and ends: home unless the user said otherwise for
+	// this date. Nil when there is neither. They are places, not events: the
+	// time to leave the origin and the time of arrival at the destination are
+	// the first commute's departure and the last commute's arrival.
+	Origin      *DayEndpoint `json:"origin"`
+	Destination *DayEndpoint `json:"destination"`
+}
+
+// Commutes to and from the day's endpoints carry these in place of an event ID.
+const (
+	DayStartID = "day-start"
+	DayEndID   = "day-end"
+)
+
+// DayEndpoint is where a day starts or ends.
+type DayEndpoint struct {
+	Location Location `json:"location"`
+	// Category of the place ("work", "park", ...) when it came from the saved
+	// places; the app picks the icon from it.
+	Category string `json:"category,omitempty"`
+	IsHome   bool   `json:"is_home"` // the home from settings, not a choice for this day
 }
 
 // DaySummary summarizes emissions, steps, and transit time for the day.
@@ -141,4 +167,11 @@ type WeekStats struct {
 	TotalPlannedSteps  int        `json:"total_planned_steps"`
 	TotalReportedSteps int        `json:"total_reported_steps"`
 	TouchGrassStreak   int        `json:"touch_grass_streak"` // consecutive days ending today
+}
+
+// StopVisit is one stop a vehicle passes through on a leg.
+type StopVisit struct {
+	Name string    `json:"name"`
+	Code string    `json:"code,omitempty"`
+	Time time.Time `json:"time"`
 }

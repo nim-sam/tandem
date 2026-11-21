@@ -11,11 +11,11 @@ import (
 )
 
 type PlaceService struct {
-	repo        *repository.MemoryRepository
+	repo        *repository.Repository
 	thirdPlaces *places.ThirdPlaceCatalog
 }
 
-func NewPlaceService(repo *repository.MemoryRepository, thirdPlaces *places.ThirdPlaceCatalog) *PlaceService {
+func NewPlaceService(repo *repository.Repository, thirdPlaces *places.ThirdPlaceCatalog) *PlaceService {
 	return &PlaceService{
 		repo:        repo,
 		thirdPlaces: thirdPlaces,

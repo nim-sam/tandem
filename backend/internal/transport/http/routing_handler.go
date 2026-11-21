@@ -104,3 +104,48 @@ func (s *Server) handleGeocode(w http.ResponseWriter, r *http.Request) {
 	}
 	respondJSON(w, http.StatusOK, loc)
 }
+
+// handleSetDayEndpoint makes one day start or end somewhere other than home.
+// Body: {"location": {...}, "category": "work"}. A location without
+// coordinates is looked up from its address (or name).
+func (s *Server) handleSetDayEndpoint(w http.ResponseWriter, r *http.Request) {
+	var ep domain.DayEndpoint
+	if err := json.NewDecoder(r.Body).Decode(&ep); err != nil {
+		respondError(w, http.StatusBadRequest, "Invalid location payload")
+		return
+	}
+	loc := &ep.Location
+	if loc.Latitude == 0 && loc.Longitude == 0 {
+		text := loc.Address
+		if text == "" {
+			text = loc.Name
+		}
+		if text == "" {
+			respondError(w, http.StatusBadRequest, "An address is required")
+			return
+		}
+		found, err := s.calendarService.Geocode(r.Context(), text)
+		if err != nil {
+			respondError(w, http.StatusNotFound, "Could not find \""+text+"\" on the map. Try a full street address.")
+			return
+		}
+		loc.Latitude, loc.Longitude = found.Latitude, found.Longitude
+		if loc.Address == "" {
+			loc.Address = found.Address
+		}
+	}
+	if loc.Name == "" {
+		loc.Name = loc.Address
+	}
+	if err := s.routingService.SetDayEndpoint(r.PathValue("date"), r.PathValue("which"), ep); err != nil {
+		respondError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	respondJSON(w, http.StatusOK, ep)
+}
+
+// handleResetDayEndpoint puts a day's start or end back to home.
+func (s *Server) handleResetDayEndpoint(w http.ResponseWriter, r *http.Request) {
+	s.routingService.ResetDayEndpoint(r.PathValue("date"), r.PathValue("which"))
+	respondJSON(w, http.StatusOK, map[string]string{"status": "reset"})
+}

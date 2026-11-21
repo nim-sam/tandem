@@ -74,7 +74,7 @@ unavailable during the demo, the same client works against a self-hosted MOTIS
 
 | Feature | Where | Status |
 |---------|-------|--------|
-| Routes between events | `service/routing_service.go` | Live. Planned as *arrive by (event start − buffer)*, so the route's departure time **is** the time to leave. With a home address set, the first commute of the day starts there. |
+| Routes between events | `service/routing_service.go` | Live. Planned as *arrive by (event start − buffer)*, so the route's departure time **is** the time to leave. A day starts and ends at home (or at the place chosen for that date): one more commute to the first event, and one back from the last, leaving when it ends. Home is a place, not an event. Fetched itineraries and the option the user picked are saved in the database, so a planned day reopens without calling the provider (refreshed every 15 min for trips in the next 24 h, daily beyond that, never for past trips); if the provider is down the saved itinerary is used before the mock. |
 | Time-to-leave | `frontend/src/hooks/useLeaveNotifications.ts` | The app schedules **local** notifications (10 min before, and at leave time) with `expo-notifications`. No push server. Not available in a browser. |
 | Route map | `frontend/src/components/RouteMap.tsx` | Leaflet in a web view, legs drawn from the API's geometry in each line's colour. OpenStreetMap public tiles: fine for a prototype, not for a released app (see below). |
 | Mode preferences | `domain/ranking.go` `PriorWeights` | Live. Preferred modes get a bonus, avoided modes a strong penalty. |
@@ -92,7 +92,7 @@ unavailable during the demo, the same client works against a self-hosted MOTIS
 | Weekly totals, streak | `service/health_service.go` `GetWeekStats` | From the day's planned routes (not measured), plus measured phone steps. |
 | "Why this route" | `GET /api/ml/weights`, Settings screen | Shows what the ranking agent has learned; can be reset. |
 | Saved places | `service/place_service.go` | Collections with create, rename, delete; places with add (geocoded), move, delete; usable as an event location or as home. |
-| Storage | `adapter/repository/memory.go` | One JSON file, `backend/data/store.json` (`DATA_PATH`). Survives restarts. Single user. |
+| Storage | `adapter/repository/sqlite.go` | One SQLite database, `backend/data/app.db` (`DATA_PATH`), via the pure-Go `modernc.org/sqlite` driver: events, collections, preferences, day stats, per-day start/end places, planned routes and route choices. Starts empty (no seed data). Single user. |
 
 Not built: user accounts (one hardcoded user), Fitbit/Garmin integrations.
 

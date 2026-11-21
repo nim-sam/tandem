@@ -5,22 +5,23 @@ import { useApp } from '../store/AppContext';
 import { Screen } from '../components/Screen';
 import { CommuteCard } from '../components/CommuteCard';
 import { EventDialog } from '../components/EventDialog';
+import { EndpointDialog } from '../components/EndpointDialog';
 import { useLeaveNotifications } from '../hooks/useLeaveNotifications';
-import { useAppTheme, useTokens } from '../theme';
-import { Event, Route } from '../types';
-import { addDays, formatCO2, formatDay, formatDuration, formatTime, fromDateKey, todayKey } from '../utils/format';
+import { endpointIcon, useTokens } from '../theme';
+import { DAY_END, DAY_START, DayEndpoint, EndpointKind, Event, Route } from '../types';
+import { addDays, isNearDay, formatCO2, formatDay, formatDuration, formatTime, fromDateKey, todayKey } from '../utils/format';
 
-// An event is a bordered block; the line to the next event leaves from under it.
+// An event is a lightly bordered block; the line to the next event leaves from
+// under it. Tapping it opens the event's details.
 const EventBlock: React.FC<{ event: Event; onPress: () => void }> = ({ event, onPress }) => {
-  const theme = useAppTheme();
   const tokens = useTokens();
   const located = !!(event.location.latitude || event.location.longitude);
   return (
     <TouchableRipple
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={`Edit ${event.title}`}
-      style={[styles.event, { borderColor: theme.colors.onSurface }]}
+      accessibilityLabel={`${event.title}, ${formatTime(event.start_time)} to ${formatTime(event.end_time)}. Show details.`}
+      style={[styles.event, { borderColor: tokens.border }]}
     >
       <View>
         <View style={styles.eventHead}>
@@ -43,13 +44,75 @@ const EventBlock: React.FC<{ event: Event; onPress: () => void }> = ({ event, on
   );
 };
 
+// Where the day starts or ends. It is a place, not an event, so it is drawn as
+// a round marker on the trail (a house for home, otherwise the icon that suits
+// the place) rather than a block. The time beside it comes from the commute:
+// when to leave the start, when the trip back arrives. Tapping it changes the place.
+const EndpointMarker: React.FC<{
+  which: EndpointKind;
+  endpoint: DayEndpoint | null;
+  time?: string;
+  onPress: () => void;
+}> = ({ which, endpoint, time, onPress }) => {
+  const tokens = useTokens();
+  const starts = which === 'origin';
+  const name = endpoint ? (endpoint.is_home ? 'Home' : endpoint.location.name) : 'Set your home';
+  const detail = endpoint
+    ? endpoint.location.address && endpoint.location.address !== name
+      ? endpoint.location.address
+      : ''
+    : starts
+      ? 'to plan the trip to your first event'
+      : 'to plan the trip back from your last event';
+  const icon = endpoint ? endpointIcon(endpoint) : 'home-plus-outline';
+  return (
+    <TouchableRipple
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={
+        endpoint
+          ? `The day ${starts ? 'starts from' : 'ends at'} ${name}${
+              time ? `, ${starts ? 'leave at' : 'arrive at'} ${time}` : ''
+            }. Change where the day ${starts ? 'starts' : 'ends'}.`
+          : `Set your home ${detail}`
+      }
+    >
+      <View style={styles.endpoint}>
+        <View
+          style={[
+            styles.marker,
+            { borderColor: tokens.border, borderStyle: endpoint ? 'solid' : 'dashed' },
+          ]}
+        >
+          <Icon source={icon} size={22} color={endpoint ? tokens.post : tokens.muted} />
+        </View>
+        <View style={{ flex: 1, minWidth: 0 }}>
+          <Text variant="titleMedium" numberOfLines={1} style={{ color: endpoint ? tokens.post : tokens.muted }}>
+            {name}
+          </Text>
+          {!!detail && (
+            <Text variant="bodySmall" style={{ color: tokens.muted }} numberOfLines={1}>
+              {detail}
+            </Text>
+          )}
+        </View>
+        {!!time && (
+          <Text variant="titleSmall" style={[styles.tabular, { color: tokens.muted }]}>
+            {starts ? 'leave' : 'arrive'} {time}
+          </Text>
+        )}
+      </View>
+    </TouchableRipple>
+  );
+};
+
 export const DayViewScreen: React.FC = () => {
-  const theme = useAppTheme();
   const tokens = useTokens();
   const { date, setDate, schedule, loading, error, refresh, selectRoute, preferences, updatePreferences } = useApp();
   const [editing, setEditing] = useState<Event | null>(null);
   const [dialog, setDialog] = useState(false);
   const [selectError, setSelectError] = useState<string | null>(null);
+  const [endpointDialog, setEndpointDialog] = useState<EndpointKind | null>(null);
 
   // Reminders are only scheduled for the real "today".
   useLeaveNotifications(date === todayKey() ? schedule : null, true);
@@ -66,13 +129,14 @@ export const DayViewScreen: React.FC = () => {
 
   const nature = preferences?.prefer_nature_routes ?? false;
   const showing = schedule && schedule.date === date ? schedule : null;
-  const home = commuteFrom('home');
+  const fromStart = commuteFrom(DAY_START);
+  const toEnd = showing?.commutes.find((c) => c.destination_event_id === DAY_END);
 
   return (
     <View style={styles.root}>
       <Screen
         title={formatDay(date)}
-        subtitle={fromDateKey(date).toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short' })}
+        subtitle={isNearDay(date) ? fromDateKey(date).toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short' }) : undefined}
         error={error ?? selectError}
         onRetry={refresh}
         refreshing={loading && !!showing}
@@ -129,15 +193,13 @@ export const DayViewScreen: React.FC = () => {
               </View>
             ) : (
               <View style={styles.day}>
-                {home && (
-                  <View style={[styles.event, { borderColor: theme.colors.onSurface }]}>
-                    <Text variant="titleMedium">Home</Text>
-                    <Text variant="bodyMedium" style={{ color: tokens.muted }} numberOfLines={1}>
-                      {home.origin_location.address || home.origin_location.name}
-                    </Text>
-                  </View>
-                )}
-                {renderCommute(home)}
+                <EndpointMarker
+                  which="origin"
+                  endpoint={showing.origin}
+                  time={fromStart && formatTime(fromStart.departure_time)}
+                  onPress={() => setEndpointDialog('origin')}
+                />
+                {renderCommute(fromStart)}
                 {showing.events.map((event) => (
                   <View key={event.id}>
                     <EventBlock
@@ -150,6 +212,12 @@ export const DayViewScreen: React.FC = () => {
                     {renderCommute(commuteFrom(event.id))}
                   </View>
                 ))}
+                <EndpointMarker
+                  which="destination"
+                  endpoint={showing.destination}
+                  time={toEnd && formatTime(toEnd.arrival_time)}
+                  onPress={() => setEndpointDialog('destination')}
+                />
               </View>
             )}
           </>
@@ -167,6 +235,13 @@ export const DayViewScreen: React.FC = () => {
         }}
       />
       <EventDialog visible={dialog} date={date} event={editing} onDismiss={() => setDialog(false)} onSaved={refresh} />
+      <EndpointDialog
+        visible={!!endpointDialog}
+        which={endpointDialog ?? 'origin'}
+        date={date}
+        endpoint={(endpointDialog === 'destination' ? showing?.destination : showing?.origin) ?? null}
+        onDismiss={() => setEndpointDialog(null)}
+      />
     </View>
   );
 };
@@ -176,7 +251,10 @@ const styles = StyleSheet.create({
   summary: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 20 },
   totals: { flex: 1, textAlign: 'right', fontVariant: ['tabular-nums'] },
   day: { paddingHorizontal: 20 },
-  event: { borderWidth: 2, borderRadius: 8, paddingHorizontal: 14, paddingVertical: 10, minHeight: 48 },
+  event: { borderWidth: 1, borderRadius: 8, paddingHorizontal: 14, paddingVertical: 10, minHeight: 48 },
+  // The marker is centred on the trail's rail (12dp inset + half of the 28dp rail column).
+  endpoint: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 48, paddingLeft: 4 },
+  marker: { width: 44, height: 44, borderRadius: 22, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
   eventHead: { flexDirection: 'row', alignItems: 'baseline', gap: 10 },
   tabular: { fontVariant: ['tabular-nums'] },
   center: { alignItems: 'center', gap: 8, paddingVertical: 56, paddingHorizontal: 32 },

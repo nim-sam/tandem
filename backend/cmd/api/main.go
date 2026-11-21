@@ -25,7 +25,7 @@ func main() {
 	// 1. Adapters
 	repo, err := repository.Open(cfg.DataPath)
 	if err != nil {
-		log.Fatalf("Could not open data file: %v", err)
+		log.Fatalf("Could not open database: %v", err)
 	}
 	googleClient := calendar.NewGoogleCalendarAdapter()
 	elevators := transit.NewAccessibilityRegistry()

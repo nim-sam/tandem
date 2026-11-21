@@ -66,8 +66,18 @@ Triggers synchronization with Google Calendar.
 ## 2. Routing & Commutes
 
 ### `GET /routes/day?date=YYYY-MM-DD&nature=true`
-Events for one local date (default today) and the commute between each pair of
-consecutive located events. `nature=true` weights green walking more heavily.
+Events for one local date (default today, any past or future date works) and
+the commutes of that day: from where the day starts to the first located event,
+between each pair of consecutive located events, and from the last one to where
+the day ends. `nature=true` weights green walking more heavily.
+
+The day starts and ends at home (`home_location` in the preferences) unless
+another place was set for that date. `origin` and `destination` describe those
+two places (`null` when there is no home and nothing was set). They are not
+events: the commute from the start has `origin_event_id: "day-start"` and its
+`departure_time` is when to leave; the commute to the end has
+`destination_event_id: "day-end"`, leaves when the last event ends, and its
+`arrival_time` is when the user gets there.
 
 Each commute is the top-ranked route; the other candidates are in `alternatives`.
 ```json
@@ -120,12 +130,23 @@ Each commute is the top-ranked route; the other candidates are in `alternatives`
       "suggested_third_places": []
     }
   ],
-  "summary": { "total_events": 3, "total_commute_minutes": 83, "total_steps": 3736, "total_co2_saved_grams": 5083.68, "nature_detour_eligible": true }
+  "summary": { "total_events": 3, "total_commute_minutes": 83, "total_steps": 3736, "total_co2_saved_grams": 5083.68, "nature_detour_eligible": true },
+  "origin": { "location": { "name": "Home", "address": "…", "latitude": 45.52, "longitude": -73.58 }, "category": "home", "is_home": true },
+  "destination": { "location": { "name": "Office", "latitude": 45.5, "longitude": -73.56 }, "category": "work", "is_home": false }
 }
 ```
 - `departure_time` is the time to leave (routes are planned to arrive `departure_buffer_minutes` before the event).
 - `source: "mock"` means hardcoded offline demo data; label it in the UI.
 - `ranked_by`: `"ml-agent"` or `"preferences"` (agent offline).
+
+### `PUT /routes/day/{date}/{origin|destination}`
+`{ "location": Location, "category": "work" }`. Starts (`origin`) or ends
+(`destination`) that one day somewhere other than home. A location with
+coordinates `0,0` is geocoded from its address; `404` if it cannot be found.
+`category` is optional (the saved place's category; the app picks the icon from it).
+
+### `DELETE /routes/day/{date}/{origin|destination}`
+Back to home for that day.
 
 ### `POST /routes/plan`
 `{ "origin": Location, "destination": Location, "nature_focused": bool }` → `{ "route": Route, "eco": EcoMetric }`, leaving now.

@@ -20,7 +20,7 @@ type Geocoder interface {
 }
 
 type CalendarService struct {
-	repo         *repository.MemoryRepository
+	repo         *repository.Repository
 	googleClient *calendar.GoogleCalendarAdapter
 	geocoder     Geocoder // may be nil (offline mode)
 
@@ -28,7 +28,7 @@ type CalendarService struct {
 	googleToken string // access token from the app's Google sign-in; memory only
 }
 
-func NewCalendarService(repo *repository.MemoryRepository, googleClient *calendar.GoogleCalendarAdapter, geocoder Geocoder) *CalendarService {
+func NewCalendarService(repo *repository.Repository, googleClient *calendar.GoogleCalendarAdapter, geocoder Geocoder) *CalendarService {
 	return &CalendarService{
 		repo:         repo,
 		googleClient: googleClient,

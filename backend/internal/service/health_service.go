@@ -19,10 +19,10 @@ import (
 //     summary carries simulated=true so the UI can say so.
 type HealthService struct {
 	wearable *health.WearableAdapter
-	repo     *repository.MemoryRepository
+	repo     *repository.Repository
 }
 
-func NewHealthService(wearable *health.WearableAdapter, repo *repository.MemoryRepository) *HealthService {
+func NewHealthService(wearable *health.WearableAdapter, repo *repository.Repository) *HealthService {
 	return &HealthService{wearable: wearable, repo: repo}
 }
 

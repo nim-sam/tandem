@@ -53,7 +53,13 @@ func TestMotisProviderMapsLegsAndDeduplicates(t *testing.T) {
 			"startTime": start, "endTime": start.Add(30 * time.Minute), "transfers": 0,
 			"legs": []any{
 				leg("WALK", "START", "Station McGill", "", "", start, start.Add(5*time.Minute)),
-				leg("TRAM", "Station McGill", "Station Du Quartier", "REM", "A1", start.Add(5*time.Minute), start.Add(25*time.Minute)),
+				func() map[string]any {
+					l := leg("TRAM", "Station McGill", "Station Du Quartier", "REM", "A1", start.Add(5*time.Minute), start.Add(25*time.Minute))
+					l["from"].(map[string]any)["stopCode"] = "S1"
+					l["to"].(map[string]any)["stopCode"] = "S9"
+					l["intermediateStops"] = []any{map[string]any{"name": "STATION PANAMA", "stopCode": "S5", "arrival": start.Add(15 * time.Minute)}}
+					return l
+				}(),
 				leg("WALK", "Station Du Quartier", "END", "", "", start.Add(25*time.Minute), start.Add(30*time.Minute)),
 			},
 		}
@@ -95,7 +101,11 @@ func TestMotisProviderMapsLegsAndDeduplicates(t *testing.T) {
 	if !r.Nodes[1].VehicleAccessible {
 		t.Error("accessible trip not flagged")
 	}
-	if got := r.Nodes[1].Instruction; got != "5 stops to Station Du Quartier" && got != "1 stop to Station Du Quartier" {
+	if n := r.Nodes[1]; n.StopCode != "S1" || n.ToStopCode != "S9" || len(n.IntermediateStops) != 1 ||
+		n.IntermediateStops[0].Name != "Station Panama" || n.IntermediateStops[0].Code != "S5" || n.StopCount != 2 {
+		t.Errorf("stop codes / intermediate stops not mapped: %+v", n)
+	}
+	if got := r.Nodes[1].Instruction; got != "2 stops to Station Du Quartier" {
 		t.Errorf("instruction = %q", got)
 	}
 }

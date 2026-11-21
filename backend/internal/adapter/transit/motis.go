@@ -36,9 +36,11 @@ func NewMotisProvider(baseURL, userAgent string) *MotisProvider {
 func (p *MotisProvider) Name() string { return "transitous" }
 
 type motisPlace struct {
-	Name string  `json:"name"`
-	Lat  float64 `json:"lat"`
-	Lon  float64 `json:"lon"`
+	Name     string    `json:"name"`
+	Lat      float64   `json:"lat"`
+	Lon      float64   `json:"lon"`
+	StopCode string    `json:"stopCode"` // the number printed on the stop's sign
+	Arrival  time.Time `json:"arrival"`
 }
 
 type motisLeg struct {
@@ -55,14 +57,14 @@ type motisLeg struct {
 		Points    string `json:"points"`
 		Precision int    `json:"precision"`
 	} `json:"legGeometry"`
-	Headsign             string            `json:"headsign"`
-	RouteShortName       string            `json:"routeShortName"`
-	RouteLongName        string            `json:"routeLongName"`
-	RouteColor           string            `json:"routeColor"`
-	AgencyName           string            `json:"agencyName"`
-	AgencyID             string            `json:"agencyId"`
-	WheelchairAccessible any               `json:"wheelchairAccessible"`
-	IntermediateStops    []json.RawMessage `json:"intermediateStops"`
+	Headsign             string       `json:"headsign"`
+	RouteShortName       string       `json:"routeShortName"`
+	RouteLongName        string       `json:"routeLongName"`
+	RouteColor           string       `json:"routeColor"`
+	AgencyName           string       `json:"agencyName"`
+	AgencyID             string       `json:"agencyId"`
+	WheelchairAccessible any          `json:"wheelchairAccessible"`
+	IntermediateStops    []motisPlace `json:"intermediateStops"`
 }
 
 type motisItinerary struct {
@@ -224,6 +226,12 @@ func (p *MotisProvider) toRoute(it motisItinerary, req PlanRequest) domain.Route
 		} else {
 			n.TransitLine = lineName(leg)
 			n.StopCount = len(leg.IntermediateStops) + 1
+			n.StopCode, n.ToStopCode = leg.From.StopCode, leg.To.StopCode
+			for _, st := range leg.IntermediateStops {
+				n.IntermediateStops = append(n.IntermediateStops, domain.StopVisit{
+					Name: tidyName(st.Name), Code: st.StopCode, Time: st.Arrival,
+				})
+			}
 			n.VehicleAccessible = isAccessible(leg.WheelchairAccessible)
 			n.RealTime = leg.RealTime
 			if leg.RealTime && !leg.ScheduledStartTime.IsZero() {

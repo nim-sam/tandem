@@ -16,7 +16,7 @@ type Server struct {
 	notificationService *service.NotificationService
 	ecoService          *service.EcoService
 	ranker              *service.Ranker
-	repo                *repository.MemoryRepository
+	repo                *repository.Repository
 	mux                 *http.ServeMux
 }
 
@@ -28,7 +28,7 @@ func NewServer(
 	notificationService *service.NotificationService,
 	ecoService *service.EcoService,
 	ranker *service.Ranker,
-	repo *repository.MemoryRepository,
+	repo *repository.Repository,
 ) *Server {
 	s := &Server{
 		calendarService:     calendarService,
@@ -67,6 +67,9 @@ func (s *Server) registerRoutes() {
 
 	// Routing & Commutes
 	s.mux.HandleFunc("GET /api/routes/day", s.handleGetDaySchedule)
+	// Where a day starts and ends, when that is not home: which = origin | destination
+	s.mux.HandleFunc("PUT /api/routes/day/{date}/{which}", s.handleSetDayEndpoint)
+	s.mux.HandleFunc("DELETE /api/routes/day/{date}/{which}", s.handleResetDayEndpoint)
 	s.mux.HandleFunc("POST /api/routes/plan", s.handlePlanRoute)
 	s.mux.HandleFunc("POST /api/routes/select", s.handleSelectRoute)
 	s.mux.HandleFunc("GET /api/geocode", s.handleGeocode)

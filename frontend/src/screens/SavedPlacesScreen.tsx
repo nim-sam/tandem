@@ -89,7 +89,7 @@ export const SavedPlacesScreen: React.FC = () => {
         ...preferences,
         home_location: { ...place.location, name: place.name, address: place.address },
       });
-    }, `${place.name} is now where your day starts.`);
+    }, `${place.name} is now home: every day starts and ends there.`);
 
   const isHome = (place: SavedPlace) =>
     !!preferences?.home_location &&
@@ -151,7 +151,7 @@ export const SavedPlacesScreen: React.FC = () => {
                     <Text variant="bodyLarge">{place.name}</Text>
                     {isHome(place) && (
                       <Text variant="labelMedium" style={{ color: tokens.teal }}>
-                        Your day starts here
+                        Home
                       </Text>
                     )}
                     <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
@@ -170,7 +170,7 @@ export const SavedPlacesScreen: React.FC = () => {
                       />
                     }
                   >
-                    <Menu.Item leadingIcon="home-outline" title="Start my day from here" onPress={() => setHome(place)} />
+                    <Menu.Item leadingIcon="home-outline" title="Set as home" onPress={() => setHome(place)} />
                     {collections
                       .filter((c) => c.id !== col.id)
                       .map((target) => (
@@ -200,7 +200,7 @@ export const SavedPlacesScreen: React.FC = () => {
           New collection
         </Button>
         <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
-          Saved places can be picked as the location when you add an event.
+          Saved places can be picked as the location of an event, or as where a day starts or ends.
         </Text>
       </Screen>
 

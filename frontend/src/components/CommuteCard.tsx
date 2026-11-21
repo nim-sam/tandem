@@ -9,7 +9,7 @@ import { RouteMap } from './RouteMap';
 
 const RAIL = 28; // width of the column the line runs down
 
-const lineSummary = (route: Route): string => {
+export const lineSummary = (route: Route): string => {
   if (route.is_park_walk) return `Walk via ${route.nodes[0]?.to_stop_name ?? 'the park'}`;
   const lines = route.nodes.filter((n) => n.mode !== 'walk').map((n) => n.transit_line);
   return lines.length ? lines.join(' → ') : 'Walk';
@@ -25,18 +25,50 @@ const visibleLegs = (nodes: IntermodalNode[]): IntermodalNode[] =>
     (n, i) => n.mode !== 'walk' || i === 0 || i === nodes.length - 1 || n.duration_minutes > TRANSFER_WALK_MAX_MIN
   );
 
-// A stretch of the line: dotted for walking, solid in the line's colour for a vehicle.
+// A stretch of the line: dotted for walking, solid in the line's colour for a
+// vehicle. Tapping a vehicle stretch lists the stops it passes, in order.
 const Segment: React.FC<{ node: IntermodalNode }> = ({ node }) => {
   const theme = useAppTheme();
   const tokens = useTokens();
+  const [open, setOpen] = useState(false);
   const walking = node.mode === 'walk';
   const late = (node.delay_minutes ?? 0) > 0;
   const color = lineColor(node.mode, node.route_color, theme.dark);
+  const passed = node.intermediate_stops ?? [];
+  const showCodes = node.mode === 'bus'; // stop numbers are printed on bus stop signs
   const label = walking
     ? node.green_spaces?.length && node.nature_score >= 0.2
       ? `Walk via ${node.green_spaces[0]}`
       : 'Walk'
     : node.transit_line;
+
+  const summary = (
+    <View style={styles.segment}>
+      <Text variant="bodyMedium" numberOfLines={1} style={{ flexShrink: 1, color: walking ? tokens.muted : theme.colors.onSurface }}>
+        {label}
+      </Text>
+      <Text variant="bodySmall" numberOfLines={1} style={[styles.tabular, { color: tokens.muted, flexShrink: 0 }]}>
+        {node.duration_minutes} min
+        {!walking && passed.length > 0 ? ` · ${passed.length + 1} stops` : ''}
+      </Text>
+      {!walking && node.real_time && (
+        <Text variant="bodySmall" style={{ color: late ? tokens.warn : tokens.teal }}>
+          {late ? `${node.delay_minutes} min late` : 'on time'}
+        </Text>
+      )}
+      {!walking && !node.elevator_available && (
+        <View accessible accessibilityLabel={node.accessibility_notes || 'Not step-free'}>
+          <Icon source="stairs" size={16} color={tokens.warn} />
+        </View>
+      )}
+      {!walking && passed.length > 0 && (
+        <>
+          <View style={{ flex: 1 }} />
+          <Icon source={open ? 'chevron-up' : 'chevron-down'} size={20} color={tokens.muted} />
+        </>
+      )}
+    </View>
+  );
 
   return (
     <View style={styles.row}>
@@ -47,30 +79,46 @@ const Segment: React.FC<{ node: IntermodalNode }> = ({ node }) => {
           <View style={[styles.solid, { backgroundColor: color }]} />
         )}
       </View>
-      <View style={styles.segment}>
-        <Text variant="bodyMedium" numberOfLines={1} style={{ flexShrink: 1, color: walking ? tokens.muted : theme.colors.onSurface }}>
-          {label}
-        </Text>
-        <Text variant="bodySmall" style={[styles.tabular, { color: tokens.muted }]}>
-          {node.duration_minutes} min
-        </Text>
-        {!walking && node.real_time && (
-          <Text variant="bodySmall" style={{ color: late ? tokens.warn : tokens.teal }}>
-            {late ? `${node.delay_minutes} min late` : 'on time'}
-          </Text>
+      <View style={{ flex: 1, minWidth: 0 }}>
+        {walking || passed.length === 0 ? (
+          summary
+        ) : (
+          <TouchableRipple
+            onPress={() => {
+              easeLayout();
+              setOpen((v) => !v);
+            }}
+            style={styles.segmentTarget}
+            accessibilityRole="button"
+            accessibilityState={{ expanded: open }}
+            accessibilityLabel={`${label}, ${node.duration_minutes} minutes. ${open ? 'Hide' : 'Show'} the ${
+              passed.length
+            } stop${passed.length > 1 ? 's' : ''} it passes.`}
+          >
+            {summary}
+          </TouchableRipple>
         )}
-        {!walking && !node.elevator_available && (
-          <View accessible accessibilityLabel={node.accessibility_notes || 'Not step-free'}>
-            <Icon source="stairs" size={16} color={tokens.warn} />
-          </View>
-        )}
+        {open &&
+          passed.map((stop, i) => (
+            <View key={`${stop.name}-${i}`} style={styles.passed}>
+              <View style={[styles.tick, { backgroundColor: color }]} />
+              <Text variant="bodySmall" style={{ flex: 1, color: tokens.muted }} numberOfLines={1}>
+                {stop.name}
+                {showCodes && stop.code ? `  ·  stop ${stop.code}` : ''}
+              </Text>
+              <Text variant="bodySmall" style={[styles.tabular, { color: tokens.muted }]}>
+                {formatTime(stop.time)}
+              </Text>
+            </View>
+          ))}
       </View>
     </View>
   );
 };
 
-// A change of mode: a small dot labelled with the station or stop.
-const Stop: React.FC<{ name: string; time: string }> = ({ name, time }) => {
+// A change of mode: a small dot labelled with the station or stop (and, for a
+// bus stop, the number on its sign).
+const Stop: React.FC<{ name: string; code?: string; time: string }> = ({ name, code, time }) => {
   const theme = useAppTheme();
   return (
     <View style={styles.row}>
@@ -80,6 +128,11 @@ const Stop: React.FC<{ name: string; time: string }> = ({ name, time }) => {
       <View style={styles.stop}>
         <Text variant="titleSmall" style={{ flex: 1 }} numberOfLines={1}>
           {name}
+          {code ? (
+            <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
+              {'  '}stop {code}
+            </Text>
+          ) : null}
         </Text>
         <Text variant="titleSmall" style={[styles.tabular, { color: theme.colors.onSurfaceVariant }]}>
           {time}
@@ -176,6 +229,13 @@ export const CommuteCard: React.FC<Props> = ({ route, onSelect }) => {
             <Stop
               // the stop where the next stretch starts; before a final walk, where you got off
               name={(leg.mode === 'walk' ? legs[i - 1].to_stop_name : leg.station_or_stop_name) ?? ''}
+              code={
+                leg.mode === 'bus'
+                  ? leg.stop_code
+                  : leg.mode === 'walk' && legs[i - 1].mode === 'bus'
+                    ? legs[i - 1].to_stop_code
+                    : undefined
+              }
               time={formatTime(leg.departure_time)}
             />
           )}
@@ -289,6 +349,9 @@ const styles = StyleSheet.create({
   solid: { position: 'absolute', top: 0, bottom: 0, width: 4, borderRadius: 2 },
   dot: { width: 12, height: 12, borderRadius: 6, borderWidth: 2, marginVertical: 6 },
   segment: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 36, paddingLeft: 8 },
+  segmentTarget: { minHeight: 48, justifyContent: 'center' },
+  passed: { flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 26, paddingLeft: 8 },
+  tick: { width: 6, height: 2, marginLeft: -8, marginRight: 0 },
   stop: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8, paddingLeft: 8 },
   pass: { flex: 1, paddingLeft: 8, paddingVertical: 6, minWidth: 0 },
   leave: { flexDirection: 'row', alignItems: 'center', gap: 10 },

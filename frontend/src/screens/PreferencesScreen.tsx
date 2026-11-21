@@ -110,14 +110,14 @@ export const PreferencesScreen: React.FC = () => {
     setHomeError('');
     if (!home.trim()) {
       await save({ home_location: null });
-      setNotice('Home removed. Your day now starts at your first event.');
+      setNotice('Home removed. Your day now starts and ends at your events.');
       return;
     }
     setBusy(true);
     try {
       const found = await API.geocode(home.trim());
       await save({ home_location: { ...found, name: 'Home', address: home.trim() } });
-      setNotice('Home saved. Your first commute of the day now starts there.');
+      setNotice('Home saved. Every day now starts and ends there.');
     } catch {
       setHomeError(`Could not find "${home.trim()}" on the map. Try a full street address.`);
     } finally {
@@ -199,9 +199,9 @@ export const PreferencesScreen: React.FC = () => {
         </View>
 
         <View style={[styles.card, { borderBottomColor: tokens.hairline }]}>
-          <Text variant="titleLarge">Where your day starts</Text>
+          <Text variant="titleLarge">Home</Text>
           <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
-            With a home address, the app also plans how to get to your first event and tells you when to leave.
+            Every day starts and ends at home: the app plans the trip to your first event, tells you when to leave, and plans the trip back after your last one. Tap the home marker on a day to start or end that day somewhere else.
           </Text>
           <TextInput mode="outlined" label="Home address" value={home} onChangeText={setHome} />
           <HelperText type="error" visible={!!homeError}>
@@ -223,7 +223,7 @@ export const PreferencesScreen: React.FC = () => {
               textColor={theme.colors.onSurface}
               onPress={() => {
                 setHome('');
-                save({ home_location: null }).then(() => setNotice('Home removed. Your day now starts at your first event.'));
+                save({ home_location: null }).then(() => setNotice('Home removed. Your day now starts and ends at your events.'));
               }}
             >
               Remove home

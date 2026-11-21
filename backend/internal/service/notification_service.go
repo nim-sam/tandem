@@ -38,7 +38,13 @@ func (s *NotificationService) GetNextDepartureAlert(ctx context.Context, userID 
 		if commute.DepartureTime.Before(now) {
 			continue
 		}
-		alert := s.formatter.GenerateTimeToLeaveAlert(events[commute.DestinationEventID], commute)
+		next, ok := events[commute.DestinationEventID]
+		if !ok {
+			// The trip back to where the day ends (home) is not to an event.
+			next = domain.Event{ID: commute.DestinationEventID, Title: commute.DestinationLocation.Name,
+				Location: commute.DestinationLocation, StartTime: commute.ArrivalTime}
+		}
+		alert := s.formatter.GenerateTimeToLeaveAlert(next, commute)
 		return &alert, nil
 	}
 	return nil, nil
