@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Button, Chip, Dialog, HelperText, Icon, IconButton, Portal, Text, TextInput } from 'react-native-paper';
+import { DatePickerModal, TimePickerModal, en, registerTranslation } from 'react-native-paper-dates';
 import { Event, Location } from '../types';
 import { useApp } from '../store/AppContext';
 import { API } from '../api/client';
@@ -17,6 +18,8 @@ interface Props {
   onSaved: () => void; // also called after a delete
 }
 
+registerTranslation('en', en);
+
 const SOURCE_LABEL: Record<string, string> = {
   google: 'From Google Calendar',
   ics: 'Imported from a calendar file',
@@ -26,6 +29,26 @@ const plusOneHour = (hhmm: string): string => {
   const [h, m] = hhmm.split(':').map(Number);
   return `${String(Math.min(h + 1, 23)).padStart(2, '0')}:${h >= 23 ? '59' : String(m).padStart(2, '0')}`;
 };
+
+// A field that is filled by a picker, not typed: it looks like the text fields
+// around it and opens the picker when pressed.
+const PickerField: React.FC<{ label: string; value: string; icon: string; onPress: () => void; style?: object }> = ({
+  label,
+  value,
+  icon,
+  onPress,
+  style,
+}) => (
+  <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={`${label}: ${value}. Change.`} style={style}>
+    <View pointerEvents="none">
+      <TextInput mode="outlined" label={label} value={value} editable={false} />
+      {/* a plain icon, not TextInput.Icon: that is a button, and this whole field already is one */}
+      <View style={styles.pickerIcon}>
+        <Icon source={icon} size={22} color={useTokens().muted} />
+      </View>
+    </View>
+  </Pressable>
+);
 
 const Detail: React.FC<{ icon: string; children: React.ReactNode }> = ({ icon, children }) => {
   const tokens = useTokens();
@@ -58,6 +81,7 @@ export const EventDialog: React.FC<Props> = ({ visible, date, event, initialStar
   const [description, setDescription] = useState('');
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
+  const [picking, setPicking] = useState<'day' | 'start' | 'end' | null>(null);
 
   // Put the event's values (or a blank form) into the fields.
   const fill = () => {
@@ -95,10 +119,9 @@ export const EventDialog: React.FC<Props> = ({ visible, date, event, initialStar
 
   const save = async () => {
     if (!title.trim()) return setError('Give the event a title.');
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) return setError('Date must look like 2026-11-21.');
     const startISO = timeOnDate(day, start);
     const endISO = timeOnDate(day, end);
-    if (!startISO || !endISO) return setError('Times must look like 09:30.');
+    if (!startISO || !endISO) return setError('Choose a start and an end time.');
     if (new Date(endISO) <= new Date(startISO)) return setError('The end time must be after the start time.');
 
     // Coordinates 0,0 ask the server to look the address up.
@@ -216,10 +239,15 @@ export const EventDialog: React.FC<Props> = ({ visible, date, event, initialStar
             ) : (
               <>
                 <TextInput mode="outlined" label="Title" value={title} onChangeText={setTitle} />
-                <TextInput mode="outlined" label="Date (YYYY-MM-DD)" value={day} onChangeText={setDay} autoCapitalize="none" />
+                <PickerField
+                  label="Date"
+                  icon="calendar-blank-outline"
+                  value={fromDateKey(day).toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' })}
+                  onPress={() => setPicking('day')}
+                />
                 <View style={styles.times}>
-                  <TextInput mode="outlined" label="Starts (HH:MM)" value={start} onChangeText={setStart} style={styles.time} />
-                  <TextInput mode="outlined" label="Ends (HH:MM)" value={end} onChangeText={setEnd} style={styles.time} />
+                  <PickerField label="Starts" icon="clock-outline" value={start} onPress={() => setPicking('start')} style={styles.time} />
+                  <PickerField label="Ends" icon="clock-outline" value={end} onPress={() => setPicking('end')} style={styles.time} />
                 </View>
                 <AddressInput
                   label="Where (address or place name)"
@@ -303,6 +331,37 @@ export const EventDialog: React.FC<Props> = ({ visible, date, event, initialStar
           )}
         </Dialog.Actions>
       </Dialog>
+
+      <DatePickerModal
+        locale="en"
+        mode="single"
+        visible={picking === 'day'}
+        date={fromDateKey(day)}
+        startWeekOnMonday
+        onDismiss={() => setPicking(null)}
+        onConfirm={({ date: chosen }) => {
+          if (chosen) setDay(toDateKey(chosen));
+          setPicking(null);
+        }}
+      />
+      <TimePickerModal
+        locale="en"
+        use24HourClock
+        visible={picking === 'start' || picking === 'end'}
+        hours={Number((picking === 'end' ? end : start).split(':')[0])}
+        minutes={Number((picking === 'end' ? end : start).split(':')[1])}
+        onDismiss={() => setPicking(null)}
+        onConfirm={({ hours, minutes }) => {
+          const chosen = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+          if (picking === 'end') setEnd(chosen);
+          else {
+            setStart(chosen);
+            // keep the event the right way round: an end at or before the new start moves an hour after it
+            if (end <= chosen) setEnd(plusOneHour(chosen));
+          }
+          setPicking(null);
+        }}
+      />
     </Portal>
   );
 };
@@ -314,6 +373,7 @@ const styles = StyleSheet.create({
   form: { paddingHorizontal: 24, paddingVertical: 8, gap: 10 },
   detail: { flexDirection: 'row', gap: 12, paddingVertical: 4 },
   detailIcon: { paddingTop: 2 },
+  pickerIcon: { position: 'absolute', right: 14, top: 6, bottom: 0, justifyContent: 'center' },
   times: { flexDirection: 'row', gap: 10 },
   time: { flex: 1 },
   label: { marginBottom: 6 },
