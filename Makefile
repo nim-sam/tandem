@@ -18,7 +18,7 @@ help:
 	@echo "  make docker-up    - Run all services via Docker Compose"
 	@echo "  make test         - Run backend, ML agent and frontend checks"
 	@echo "  make data         - Refresh bundled data: parks, third places (OpenStreetMap), step-free stations (STM)"
-	@echo "  make reset-data   - Delete saved events/places/settings; the next start reseeds demo data for today"
+	@echo "  make reset-data   - Delete saved events, places, settings and planned routes; the app starts empty"
 
 setup:
 	@echo "Setting up backend..."
@@ -99,8 +99,7 @@ data:
 	python3 scripts/fetch_third_places.py
 	python3 scripts/fetch_station_access.py
 
-# Everything the app saves lives in backend/data/store.json. The demo events are
-# created for the day of the first start, so reset to get a fresh demo day.
+# Everything the app saves lives in one SQLite database, backend/data/app.db.
 reset-data:
-	rm -f backend/data/store.json
-	@echo "Saved data removed. Restart the backend to reseed demo data."
+	rm -f backend/data/app.db backend/data/app.db-wal backend/data/app.db-shm
+	@echo "Saved data removed. The app starts empty on the next backend start."

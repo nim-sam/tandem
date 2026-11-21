@@ -12,7 +12,7 @@
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the reasoning and a per-feature status table (what is live vs. simulated).
 
-**Not real yet:** Fitbit/Garmin step counts (simulated and labelled; the phone pedometer is real), and Google Calendar sync until you add OAuth client IDs to `frontend/.env`. Data is saved to `backend/data/store.json`; `make reset-data` starts over with a fresh demo day.
+**Not real yet:** Fitbit/Garmin step counts (simulated and labelled; the phone pedometer is real), and Google Calendar sync until you add OAuth client IDs to `frontend/.env`. The app starts empty: no sample events or places. Everything you add, and every route already planned, is saved to a SQLite database, `backend/data/app.db`; `make reset-data` wipes it.
 
 ---
 
