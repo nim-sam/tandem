@@ -48,6 +48,9 @@ export const API = {
   resetDayEndpoint: (date: string, which: EndpointKind) => request<void>(`/routes/day/${date}/${which}`, 'DELETE'),
   // The user prefers this alternative: pins it and trains the ranking agent.
   selectRoute: (routeId: string) => request<void>('/routes/select', 'POST', { route_id: routeId }),
+  // Places matching a partly typed address, best first, each with coordinates.
+  suggestPlaces: (query: string) =>
+    request<{ suggestions: Location[] }>(`/geocode/suggest?q=${encodeURIComponent(query)}`),
   geocode: (query: string) => request<Location>(`/geocode?q=${encodeURIComponent(query)}`),
 
   // Calendar

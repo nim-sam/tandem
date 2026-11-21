@@ -73,6 +73,7 @@ func (s *Server) registerRoutes() {
 	s.mux.HandleFunc("POST /api/routes/plan", s.handlePlanRoute)
 	s.mux.HandleFunc("POST /api/routes/select", s.handleSelectRoute)
 	s.mux.HandleFunc("GET /api/geocode", s.handleGeocode)
+	s.mux.HandleFunc("GET /api/geocode/suggest", s.handleSuggestPlaces) // ?q=partly typed address
 
 	// Saved places, organised in collections
 	s.mux.HandleFunc("GET /api/collections", s.handleGetCollections)

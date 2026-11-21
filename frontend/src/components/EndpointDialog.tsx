@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { Button, Chip, Dialog, HelperText, Portal, Switch, Text, TextInput } from 'react-native-paper';
+import { Button, Chip, Dialog, HelperText, Portal, Switch, Text } from 'react-native-paper';
 import { DayEndpoint, EndpointKind, Location } from '../types';
 import { useApp } from '../store/AppContext';
 import { API } from '../api/client';
 import { placeIcon, useTokens } from '../theme';
 import { formatDay } from '../utils/format';
+import { AddressInput } from './AddressInput';
 
 interface Props {
   visible: boolean;
@@ -96,13 +97,17 @@ export const EndpointDialog: React.FC<Props> = ({ visible, which, date, endpoint
                   }${endpoint.location.address && endpoint.location.address !== endpoint.location.name ? ` (${endpoint.location.address})` : ''}.`
                 : 'No home address yet. Add one to plan the trip to your first event and back from your last.'}
             </Text>
-            <TextInput
-              mode="outlined"
+            <AddressInput
               label={starts ? 'Start from (address or place name)' : 'End at (address or place name)'}
               value={address}
+              resolved={!!picked}
               onChangeText={(text) => {
                 setAddress(text);
                 setPicked(null);
+              }}
+              onPick={(location) => {
+                setPicked({ location });
+                setAddress(location.address || location.name);
               }}
             />
             {savedPlaces.length > 0 && (

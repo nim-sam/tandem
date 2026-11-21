@@ -70,7 +70,7 @@ export const SavedPlacesScreen: React.FC = () => {
       confirm: 'Add place',
       fields: [
         { key: 'name', label: 'Name', required: true },
-        { key: 'address', label: 'Address', required: true },
+        { key: 'address', label: 'Address', required: true, address: true },
         { key: 'notes', label: 'Notes (optional)' },
       ],
       run: async (v) => {

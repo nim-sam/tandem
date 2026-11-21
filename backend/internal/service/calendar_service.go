@@ -17,6 +17,8 @@ import (
 // Geocoder resolves an address or place name to coordinates.
 type Geocoder interface {
 	Geocode(ctx context.Context, text string) (domain.Location, error)
+	// Suggest lists the best matches for a partly typed address.
+	Suggest(ctx context.Context, text string, limit int) ([]domain.Location, error)
 }
 
 type CalendarService struct {
@@ -42,6 +44,14 @@ func (s *CalendarService) Geocode(ctx context.Context, text string) (domain.Loca
 		return domain.Location{}, errors.New("geocoding is unavailable in offline mode")
 	}
 	return s.geocoder.Geocode(ctx, text)
+}
+
+// SuggestPlaces lists matches for a partly typed address or place name.
+func (s *CalendarService) SuggestPlaces(ctx context.Context, text string) ([]domain.Location, error) {
+	if s.geocoder == nil {
+		return nil, errors.New("address search is unavailable in offline mode")
+	}
+	return s.geocoder.Suggest(ctx, text, 6)
 }
 
 // resolveLocation fills in coordinates for events that only carry location

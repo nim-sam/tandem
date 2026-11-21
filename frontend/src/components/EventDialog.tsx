@@ -5,6 +5,7 @@ import { Event, Location } from '../types';
 import { useApp } from '../store/AppContext';
 import { API } from '../api/client';
 import { useAppTheme, useTokens } from '../theme';
+import { AddressInput } from './AddressInput';
 import { formatTime, fromDateKey, timeOnDate, toDateKey, toHHMM } from '../utils/format';
 
 interface Props {
@@ -221,13 +222,17 @@ export const EventDialog: React.FC<Props> = ({ visible, date, event, initialStar
                   <TextInput mode="outlined" label="Starts (HH:MM)" value={start} onChangeText={setStart} style={styles.time} />
                   <TextInput mode="outlined" label="Ends (HH:MM)" value={end} onChangeText={setEnd} style={styles.time} />
                 </View>
-                <TextInput
-                  mode="outlined"
+                <AddressInput
                   label="Where (address or place name)"
                   value={place}
+                  resolved={!!picked}
                   onChangeText={(text) => {
                     setPlace(text);
                     setPicked(null);
+                  }}
+                  onPick={(location) => {
+                    setPicked(location);
+                    setPlace(location.address || location.name);
                   }}
                 />
                 {savedPlaces.length > 0 && (

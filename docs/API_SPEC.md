@@ -148,6 +148,13 @@ coordinates `0,0` is geocoded from its address; `404` if it cannot be found.
 ### `DELETE /routes/day/{date}/{origin|destination}`
 Back to home for that day.
 
+### `GET /geocode/suggest?q=partly typed address`
+Up to 6 places in the Montreal region matching what has been typed so far
+(fuzzy, at least 3 characters), best first: `{ "suggestions": [Location] }`.
+`name` is the place or street address ("2765 Rue du Roitelet"), `address` adds
+the city, and the coordinates are filled in, so a picked suggestion needs no
+further lookup.
+
 ### `POST /routes/plan`
 `{ "origin": Location, "destination": Location, "nature_focused": bool }` → `{ "route": Route, "eco": EcoMetric }`, leaving now.
 

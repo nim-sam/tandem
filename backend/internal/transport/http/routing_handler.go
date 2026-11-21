@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/nim-sam/codejam16/backend/internal/domain"
@@ -148,4 +149,20 @@ func (s *Server) handleSetDayEndpoint(w http.ResponseWriter, r *http.Request) {
 func (s *Server) handleResetDayEndpoint(w http.ResponseWriter, r *http.Request) {
 	s.routingService.ResetDayEndpoint(r.PathValue("date"), r.PathValue("which"))
 	respondJSON(w, http.StatusOK, map[string]string{"status": "reset"})
+}
+
+// handleSuggestPlaces lists the places matching a partly typed address
+// (?q=, at least 3 characters), best first, each with its coordinates.
+func (s *Server) handleSuggestPlaces(w http.ResponseWriter, r *http.Request) {
+	q := strings.TrimSpace(r.URL.Query().Get("q"))
+	if len([]rune(q)) < 3 {
+		respondJSON(w, http.StatusOK, map[string]any{"suggestions": []domain.Location{}})
+		return
+	}
+	matches, err := s.calendarService.SuggestPlaces(r.Context(), q)
+	if err != nil {
+		respondError(w, http.StatusBadGateway, "Address search is not available: "+err.Error())
+		return
+	}
+	respondJSON(w, http.StatusOK, map[string]any{"suggestions": matches})
 }

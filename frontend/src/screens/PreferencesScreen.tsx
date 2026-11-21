@@ -6,7 +6,8 @@ import { useApp } from '../store/AppContext';
 import { API } from '../api/client';
 import { Screen } from '../components/Screen';
 import { useAppTheme, useTokens } from '../theme';
-import { Appearance, LearnedWeights, TransitMode, UserPreferences } from '../types';
+import { AddressInput } from '../components/AddressInput';
+import { Appearance, LearnedWeights, Location, TransitMode, UserPreferences } from '../types';
 
 const MODES: { mode: TransitMode; label: string }[] = [
   { mode: 'walk', label: 'Walking' },
@@ -55,6 +56,7 @@ export const PreferencesScreen: React.FC = () => {
   const { preferences, updatePreferences } = useApp();
   const [numbers, setNumbers] = useState({ walk: '', buffer: '', goal: '' });
   const [home, setHome] = useState('');
+  const [homePicked, setHomePicked] = useState<Location | null>(null); // chosen from the suggestions
   const [homeError, setHomeError] = useState('');
   const [busy, setBusy] = useState(false);
   const [learned, setLearned] = useState<LearnedWeights | null>(null);
@@ -115,7 +117,7 @@ export const PreferencesScreen: React.FC = () => {
     }
     setBusy(true);
     try {
-      const found = await API.geocode(home.trim());
+      const found = homePicked ?? (await API.geocode(home.trim()));
       await save({ home_location: { ...found, name: 'Home', address: home.trim() } });
       setNotice('Home saved. Every day now starts and ends there.');
     } catch {
@@ -203,7 +205,19 @@ export const PreferencesScreen: React.FC = () => {
           <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
             Every day starts and ends at home: the app plans the trip to your first event, tells you when to leave, and plans the trip back after your last one. Tap the home marker on a day to start or end that day somewhere else.
           </Text>
-          <TextInput mode="outlined" label="Home address" value={home} onChangeText={setHome} />
+          <AddressInput
+            label="Home address"
+            value={home}
+            resolved={!!homePicked}
+            onChangeText={(text) => {
+              setHome(text);
+              setHomePicked(null);
+            }}
+            onPick={(location) => {
+              setHomePicked(location);
+              setHome(location.address || location.name);
+            }}
+          />
           <HelperText type="error" visible={!!homeError}>
             {homeError}
           </HelperText>

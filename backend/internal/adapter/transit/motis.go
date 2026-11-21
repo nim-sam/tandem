@@ -385,27 +385,73 @@ func isAccessible(v any) bool {
 // Geocode resolves free text ("3480 Rue University, Montréal") to coordinates,
 // biased toward Montreal.
 func (p *MotisProvider) Geocode(ctx context.Context, text string) (domain.Location, error) {
+	matches, err := p.Suggest(ctx, text, 1)
+	if err != nil {
+		return domain.Location{}, err
+	}
+	if len(matches) == 0 {
+		return domain.Location{}, fmt.Errorf("no match for %q in the Montreal region", text)
+	}
+	// Keep what the user typed as the name; the match is the address.
+	best := matches[0]
+	best.Name = text
+	return best, nil
+}
+
+// Suggest returns the places in the region that best match what has been
+// typed so far (the geocoder matches fuzzily and on prefixes, so this works
+// while typing). Name is the place or street address, Address adds the city.
+func (p *MotisProvider) Suggest(ctx context.Context, text string, limit int) ([]domain.Location, error) {
 	q := url.Values{}
 	q.Set("text", text)
 	q.Set("place", fmt.Sprintf("%.4f,%.4f", serviceLat, serviceLon))
 	q.Set("placeBias", "5") // weigh closeness to the service area well above text similarity
 	var results []struct {
-		Name string  `json:"name"`
-		Lat  float64 `json:"lat"`
-		Lon  float64 `json:"lon"`
+		Type        string  `json:"type"` // ADDRESS, PLACE or STOP
+		Name        string  `json:"name"`
+		Lat         float64 `json:"lat"`
+		Lon         float64 `json:"lon"`
+		Street      string  `json:"street"`
+		HouseNumber string  `json:"houseNumber"`
+		Areas       []struct {
+			Name    string `json:"name"`
+			Default bool   `json:"default"` // the area to show: the municipality
+		} `json:"areas"`
 	}
 	if err := p.get(ctx, "/api/v1/geocode?"+q.Encode(), &results); err != nil {
-		return domain.Location{}, err
+		return nil, err
 	}
 	// The geocoder is worldwide and ranks by name first, so a misspelt
 	// "McGill" can match a building in Texas. A place the transit network
-	// cannot reach is not a usable answer: take the best match in the region.
+	// cannot reach is not a usable answer: keep the matches in the region.
+	out := []domain.Location{}
+	seen := map[string]bool{}
 	for _, r := range results {
-		if HaversineMeters(serviceLat, serviceLon, r.Lat, r.Lon) <= serviceRadiusMeters {
-			return domain.Location{Name: text, Address: r.Name, Latitude: r.Lat, Longitude: r.Lon}, nil
+		if len(out) >= limit {
+			break
 		}
+		if HaversineMeters(serviceLat, serviceLon, r.Lat, r.Lon) > serviceRadiusMeters {
+			continue
+		}
+		name := r.Name
+		if r.Type == "ADDRESS" && r.Street != "" && r.HouseNumber != "" {
+			name = r.HouseNumber + " " + r.Street // as addresses are written here
+		} else if r.Type == "STOP" {
+			name = tidyName(name)
+		}
+		address := name
+		for _, area := range r.Areas {
+			if area.Default && area.Name != "" && !strings.Contains(name, area.Name) {
+				address = name + ", " + area.Name
+			}
+		}
+		if seen[address] {
+			continue
+		}
+		seen[address] = true
+		out = append(out, domain.Location{Name: name, Address: address, Latitude: r.Lat, Longitude: r.Lon})
 	}
-	return domain.Location{}, fmt.Errorf("no match for %q in the Montreal region", text)
+	return out, nil
 }
 
 // The region the app plans trips in: greater Montreal and the commuter-rail
