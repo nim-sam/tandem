@@ -34,27 +34,43 @@
 
 Routes are planned from the calendar, not from a search box: the app already knows where you have to be and when.
 
+**Your day**
+
 - **Routes between events.** Each day starts and ends at home (or a place you choose for that day). Every trip is planned to arrive before the event, so its departure time is your time to leave.
+- **The trip that matters now.** The Day tab opens on the trip under way or next to leave, already unfolded and scrolled into view. The rest of the day is folded to one line per trip, and a dot marks where you are.
+- **The day at a glance.** Time travelled, CO₂ saved against driving, and steps walked, at the top of the day.
 - **Time-to-leave reminders.** Local notifications 10 minutes before and at the moment to leave (phone only).
-- **Ranked for you.** Routes are ordered by your settings (preferred and avoided modes, longest walk, step-free only) and by what you actually pick: choosing an alternative teaches a small ranking agent.
-- **The trip that matters now.** The Day tab opens on the trip under way or next to leave, marked with a pointer; the rest of the day is folded to one line per trip.
-- **Map.** The open trip drawn section by section (walk, bus, metro, REM, train) with your live position and the steps listed underneath.
-- **Green routes.** A switch, per trip or for every trip, favours walks through parks, marks them with a pine tree, and on short trips in dry weather offers a walk routed through a park.
-- **Hold for options.** Hold an event to optimise the trip from it for nature, steps or CO₂ saved, or to say you finished early and pick a café, restaurant or park to go to; the stop is fitted in before your next event.
-- **Free-time suggestions.** When there is slack before you need to leave, the app suggests a café, library or park that fits.
-- **Impact at a glance.** Time travelling, steps on foot, and CO₂ saved against driving, with a plain comparison such as "≈ 49 km by car".
 - **Your events.** Add and edit events on the Day tab, jump to any date, import an `.ics` calendar file from Settings, and optionally sync Google Calendar.
+
+**Hold an event for options**
+
+Hold an event (or the home marker) and it lifts out of a blurred screen with what you can do from there:
+
+- **Optimize for Nature.** The trip leaving it switches to its greenest way, with walks through parks marked by a pine tree. Before it applies, the app shows what changes: the steps and minutes it adds, the new lines, the parks it crosses.
+- **Optimize for Steps** or **for CO₂ Saved.** That trip takes the option with the most walking, or the lowest emissions, among those that fit your schedule.
+- **Finished Early.** Pick a café, a restaurant or a park nearby, narrowed down with a few words (study, coffee, terrace, pizza, vegetarian, large park…), or search for any place. Your most-picked places come first. The stop is fitted in before your next event, with the trips there and onwards planned around it.
+
+**Getting there**
+
+- **Map.** The open trip drawn section by section (walk, bus, metro, REM, train) with your live position; tap a stretch to zoom to it.
+- **Ranked for you.** Routes are ordered by your settings (preferred and avoided modes, longest walk, step-free only) and by what you actually pick: choosing an alternative teaches a small ranking agent.
+- **Free-time suggestions.** When there is slack before you need to leave, the app suggests a café, library or park that fits.
+
+**And**
+
 - **Saved places.** Keep the places you go to often and pick them as an event's location or a day's start or end.
-- **Step counting.** From the phone's own pedometer, with a seven-day chart and a green-walk streak.
+- **Activity.** Steps from the phone's own pedometer, a seven-day chart, a green-walk streak, and the week's CO₂ saved with a plain comparison such as "the exhaust of 311 km driven by car".
 - **Light and dark themes.**
 
 <p align="center">
-  <img src="mockups/light/10-green-routes.png" alt="Day tab with green routes on: the day's totals, then the route from home to the first event, with the walk through a park marked by a pine tree" width="280">
-  &nbsp;&nbsp;&nbsp;
-  <img src="mockups/light/07-activity.png" alt="Activity tab: today's steps and the last seven days" width="280">
+  <img src="mockups/light/01-day.png" alt="Day tab: the day's three figures, then the trip from home to the first event unfolded, with a walk through a park marked by a pine tree" width="250">
+  &nbsp;&nbsp;
+  <img src="mockups/light/03-options.png" alt="Holding an event: it stays sharp over a blurred screen, with Optimize for Nature, Finished Early, Optimize for Steps and Optimize for CO₂ Saved listed under it" width="250">
+  &nbsp;&nbsp;
+  <img src="mockups/light/06-map.png" alt="Map tab: the trip drawn in sections with line numbers, a pin at the destination and a strip of its stretches underneath" width="250">
 </p>
 
-<p align="center"><sub>Day, with green routes on &nbsp;·&nbsp; Activity</sub></p>
+<p align="center"><sub>The day &nbsp;·&nbsp; Hold an event for options &nbsp;·&nbsp; The trip on the map</sub></p>
 
 ## How it works
 
@@ -156,7 +172,7 @@ docker compose up --build   # backend on :8080 and agent on :8000
 | `make test` | Go tests, ML agent tests and the frontend typecheck |
 | `make logs` | Follow the backend and ML agent logs |
 | `make stop` | Stop background servers left over from `make dev` |
-| `make data` | Refresh bundled data: parks, third places, step-free stations |
+| `make data` | Refresh bundled data: parks, places to stop at (cafés, restaurants, libraries), step-free stations |
 | `make reset-data` | Delete saved events, places, settings and planned routes |
 
 ## Configuration
@@ -190,7 +206,7 @@ All settings are optional environment variables.
 │       ├── store/               # app state
 │       └── theme/               # colours and type
 ├── ml-agent/                    # route-ranking agent (FastAPI, :8000)
-├── scripts/                     # routing engine setup and bundled-data refresh
+├── scripts/                     # routing engine setup, bundled-data refresh, icon, pattern and banner generators
 ├── docs/                        # architecture, API, UI concept
 ├── mockups/                     # screenshots, light and dark
 └── Makefile
@@ -205,6 +221,8 @@ Tandem is a hackathon prototype for a single user.
 - **Step counts** are exact on iOS; Android counts only while the app is open; a browser has no step sensor.
 - **Time-to-leave notifications** are not available in a browser.
 - **CO₂ figures** are estimates from per-mode averages, and the comparisons (car distance, gasoline, trees) are rough.
+- **Places to stop at** come from OpenStreetMap, which has no prices: restaurants can be narrowed down by cuisine and service, not by cost. Walking times to them are straight-line estimates.
+- **Blur effects** (frosted cards, the blurred screen behind options) need a browser; on a phone those surfaces are translucent or nearly opaque instead.
 - **Step-free access** comes from a static station list, not live elevator outages.
 - **Live delays** appear only with the public Transitous server and are cached for 15 minutes.
 

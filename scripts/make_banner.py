@@ -29,10 +29,10 @@ DESCRIPTION = [
 # Screens in each column, top to bottom; columns run left to right.
 COLUMNS = [
     # the day's schedule leads: these two columns are the ones nearest the text
-    ["dark/05-calendar-week", "light/10-green-routes", "dark/02-day-route"],
-    ["light/03-route-details", "dark/01-day", "light/02-day-route", "dark/04-calendar-month"],
-    ["light/07-activity", "dark/03-route-details", "light/04-calendar-month", "dark/09-settings-learned"],
-    ["light/08-settings", "dark/07-activity", "light/05-calendar-week", "dark/08-settings"],
+    ["dark/08-activity", "light/01-day", "dark/02-day-route"],
+    ["light/06-map", "dark/01-day", "light/03-options", "dark/06-map"],
+    ["light/08-activity", "dark/04-finished-early", "light/02-day-route", "dark/09-settings"],
+    ["light/09-settings", "dark/03-options", "light/05-restaurants", "dark/07-places"],
 ]
 TILE_W, GAP, ANGLE = 400, 44, 18
 STAGGER = [0, -330, -120, -450]  # vertical offset of each column

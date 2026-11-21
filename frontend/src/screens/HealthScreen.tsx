@@ -100,7 +100,7 @@ export const HealthScreen: React.FC = () => {
               {streak > 0 ? `${streak} day${streak === 1 ? '' : 's'} in a row with a green walk` : 'No green-walk streak yet'}
             </Text>
             <Text variant="bodyMedium" style={{ color: tokens.muted }}>
-              {streak > 0 ? 'Counted from the routes planned for each day.' : 'Turn on green routes on the Day tab to start one.'}
+              {streak > 0 ? 'Counted from the routes planned for each day.' : 'Hold an event on the Day tab and choose Optimize for Nature to start one.'}
             </Text>
           </View>
         </View>

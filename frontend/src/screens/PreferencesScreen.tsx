@@ -191,7 +191,7 @@ export const PreferencesScreen: React.FC = () => {
           <Row title="Step-free routes only" hint="Strongly favours stations with elevators and accessible vehicles.">
             <Switch value={preferences.require_elevator} onValueChange={(v) => save({ require_elevator: v })} />
           </Row>
-          <Row title="Prefer green routes" hint="Favours walks through parks on every trip. The switch on the Day tab changes one trip at a time.">
+          <Row title="Prefer green routes" hint="Favours walks through parks on every trip. To change one trip, hold its event on the Day tab.">
             <Switch value={preferences.prefer_nature_routes} onValueChange={(v) => save({ prefer_nature_routes: v })} />
           </Row>
           <Row title="Suggest places for free time" hint="Cafés, libraries and parks that fit before you need to leave.">
