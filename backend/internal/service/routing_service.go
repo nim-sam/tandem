@@ -11,10 +11,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/nim-sam/codejam16/backend/internal/adapter/places"
-	"github.com/nim-sam/codejam16/backend/internal/adapter/repository"
-	"github.com/nim-sam/codejam16/backend/internal/adapter/transit"
-	"github.com/nim-sam/codejam16/backend/internal/domain"
+	"github.com/nim-sam/tandem/backend/internal/adapter/places"
+	"github.com/nim-sam/tandem/backend/internal/adapter/repository"
+	"github.com/nim-sam/tandem/backend/internal/adapter/transit"
+	"github.com/nim-sam/tandem/backend/internal/domain"
 )
 
 // RoutingService turns a day of calendar events into commutes.

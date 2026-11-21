@@ -9,7 +9,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/nim-sam/codejam16/backend/internal/domain"
+	"github.com/nim-sam/tandem/backend/internal/domain"
 )
 
 // Ranker scores candidate routes. Scoring is always weights . features.

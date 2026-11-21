@@ -5,10 +5,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/nim-sam/codejam16/backend/internal/adapter/places"
-	"github.com/nim-sam/codejam16/backend/internal/adapter/repository"
-	"github.com/nim-sam/codejam16/backend/internal/adapter/transit"
-	"github.com/nim-sam/codejam16/backend/internal/domain"
+	"github.com/nim-sam/tandem/backend/internal/adapter/places"
+	"github.com/nim-sam/tandem/backend/internal/adapter/repository"
+	"github.com/nim-sam/tandem/backend/internal/adapter/transit"
+	"github.com/nim-sam/tandem/backend/internal/domain"
 )
 
 // stubProvider returns a fast bus trip and a slower metro trip.

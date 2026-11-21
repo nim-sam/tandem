@@ -1,4 +1,4 @@
-# EcoCommute - REST API Specification
+# Tandem - REST API Specification
 
 Base URL: `http://localhost:8080/api`
 

@@ -3,7 +3,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: codejam16-backend
+    container_name: tandem-backend
     ports:
       - "8080:8080"
     environment:
@@ -14,7 +14,7 @@ services:
       # transitous = live schedules (default); mock = hardcoded offline demo data
       - TRANSIT_PROVIDER=${TRANSIT_PROVIDER:-transitous}
       # Transitous requires app name, version and a contact e-mail or URL here
-      - TRANSIT_USER_AGENT=${TRANSIT_USER_AGENT:-transit-day-planner/0.1 (hackathon prototype)}
+      - TRANSIT_USER_AGENT=${TRANSIT_USER_AGENT:-tandem/0.1 (hackathon prototype)}
     volumes:
       - ./backend/data:/root/data # saved events, places and settings
     restart: unless-stopped
@@ -23,7 +23,7 @@ services:
     build:
       context: ./ml-agent
       dockerfile: Dockerfile
-    container_name: codejam16-ml-agent
+    container_name: tandem-ml-agent
     ports:
       - "8000:8000"
     environment:

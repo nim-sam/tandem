@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/nim-sam/codejam16/backend/internal/domain"
+	"github.com/nim-sam/tandem/backend/internal/domain"
 )
 
 // MockProvider returns a HARDCODED itinerary (walk -> metro -> REM -> bus/walk)

@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/nim-sam/codejam16/backend/internal/domain"
+	"github.com/nim-sam/tandem/backend/internal/domain"
 )
 
 // ParseICS parses raw .ics (iCalendar) text into domain Events.

@@ -6,14 +6,14 @@ import (
 	"net/http"
 	_ "time/tzdata" // containers have no zoneinfo; TZ=America/Toronto must resolve
 
-	"github.com/nim-sam/codejam16/backend/config"
-	"github.com/nim-sam/codejam16/backend/internal/adapter/calendar"
-	placesAdapter "github.com/nim-sam/codejam16/backend/internal/adapter/places"
-	"github.com/nim-sam/codejam16/backend/internal/adapter/repository"
-	"github.com/nim-sam/codejam16/backend/internal/adapter/transit"
-	"github.com/nim-sam/codejam16/backend/internal/adapter/weather"
-	"github.com/nim-sam/codejam16/backend/internal/service"
-	httpTransport "github.com/nim-sam/codejam16/backend/internal/transport/http"
+	"github.com/nim-sam/tandem/backend/config"
+	"github.com/nim-sam/tandem/backend/internal/adapter/calendar"
+	placesAdapter "github.com/nim-sam/tandem/backend/internal/adapter/places"
+	"github.com/nim-sam/tandem/backend/internal/adapter/repository"
+	"github.com/nim-sam/tandem/backend/internal/adapter/transit"
+	"github.com/nim-sam/tandem/backend/internal/adapter/weather"
+	"github.com/nim-sam/tandem/backend/internal/service"
+	httpTransport "github.com/nim-sam/tandem/backend/internal/transport/http"
 )
 
 func main() {
@@ -59,7 +59,7 @@ func main() {
 
 	addr := fmt.Sprintf(":%s", cfg.Port)
 	log.Printf("==================================================")
-	log.Printf(" Codejam 16 Multi-Modal Transit Backend starting  ")
+	log.Printf(" Tandem backend starting                          ")
 	log.Printf(" Listening on http://localhost%s               ", addr)
 	log.Printf(" Environment: %s                                  ", cfg.Environment)
 	log.Printf(" Transit provider: %s (%d green spaces loaded)", primary.Name(), greenSpaces.Len())

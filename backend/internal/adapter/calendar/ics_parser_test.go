@@ -4,13 +4,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/nim-sam/codejam16/backend/internal/adapter/calendar"
+	"github.com/nim-sam/tandem/backend/internal/adapter/calendar"
 )
 
 func TestParseICS(t *testing.T) {
 	sampleICS := `BEGIN:VCALENDAR
 VERSION:2.0
-PRODID:-//Hackathon//Codejam16//EN
+PRODID:-//Hackathon//Tandem//EN
 BEGIN:VEVENT
 UID:hack-event-001
 SUMMARY:Codejam Opening Ceremony

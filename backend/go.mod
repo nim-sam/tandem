@@ -1,4 +1,4 @@
-module github.com/nim-sam/codejam16/backend
+module github.com/nim-sam/tandem/backend
 
 go 1.26.0
 

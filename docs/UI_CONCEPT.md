@@ -1,12 +1,12 @@
-# EcoCommute - Daily Timeline & UI Concept
+# Tandem - Daily Timeline & UI Concept
 
 ## The "ONE Day in the UI" Visualization
 
-The user experience centers on the **Daily Intermodal Timeline (`DayTimeline.tsx`)**. Rather than isolating calendar events and transit directions into separate apps, EcoCommute weaves them into a unified chronological day stream.
+The user experience centers on the **Daily Intermodal Timeline (`DayTimeline.tsx`)**. Rather than isolating calendar events and transit directions into separate apps, Tandem weaves them into a unified chronological day stream.
 
 ```
 +-------------------------------------------------------------------+
-|  [Header] EcoCommute               [Switch: Touch Grass 🌱 ON]    |
+|  [Header] Tandem                   [Switch: Touch Grass 🌱 ON]    |
 +-------------------------------------------------------------------+
 |  [Time-to-Leave Banner]                                           |
 |  ⏰ Leave in 12 mins to reach McGill McConnell Hall               |

@@ -5,8 +5,8 @@ import (
 	"errors"
 	"time"
 
-	"github.com/nim-sam/codejam16/backend/internal/adapter/repository"
-	"github.com/nim-sam/codejam16/backend/internal/domain"
+	"github.com/nim-sam/tandem/backend/internal/adapter/repository"
+	"github.com/nim-sam/tandem/backend/internal/domain"
 )
 
 // HealthService reports step counts: real numbers, pushed by the app from the

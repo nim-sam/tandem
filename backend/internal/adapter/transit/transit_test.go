@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/nim-sam/codejam16/backend/internal/domain"
+	"github.com/nim-sam/tandem/backend/internal/domain"
 )
 
 func TestDecodePolyline(t *testing.T) {

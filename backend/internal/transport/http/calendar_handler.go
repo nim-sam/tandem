@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/nim-sam/codejam16/backend/internal/adapter/calendar"
-	"github.com/nim-sam/codejam16/backend/internal/service"
+	"github.com/nim-sam/tandem/backend/internal/adapter/calendar"
+	"github.com/nim-sam/tandem/backend/internal/service"
 
-	"github.com/nim-sam/codejam16/backend/internal/domain"
+	"github.com/nim-sam/tandem/backend/internal/domain"
 )
 
 func (s *Server) handleGetEvents(w http.ResponseWriter, r *http.Request) {

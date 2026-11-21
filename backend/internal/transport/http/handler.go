@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/nim-sam/codejam16/backend/internal/adapter/repository"
-	"github.com/nim-sam/codejam16/backend/internal/service"
+	"github.com/nim-sam/tandem/backend/internal/adapter/repository"
+	"github.com/nim-sam/tandem/backend/internal/service"
 )
 
 type Server struct {
@@ -44,7 +44,7 @@ func (s *Server) registerRoutes() {
 	s.mux.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) {
 		respondJSON(w, http.StatusOK, map[string]any{
 			"status":           "ok",
-			"service":          "codejam16-backend",
+			"service":          "tandem-backend",
 			"transit_provider": s.routingService.ProviderName(),
 			"ml_agent_online":  s.ranker.Available(r.Context()),
 			"google_connected": s.calendarService.GoogleConnected(),

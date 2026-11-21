@@ -7,7 +7,7 @@ import (
 	"math"
 	"sort"
 
-	"github.com/nim-sam/codejam16/backend/internal/domain"
+	"github.com/nim-sam/tandem/backend/internal/domain"
 )
 
 // ThirdPlaceCatalog provides vetted third places, parks, and outdoor spots for "Touch Grass" routing.

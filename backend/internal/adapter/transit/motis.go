@@ -11,7 +11,7 @@ import (
 	"time"
 	"unicode"
 
-	"github.com/nim-sam/codejam16/backend/internal/domain"
+	"github.com/nim-sam/tandem/backend/internal/domain"
 )
 
 // MotisProvider plans public-transit trips through a MOTIS routing server.

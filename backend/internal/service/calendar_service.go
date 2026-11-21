@@ -9,9 +9,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/nim-sam/codejam16/backend/internal/adapter/calendar"
-	"github.com/nim-sam/codejam16/backend/internal/adapter/repository"
-	"github.com/nim-sam/codejam16/backend/internal/domain"
+	"github.com/nim-sam/tandem/backend/internal/adapter/calendar"
+	"github.com/nim-sam/tandem/backend/internal/adapter/repository"
+	"github.com/nim-sam/tandem/backend/internal/domain"
 )
 
 // Geocoder resolves an address or place name to coordinates.

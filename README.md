@@ -1,4 +1,4 @@
-# EcoCommute (Codejam 16)
+# Tandem
 
 > Multi-modal urban transit planner with external calendar synchronization, dynamic nature-focused rescheduling ("Touch Grass" prize), accessibility elevator tracking (STM Metro & CDPQ REM), carbon savings calculation, and step counting with the phone's pedometer.
 

@@ -9,7 +9,7 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/nim-sam/codejam16/backend/internal/domain"
+	"github.com/nim-sam/tandem/backend/internal/domain"
 )
 
 // GoogleCalendarAdapter talks to the Google Calendar v3 REST API using an

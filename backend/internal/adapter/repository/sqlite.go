@@ -14,7 +14,7 @@ import (
 
 	_ "modernc.org/sqlite" // pure Go driver, so the binary still builds with CGO_ENABLED=0
 
-	"github.com/nim-sam/codejam16/backend/internal/domain"
+	"github.com/nim-sam/tandem/backend/internal/domain"
 )
 
 // Repository is the app's storage: events, saved places, settings, day

@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/nim-sam/codejam16/backend/internal/domain"
+	"github.com/nim-sam/tandem/backend/internal/domain"
 )
 
 func (s *Server) handleGetHealthSummary(w http.ResponseWriter, r *http.Request) {

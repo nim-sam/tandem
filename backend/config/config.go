@@ -43,7 +43,7 @@ func Load() *Config {
 		WeatherAPIURL:      getenv("WEATHER_API_URL", "https://api.open-meteo.com"),
 		TransitProvider:    getenv("TRANSIT_PROVIDER", "transitous"),
 		TransitAPIURL:      getenv("TRANSIT_API_URL", "https://api.transitous.org"),
-		TransitUserAgent:   getenv("TRANSIT_USER_AGENT", "transit-day-planner/0.1 (hackathon prototype)"),
+		TransitUserAgent:   getenv("TRANSIT_USER_AGENT", "tandem/0.1 (hackathon prototype)"),
 		Port:               port,
 		Environment:        env,
 		MLAgentURL:         mlAgentURL,
