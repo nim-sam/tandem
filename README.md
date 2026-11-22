@@ -21,6 +21,7 @@
 
 ## Contents
 
+- [Why](#why)
 - [What it does](#what-it-does)
 - [How it works](#how-it-works)
 - [Quick start](#quick-start)
@@ -29,6 +30,16 @@
 - [Project layout](#project-layout)
 - [Status and limits](#status-and-limits)
 - [Data and attribution](#data-and-attribution)
+
+## Why
+
+A Tuesday for a student in Montreal might look like this: a 9:00 class at Concordia, a group meeting at McGill at 13:00, a shift in Verdun at 17:00, and dinner at a friend's place in Laval. All of that is already in their calendar. A transit app knows none of it.
+
+So four times a day they copy an address out of an event, paste it into a search box, set "arrive by", read the leave time, and try to remember it. Miss that step once and they're running for a bus they could have caught calmly. If a class lets out 40 minutes early, nothing tells them there's a park on the way, or a café with outlets two stops from the next room.
+
+That copy-and-paste routine is also part of why people who could ride transit end up driving. A car is one decision a day. Transit is a small planning job before every trip, and on a busy day that adds up.
+
+Tandem starts from the calendar instead. It already knows where you have to be and when, so it plans every trip between your events, tells you when to leave, and turns spare minutes into a walk through a park or a stop you wouldn't otherwise have made. You open it to find out what's next, not to plan anything.
 
 ## What it does
 
