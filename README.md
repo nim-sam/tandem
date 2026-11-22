@@ -41,6 +41,14 @@ That copy-and-paste routine is also part of why people who could ride transit en
 
 Tandem starts from the calendar instead. It already knows where you have to be and when, so it plans every trip between your events, tells you when to leave, and turns spare minutes into a walk through a park or a stop you wouldn't otherwise have made. You open it to find out what's next, not to plan anything.
 
+<p align="center">
+  <a href="https://youtu.be/6lUN8n4KTeg">
+    <img src="mockups/thumbnail.jpg" alt="Watch the Tandem intro video on YouTube: Your calendar knows the way." width="720">
+  </a>
+</p>
+
+<p align="center"><sub><a href="https://youtu.be/6lUN8n4KTeg">Watch the intro video on YouTube</a></sub></p>
+
 ## What it does
 
 Routes are planned from the calendar, not from a search box: the app already knows where you have to be and when.
